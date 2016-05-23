@@ -1,0 +1,30 @@
+{% extends "admin/_base.html" %}
+{% block content %}
+    {% from 'macros/form.html' import render_form %}
+    <div class="col-lg-12">
+    <h1 class="page-header">{{ _('User Profile') }}</h1>
+    <div class="panel panel-default">
+        {% if user %}
+            <div class="panel-heading">
+               <strong>{{user.nicename}}</strong>
+            </div>
+            <!-- /.panel-heading -->
+            <div class="panel-body">
+                {{render_form(form, action_url='/user/login', btn_class="btn btn-lg btn-success ")}}
+            </div>
+        {% else %}
+            <div class="panel-heading">
+               <strong>{{_('User not found')}}</strong>
+            </div>
+            <!-- /.panel-heading -->
+            <div class="panel-body">
+                <div class="alert alert-warning">
+                <p >{{_('User with ID <strong>%s</strong> does not exist.' % request.args.get('id')|e)}}</p>
+                <br />
+                <a href="{{url_for('admin.users')}}" class="btn btn-default ">{{_('Back to All Users')}}</a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

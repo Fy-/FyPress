@@ -1,0 +1,10 @@
+.user-avatar {
+    float: left;
+    margin-right: 5px;
+}
+.ldanger {
+    color: darkred;
+}
+.ldanger:hover {
+    color: red;
+}

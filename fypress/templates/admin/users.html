@@ -1,0 +1,54 @@
+{% extends "admin/_base.html" %}
+{% block content %}
+<div class="col-lg-12">
+    <h1 class="page-header">{{ _('Users') }}</h1>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+           {{ _('Users') }}: Role | Role | Role}}
+        </div>
+        <!-- /.panel-heading -->
+        <div class="panel-body">
+            <div class="dataTable_wrapper">
+                <table class="table table-striped table-bordered table-hover" id="dataTables-users">
+                    <thead>
+                        <tr>
+                            <th>{{ _('ID') }}</th>
+                            <th>{{ _('Login') }}</th>
+                            <th>{{ _('Name') }}</th>
+                            <th>{{ _('Nicename') }}</th>
+                            <th>{{ _('Contact') }}</th>
+                            <th>{{ _('Role') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                            <tr class="odd gradeX">
+                                <td> {{user.id}}</td>
+                                <td>
+                                    <a href="{{url_for('admin.users_edit')}}?id={{user.id}}"><img class="user-avatar" src="{{user.gravatar(40)}}" alt="{{user.login}}" /></a>
+                                    <a href="{{url_for('admin.users_edit')}}?id={{user.id}}"><strong>{{user.login}}</strong></a>
+                                    <br />
+                                    <small class="text-muted"><a href="{{url_for('admin.users_edit')}}?id={{user.id}}">Edit</a> | <a class="ldanger" href="">Delete</a></small>
+                                </td>
+                                <td>{{user.firstname}} {{user.lastname}}</td>
+                                <td>{{user.nicename}}</td>
+                                <td><a href="mailto:{{user.email}}">{{user.email}}</a></td>
+                                <td>-</td>
+                            </tr>
+                        {% endfor %}
+                </tbody>
+                </table>
+                <script>
+                    $(document).ready(function() {
+                        $('#dataTables-users').DataTable({
+                            responsive: true,
+                            paging: false,
+                            info: false
+                        });
+                    });
+                </script>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
