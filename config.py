@@ -11,6 +11,10 @@ CSRF_SESSION_KEY = "secretkeylol"
 CSRF_ENABLED    = True
 SECRET_KEY 		= "secretkeygglol"
 
+### Babel ###
+BABEL_DEFAULT_LOCALE    = 'en'
+BABEL_DEFAULT_TIMEZONE  = 'UTC'
+
 ### MYSQL ###
 MYSQL_USER 		= 'fypress'
 MYSQL_PASSWORD	= 'stay'

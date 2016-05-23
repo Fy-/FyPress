@@ -1,24 +1,35 @@
 # -*- coding: UTF-8 -*-
-from flask import Flask
+from flask import Flask, session, g
+from flask.ext.babel import Babel
 import fy_mysql
+
 
 app   = Flask(__name__)
 app.config.from_object('config')
+
+### Babel ###
+babel = Babel(app)
 
 ### MySQL ###
 db 	= fy_mysql.flask(app)
 
 ### Context ###
-from admin.model import Option
 @app.context_processor
 def inject_options():
+    from fypress.admin import Option
     return dict(options=Option.auto_load())
 
+@app.before_request
+def before_request():
+    from fypress.user import User
+    g.user = None
+    if 'user_id' in session:
+        g.user = User.query.get(session['user_id'])
 
 ### Blueprints ###
-from user.controller import user 
-from admin.controller import admin
+from user import user_blueprint
+from admin import admin_blueprint
 
 ### Load Blueprints ###
-app.register_blueprint(user)
-app.register_blueprint(admin)
+app.register_blueprint(user_blueprint)
+app.register_blueprint(admin_blueprint)

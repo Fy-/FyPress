@@ -1,2 +1,4 @@
-from controller import login_required
-from model import User
+from views import user as user_blueprint
+from models import User
+from forms import UserEditForm
+from decorators import login_required
