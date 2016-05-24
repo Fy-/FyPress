@@ -1,5 +1,4 @@
 # -*- coding: UTF-8 -*-
-from functools import wraps
 from flask import Blueprint, session, request, redirect, url_for, render_template
 
 from fypress.user.models import User
@@ -37,6 +36,7 @@ def logout():
     session.clear()
     return redirect(url_for('user.login'))
 
-@user.route('/blank')
-def blank():
-    return render_template('admin/blank.html', title='Admin')
+@user.route('/not_authorize')
+def not_authorize():
+    return render_template('admin/403.html', title='Admin')
+

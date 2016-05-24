@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import session
+from flask.ext.babel import lazy_gettext as gettext
 import fy_mysql, urllib, hashlib
 
 class User(fy_mysql.Base):
@@ -18,20 +19,33 @@ class User(fy_mysql.Base):
     user_status             = fy_mysql.Column(etype='int')
     user_meta               = fy_mysql.Column(meta=True)
 
-    def __init__(self):
-        pass
-    
-    @property
-    def password(self):
-        if self.__dict__.has_key('password'):
-            return self.__dict__['password']
+    roles                   = {
+        0: gettext('Member'),
+        1: gettext('Contributor'),
+        2: gettext('Author'),
+        3: gettext('Editor'),
+        4: gettext('Administrator')
+    }
+
+    def init(self):
+        self.role = self.roles[self.status]
+        
+    def has_level(self, level):
+        if self.status >= level:
+            return True
+        return False
 
     def gravatar(self, size=50):
-        default = "http://www.example.com/default.jpg"
+        default = "identicon"
         gravatar_url = "http://www.gravatar.com/avatar/" + hashlib.md5(self.email.lower()).hexdigest() + "?"
         gravatar_url += urllib.urlencode({'d':default, 's':str(size)})
 
         return gravatar_url
+
+    @property
+    def password(self):
+        if self.__dict__.has_key('password'):
+            return self.__dict__['password']
 
     @password.setter
     def password(self, value):
@@ -39,6 +53,10 @@ class User(fy_mysql.Base):
             self.__dict__['password'] = value
         else:
             self.__dict__['password'] = generate_password_hash(value)
+
+
+    def check_password(self, password):
+        return check_password_hash(self.password, password)
 
 
     @staticmethod
@@ -49,9 +67,6 @@ class User(fy_mysql.Base):
             return True
         else:
             return False
-
-    def check_password(self, password):
-        return check_password_hash(self.password, password)
 
     @staticmethod
     def add(login, email, password, data=None):

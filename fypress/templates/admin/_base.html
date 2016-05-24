@@ -212,90 +212,100 @@
                             <!-- /input-group -->
                         </li>
 
-                        <li>
-                            <a href="#"><i class="fa fa-file-text-o fa-fw"></i> Posts<span class="fa arrow"></span></a>
-                            <ul class="nav nav-second-level">
-                                <li>
-                                    <a href="/admin/posts">All posts</a>
-                                </li>
-                                <li>
-                                    <a href="/admin/post/new">Add New</a>
-                                </li>
-                                <li>
-                                    <a href="/admin/categories">Categories</a>
-                                </li>
-                                <li>
-                                    <a href="/admin/tags">Tags</a>
-                                </li>
-                            </ul>
-                        </li>
+                        {% if g.user.has_level(1) %}
+                            <li>
+                                <a href="#"><i class="fa fa-file-text-o fa-fw"></i> Posts<span class="fa arrow"></span></a>
+                                <ul class="nav nav-second-level">
+                                    <li>
+                                        <a href="/admin/posts">All posts</a>
+                                    </li>
+                                    <li>
+                                        <a href="/admin/post/new">Add New</a>
+                                    </li>
+                                    <li>
+                                        <a href="/admin/categories">Categories</a>
+                                    </li>
+                                    <li>
+                                        <a href="/admin/tags">Tags</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        {% endif %}
 
-                        <li>
-                            <a href="#"><i class="fa fa-file-o fa-fw"></i> Pages<span class="fa arrow"></span></a>
-                            <ul class="nav nav-second-level">
-                                <li>
-                                    <a href="/admin/posts/type/page">All Pages</a>
-                                </li>
-                                <li>
-                                    <a href="/admin/post/new/type/page">Add New</a>
-                                </li>
-                            </ul>
-                        </li>
+                        {% if g.user.has_level(3) %}
+                            <li>
+                                <a href="#"><i class="fa fa-file-o fa-fw"></i> Pages<span class="fa arrow"></span></a>
+                                <ul class="nav nav-second-level">
+                                    <li>
+                                        <a href="/admin/posts/type/page">All Pages</a>
+                                    </li>
+                                    <li>
+                                        <a href="/admin/post/new/type/page">Add New</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        {% endif %}
 
+                        {% if g.user.has_level(3) %}
+                            <li>
+                                <a href="/admin/comments"><i class="fa fa-comment-o fa-fw"></i> Comments <span class="badge alert-danger pull-right">1</span></a>
+                            </li>
+                        {% endif %}
 
-                        <li>
-                            <a href="/admin/comments"><i class="fa fa-comment-o fa-fw"></i> Comments <span class="badge alert-danger pull-right">1</span></a>
-                        </li>
-
-
-                        <li>
-                            <a href="#"><i class="fa fa-picture-o fa-fw"></i> Media<span class="fa arrow"></span></a>
-                            <ul class="nav nav-second-level">
-                                <li>
-                                    <a href="/admin/medias/">Library</a>
-                                </li>
-                                <li>
-                                    <a href="/admin/media/new">Add New</a>
-                                </li>
-                            </ul>
-                        </li>
+                        {% if g.user.has_level(1) %}
+                            <li>
+                                <a href="#"><i class="fa fa-picture-o fa-fw"></i> Media<span class="fa arrow"></span></a>
+                                <ul class="nav nav-second-level">
+                                    <li>
+                                        <a href="/admin/medias/">Library</a>
+                                    </li>
+                                    <li>
+                                        <a href="/admin/media/new">Add New</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        {% endif %}
 
 
                         <li >
                             <a href="/admin/users"  ><i class="fa fa-user fa-fw"></i> Users<span class="fa arrow"></span></a>
                             <ul class="nav nav-second-level">
+                                {% if g.user.has_level(4) %}
+                                    <li>
+                                        <a   href="{{url_for('admin.users')}}">{{ _('All Users') }}</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{url_for('admin.users_new')}}">{{ _('Add New') }}</a>
+                                    </li>
+                                {% endif %}
                                 <li>
-                                    <a  class="active"  href="{{url_for('admin.users')}}">{{ _('All Users') }}</a>
-                                </li>
-                                <li>
-                                    <a href="/admin/users/new">{{ _('Add New') }}</a>
-                                </li>
-                                <li>
-                                    <a href="/admin/users/me">{{ _('Your profile') }}</a>
+                                    <a href="{{url_for('admin.users_me')}}">{{ _('Your profile') }}</a>
                                 </li>
                             </ul>
                         </li>
 
-                        <li>
-                            <a href="#"><i class="fa fa-cogs fa-fw"></i> Settings<span class="fa arrow"></span></a>
-                            <ul class="nav nav-second-level">
-                                <li>
-                                    <a href="/admin/settings/">General</a>
-                                </li>
-                                <li>
-                                    <a href="/admin/settings/social">Social</a>
-                                </li>
-                                <li>
-                                    <a href="/admin/settings/seo">SEO</a>
-                                </li>
-                                <li>
-                                    <a href="/admin/settings/writing">Writing</a>
-                                </li>
-                                <li>
-                                    <a href="/admin/settings/reading">Reading</a>
-                                </li>
-                            </ul>
-                        </li>
+                        {% if g.user.has_level(4) %}
+                            <li>
+                                <a href="#"><i class="fa fa-cogs fa-fw"></i> Settings<span class="fa arrow"></span></a>
+                                <ul class="nav nav-second-level">
+                                    <li>
+                                        <a href="/admin/settings/">General</a>
+                                    </li>
+                                    <li>
+                                        <a href="/admin/settings/social">Social</a>
+                                    </li>
+                                    <li>
+                                        <a href="/admin/settings/seo">SEO</a>
+                                    </li>
+                                    <li>
+                                        <a href="/admin/settings/writing">Writing</a>
+                                    </li>
+                                    <li>
+                                        <a href="/admin/settings/reading">Reading</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        {% endif %}
                     </ul>
                 </div>
                 <!-- /.sidebar-collapse -->
@@ -306,6 +316,22 @@
             <div class="container-fluid">
                 <div class="row">
                     {% block content %}{% endblock %}
+
+                    {% if debug %}
+                        <hr />
+                        <div class="col-lg-12">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <strong>[DEBUG]</strong> <em>{{queries.n}}</em> queries in <em> {{queries.t}} </em> seconds
+                                </div>
+                                <div class="panel-body" style="font-size: 12px">
+                                    {% for query in queries.d %}
+                                        {{query.t}} :<pre style="font-size: 12px">{{query.q}}</pre>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
                </div>
                 <!-- /.row -->
             </div>
