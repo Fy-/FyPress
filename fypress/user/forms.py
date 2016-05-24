@@ -1,18 +1,34 @@
 # -*- coding: UTF-8 -*-
+from flask.ext.babel import gettext, ngettext
 from flask_wtf import Form
 from wtforms import TextField, PasswordField, BooleanField, HiddenField, validators
 
 class UserLoginForm(Form):
-    login       = TextField(u'Login', validators=[validators.required()])
-    password    = PasswordField(u'Password', validators=[validators.required()])
-    remember_me = BooleanField(u'Remember Me')
+    login       = TextField(gettext(u'Login'), validators=[validators.required()])
+    password    = PasswordField(gettext(u'Password'), validators=[validators.required()])
+    remember_me = BooleanField(gettext(u'Remember Me'))
     next        = HiddenField()
 
 class UserEditForm(Form):
-    login       = TextField(u'Login', validators=[validators.required()])
-    #password    = PasswordField(u'Password', validators=[validators.required()])
-    email       = TextField(u'E-Mail', validators=[validators.Email(), validators.required()])
-    nicename    = TextField(u'Nicename', validators=[validators.required()])
-    firstname   = TextField(u'Firstname', validators=[validators.required()])
-    lastname    = TextField(u'Lastname', validators=[validators.required()])
-    url         = TextField(u'URL', validators=[validators.required()])
+    login       = TextField(gettext(u'Login'), validators=[validators.required()])
+    email       = TextField(gettext(u'E-Mail'), validators=[validators.Email(), validators.required()])
+    nicename    = TextField(gettext(u'Nicename'), validators=[validators.required()])
+    firstname   = TextField(gettext(u'Firstname'), validators=[])
+    lastname    = TextField(gettext(u'Lastname'), validators=[])
+    url         = TextField(gettext(u'URL'), validators=[])
+
+class UserAddForm(Form):
+    login       = TextField(gettext(u'Login'), validators=[validators.required()])
+
+    password    = PasswordField(gettext(u'Password'), validators=[validators.required()])
+    password_c  = PasswordField(gettext(u'Repeat Password'), validators=[
+        validators.required(), 
+        validators.EqualTo('password_c'), 
+        message=gettext('Passwords must match')
+    ])
+
+    email       = TextField(gettext(u'E-Mail'), validators=[validators.Email(), validators.required()])
+    nicename    = TextField(gettext(u'Nicename'), validators=[validators.required()])
+    firstname   = TextField(gettext(u'Firstname'), validators=[])
+    lastname    = TextField(gettext(u'Lastname'), validators=[])
+    url         = TextField(gettext(u'URL'), validators=[])
