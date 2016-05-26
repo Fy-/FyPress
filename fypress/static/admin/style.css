@@ -7,4 +7,117 @@
 }
 .ldanger:hover {
     color: red;
+    text-decoration: none;
+}
+.lok {
+    color: darkgreen;
+
+}
+.lok:hover {
+    color: green;
+    text-decoration: none;
+}
+
+.panel-logo {
+    margin-top: 20px;
+    text-align:center;
+}
+
+/*
+    Titles
+*/
+h1 { font-size: 24px; }
+h2 { font-size: 20px; }
+h3 { font-size: 16px; font-weight: bold; }
+
+/*
+    SEO Preview
+*/
+.seo-preview {
+    border: 1px solid #aaa;
+    background: #fff;
+    padding: 10px;
+}
+    .seo-preview span {
+        display: block;
+    }
+    .seo-preview-title {
+        color: #1E0FBE;
+        font-family: Arial;
+        font-size: 18px;
+    }
+    .seo-preview-url {
+        font-family: Arial;
+        font-size: 16px;
+        color:  #006621;
+    }
+    .seo-preview-desc {
+        font-family: Arial;
+        font-size: 13px;
+        color: #777777;
+    }
+
+/* Sortable */
+.sortable {
+    margin: 0;
+    padding: 0;
+}
+.sortable li {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+     margin-top: 5px;
+}
+.sortable li div {
+
+    cursor: move;
+    margin: 0;
+
+}
+
+.sortable .panel-body {
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+
+.mjs-nestedSortable-error {
+    background: #fbe3e4;
+    border-color: transparent;
+}
+li.mjs-nestedSortable-collapsed.mjs-nestedSortable-hovering div {
+    border-color: #999;
+}
+
+.disclose, .expandEditor {
+    cursor: pointer;
+    width: 20px;
+    display: none;
+}
+
+.sortable li.mjs-nestedSortable-collapsed > ol {
+    display: none;
+}
+
+.sortable li.mjs-nestedSortable-branch > div > .disclose {
+    display: inline-block;
+}
+
+.sortable span.ui-icon {
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+}
+.placeholder {
+    outline: 1px dashed #4183C4;
+}
+.deleteMenu, .editMenu {
+    float: right;
+    cursor: pointer;
+    margin-left: 10px;
+}
+.root span {
+    display: none;
 }

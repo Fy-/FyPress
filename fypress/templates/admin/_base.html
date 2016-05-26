@@ -4,63 +4,43 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
+    <meta name="description" content="FyPress - Dashboard">
+    <meta name="author" content="FyPress">
 
     <title>{% block title %}{{title}} - {{options.name}}{% endblock %}</title>
-
+     <link rel=icon href=/static/images/fypress_icon_64.png sizes="any" type="image/png">
     {% block css %}
-        <!-- Bootstrap Core CSS -->
-        <link href="/static/admin/bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-
-        <!-- MetisMenu CSS -->
-        <link href="/static/admin/bower_components/metisMenu/dist/metisMenu.min.css" rel="stylesheet">
-
-        <!-- DataTables CSS -->
-        <link href="/static/admin/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.css" rel="stylesheet">
-
-        <!-- DataTables Responsive CSS -->
-        <link href="/static/admin/bower_components/datatables-responsive/css/responsive.dataTables.scss" rel="stylesheet">
-
-        <!-- Custom CSS -->
-        <link href="/static/admin/dist/css/sb-admin-2.css" rel="stylesheet">
-
-        <!-- Custom CSS -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/metisMenu/2.5.2/metisMenu.css" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.12/css/dataTables.bootstrap.min.css" rel="stylesheet">
+        <link href="//cdn.datatables.net/responsive/2.1.0/css/responsive.bootstrap.min.css" rel="stylesheet" type="text/css">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/startbootstrap-sb-admin-2/1.0.8/css/sb-admin-2.min.css" rel="stylesheet">
+        
         <link href="/static/admin/style.css" rel="stylesheet">
     {% endblock %}
     {% block js %}
-        <!-- Custom Fonts -->
-        <link href="/static/admin/bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-
-        <!-- jQuery -->
-        <script src="/static/admin/bower_components/jquery/dist/jquery.min.js"></script>
-
-        <!-- Bootstrap Core JavaScript -->
-        <script src="/static/admin/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-
-        <!-- Metis Menu Plugin JavaScript -->
-        <script src="/static/admin/bower_components/metisMenu/dist/metisMenu.min.js"></script>
-
-        <!-- Custom Theme JavaScript -->
-        <script src="/static/admin/dist/js/sb-admin-2.js"></script>
-
-        <!-- Metis Menu Plugin JavaScript -->
-        <script src="/static/admin/bower_components/metisMenu/dist/metisMenu.min.js"></script>
-
-        <!-- DataTables JavaScript -->
-        <script src="/static/admin/bower_components/datatables/media/js/jquery.dataTables.min.js"></script>
-        <script src="/static/admin/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha/js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/metisMenu/2.5.2/metisMenu.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/startbootstrap-sb-admin-2/1.0.8/js/sb-admin-2.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.12/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.12/js/dataTables.bootstrap.min.js"></script>
+        <script src="//cdn.datatables.net/responsive/2.1.0/js/dataTables.responsive.min.js"></script>
 
 
-        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+
+        <script src="//cdn.datatables.net/responsive/2.1.0/js/responsive.bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/nestedSortable/2.0.0/jquery.mjs.nestedSortable.min.js"></script>
         <!--[if lt IE 9]>
             <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
             <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
         <![endif]-->
     {% endblock %}
 </head>
-
+    
+    
 <body>
     <div id="wrapper">
         <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
@@ -71,11 +51,12 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="{{url_for('admin.root')}}">{{options.name}}</a>
+                <a class="navbar-brand" href="{{url_for('admin.root')}}"><img src="/static/images/fypress_40.png" style="margin-top: -10px;" alt="{{options.name}}" /></a>
             </div>
 
             <ul class="nav navbar-top-links navbar-right">
                 <li class="dropdown">
+
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                         <span class="badge alert-danger ">1</span> <i class="fa fa-envelope fa-fw"></i>  <i class="fa fa-caret-down"></i>
                     </a>
@@ -211,6 +192,20 @@
                             </div>
                             <!-- /input-group -->
                         </li>
+                        
+                        {% if g.user.has_level(3) %}
+                            <li>
+                                <a href="#"><i class="fa fa-folder-open-o fa-fw"></i> {{ _('Categories') }}<span class="fa arrow"></span></a>
+                                <ul class="nav nav-second-level">
+                                    <li>
+                                        <a href="{{ url_for('admin.folders') }}">{{ _('All Categories') }}</a>
+                                    </li>
+                                    <li>
+                                        <a href="/admin/post/new">{{ _('Add New') }}</a>
+                                    </li>
+                                </ul>
+                            </li>                  
+                        {% endif %}
 
                         {% if g.user.has_level(1) %}
                             <li>
@@ -221,12 +216,6 @@
                                     </li>
                                     <li>
                                         <a href="/admin/post/new">Add New</a>
-                                    </li>
-                                    <li>
-                                        <a href="/admin/categories">Categories</a>
-                                    </li>
-                                    <li>
-                                        <a href="/admin/tags">Tags</a>
                                     </li>
                                 </ul>
                             </li>
@@ -268,7 +257,7 @@
 
 
                         <li >
-                            <a href="/admin/users"  ><i class="fa fa-user fa-fw"></i> Users<span class="fa arrow"></span></a>
+                            <a href="/admin/users"  ><i class="fa fa-user fa-fw"></i> {{ _('Users') }}<span class="fa arrow"></span></a>
                             <ul class="nav nav-second-level">
                                 {% if g.user.has_level(4) %}
                                     <li>
@@ -318,6 +307,7 @@
                     {% block content %}{% endblock %}
 
                     {% if debug %}
+                        <div class="clearfix"></div>
                         <hr />
                         <div class="col-lg-12">
                             <div class="panel panel-default">

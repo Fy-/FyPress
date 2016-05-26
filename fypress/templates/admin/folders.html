@@ -1,0 +1,53 @@
+{% extends "admin/_base.html" %}
+{% block content %}
+    {% from 'macros/form.html' import render_form %}
+    <div class="col-lg-12">
+        <h1 class="page-header">{{ _('Categories') }}</h1>
+        <p>Blabla</p>
+    </div>
+    <div class="col-lg-5">
+        <h2>{{ _('Add Category') }}</h2>
+        {{render_form(form, action_url='', btn_class="btn btn-success ")}}
+
+        <h3>{{ _('SEO Preview')}}</h3>
+        <div class="seo-preview">
+            <span class="seo-preview-title">%%title%%</span>
+            <span class="seo-preview-url">{{options.url}}%%slug%%</span>
+            <span class="seo-preview-desc">%%description%%</span>
+        </div>
+    </div>
+    <div class="col-lg-7">
+        <h2>{{ _('Categories') }}</h2>
+        {{folders|safe}}
+    </div>
+
+
+    <script>
+
+        $(document).ready(function(){
+           
+            $('.sortable').nestedSortable({
+                handle: 'div',
+                items: 'li',
+                maxLevels: 5,
+                rootID: 'folder_1',
+                isTree: true,
+                toleranceElement: '> div',
+                excludeRoot: true,
+                protectRoot: true,
+                placeholder: 'placeholder',
+                forcePlaceholderSize: true,
+                tabSize: 40,
+                opacity: .6,
+                relocate: function() {
+                    arraied = $('ol.sortable').nestedSortable('toArray', {startDepthCount: 0});
+                    $.post( '{{ url_for('admin.ajax_folders') }}', {'data': JSON.stringify(arraied)} );
+                }
+            });
+
+             $('#toArray').click(function(e){
+               
+            });
+        });
+    </script>
+{% endblock %}

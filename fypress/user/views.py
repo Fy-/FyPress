@@ -7,12 +7,8 @@ from fypress.user.decorators import login_required
 
 user = Blueprint('user', __name__,  url_prefix='/user')
 
-@user.route('/')
-@login_required
-def root():
-	return 'index'
-
 @user.route('/login', methods=['GET', 'POST'])
+@user.route('/', methods=['GET', 'POST'])
 def login():
     if 'user_id' in session:
         return redirect('/admin/')
@@ -21,12 +17,13 @@ def login():
 
     if form.validate_on_submit():
         login = User.login(form.data['login'], form.data['password'])
-        print login
         if login:
             if form.data['next'] != '':
                 return redirect(form.data['next'])
             else:
                 return redirect('/admin/')
+        else:
+            pass
     
     return render_template('admin/login.html', form=form, title="Please sign in")
 
@@ -38,5 +35,5 @@ def logout():
 
 @user.route('/not_authorize')
 def not_authorize():
-    return render_template('admin/403.html', title='Admin')
+    return render_template('admin/403.html', title='Admin'), 403
 

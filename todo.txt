@@ -1,0 +1,14 @@
+FyPress
+- USER
+-- Erreur login
+- USER Admin
+-- Mon profil / Profil
+-- Delete User (Waiting for items)
+-- Edit user roles
+-- Rename status -> role (User.db)
+- ADMIN Template
+- Responsive tables
+
+
+FyMySQL
+- Optimize Debug=False // Provide Debug Template?

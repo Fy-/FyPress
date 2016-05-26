@@ -1,0 +1,116 @@
+                    {% set depth = 0 %}
+                    {% set ol = false %}
+                    {% set parent = None %}
+                    {% for folder in folders %}
+                        {% if depth != folder.depth %}
+                            {% if not ol %}
+                                {% set ol = true %}
+                                <ol>
+                            {% else %}
+                                {% set ol = false %}
+                                </ol>
+                            {% endif %}
+                            {% set depth = folder.depth %}
+                        {% endif %}
+
+                        <li  style="display: list-item;" id="folder_{{folder.id}}" ><div class="ui-sortable-handle">[{{folder.id}}] {{folder.name}} d:{{folder.depth}} p:{{folder.parent}}</div>
+
+                        {% if parent != folder.parent %} </li>{% endif %}
+                        {% set parent = folder.parent %}
+                    {% endfor %}
+                    {% if ol %}</ol>{% endif %}
+
+                                       {% for key, value in folders.items() recursive %}
+                        {% set depth = 0 %}
+                        {% set ol = false %}
+
+                        {% if value is mapping %}
+                            {{ loop(value.items())}}
+                        {% else %}
+                            {% if depth != value.depth %}
+                                {% if not ol %}{% set ol = true %}<ol>{% else %}{% set ol = false %}</ol></li>{% endif %}
+                                {% set depth = value.depth %}
+                            {% endif %}
+                            <li id="folder_{{value.id}}">
+                                <div class="panel panel-info">
+                                    <div class="panel-heading">
+                                        <strong>{{value.name}}</strong>
+                                    </div>
+                                    <div class="panel-body">
+                                        <p>{{value.content}}</p>
+                                    </div>
+                                </div>
+                        {% endif %}
+                        {% if ol %}</ol></li>{% endif %}
+                    {% endfor %}
+
+
+
+            result += """
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        {}
+                    </div>
+                    <div class="panel-body">
+                        {}
+                    </div>
+                </div>
+            """.format(current.name, current.content)
+
+       
+        def generate(last, current, position, li, ol, result):
+            if last:
+                delta = current.depth - last.depth
+            else:
+                delta = 0
+
+            '''
+            if last <= 0:
+                result += '<ol>\n'
+
+            if delta <= 0:
+                for _ in range(abs(delta)):
+                    result += '</li>\n'
+                    li -= 1
+
+                if delta == 0 or current.parent == 0:
+                    if position != 0:
+                        result += '</li>'
+                        li -= 1
+
+                    result += '<li id="folder_{}">\n'.format(current.id)
+                    li += 1
+                        
+            elif delta > 0:
+                result += '</ol>\n'
+                li     += 1
+                result += '<li id="folder_{}">\n'.format(current.id)
+            
+            '''
+
+            if delta == 0:
+                result += '<li id="folder_{}">\n'.format(current.id)
+                li += 1
+            elif delta > 0:
+                if current.childs != 0:
+                    result += '<ol>\n'
+                    if ol <= 0:
+                        ol = current.childs
+                result += '<li id="folder_{}">\n'.format(current.id)
+                li += 1
+            else:
+                pass
+
+            result += """<div class="panel panel-info">{} d:{} p:{} c:{}</div>\n""".format(current.name, delta, current.path, current.childs)
+
+
+            if position+1 >= len(folders):
+                for _ in range(li):
+                    result += '</li>\n'
+                return result
+
+            return generate(current, folders[position+1], position+1, li, ol, result)
+
+        return generate(None, folders[0], 0, 0, 0, '')
+
+        
