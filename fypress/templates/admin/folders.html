@@ -1,21 +1,31 @@
 {% extends "admin/_base.html" %}
 {% block content %}
     {% from 'macros/form.html' import render_form %}
-    <div class="col-lg-12">
-        <h1 class="page-header">{{ _('Categories') }}</h1>
-        <p>Blabla</p>
-    </div>
-    <div class="col-lg-5">
-        <h2>{{ _('Add Category') }}</h2>
-        {{render_form(form, action_url='', btn_class="btn btn-success ")}}
+    {% if not request.args.get('edit') or request.args.get('edit') == '1' %}
+        <div class="col-lg-5">
+            <h2>{{ _('Add Category') }}</h2>
+            {{render_form(form, action_url='', btn_class="btn btn-success",  action_text=_('Save'))}}
 
-        <h3>{{ _('SEO Preview')}}</h3>
-        <div class="seo-preview">
-            <span class="seo-preview-title">%%title%%</span>
-            <span class="seo-preview-url">{{options.url}}%%slug%%</span>
-            <span class="seo-preview-desc">%%description%%</span>
+            <h3>{{ _('SEO Preview')}}</h3>
+            <div class="seo-preview">
+                <span class="seo-preview-title">%%title%%</span>
+                <span class="seo-preview-url">{{options.url}}%%slug%%</span>
+                <span class="seo-preview-desc">%%description%%</span>
+            </div>
         </div>
-    </div>
+    {% else %}
+        <div class="col-lg-5">
+            <h2>{{ _('Edit Category') }}: {{folder.name}}</h2>
+            {{render_form(form, action_url='', btn_class="btn btn-success", action_text=_('Save'))}}
+
+            <h3>{{ _('SEO Preview')}}</h3>
+            <div class="seo-preview">
+                <span class="seo-preview-title">%%title%%</span>
+                <span class="seo-preview-url">{{options.url}}%%slug%%</span>
+                <span class="seo-preview-desc">%%description%%</span>
+            </div>
+        </div>
+    {% endif %}
     <div class="col-lg-7">
         <h2>{{ _('Categories') }}</h2>
         {{folders|safe}}
@@ -25,7 +35,8 @@
     <script>
 
         $(document).ready(function(){
-           
+            $('#fp_slug').slugify('#fp_name');
+
             $('.sortable').nestedSortable({
                 handle: 'div',
                 items: 'li',
@@ -43,10 +54,6 @@
                     arraied = $('ol.sortable').nestedSortable('toArray', {startDepthCount: 0});
                     $.post( '{{ url_for('admin.ajax_folders') }}', {'data': JSON.stringify(arraied)} );
                 }
-            });
-
-             $('#toArray').click(function(e){
-               
             });
         });
     </script>

@@ -1,17 +1,32 @@
 # -*- coding: UTF-8 -*-
 from functools import wraps
-from flask import Blueprint, session, request, redirect, url_for, render_template
+from flask import Blueprint, session, request, redirect, url_for, render_template, flash
+from flask.ext.babel import lazy_gettext as gettext
 from fypress.user import level_required, login_required, User, UserEditForm, UserAddForm
 from fypress.item import FolderForm, Folder
 import json
 
 admin = Blueprint('admin', __name__,  url_prefix='/admin')
 
+messages = {
+    'updated'   : gettext('Item updated'),
+    'added'     : gettext('Item added')
+}
 
 @admin.route('/')
 @login_required
 def root():
     return render_template('admin/index.html', title='Admin')
+
+
+"""
+    Posts
+"""
+@admin.route('/posts/new')
+@level_required(1)
+def posts_add():
+    return render_template('admin/posts_new.html', title=gettext('New - Posts'))
+
 
 
 """
@@ -21,20 +36,31 @@ def root():
 @admin.route('/folders/all', methods=['POST', 'GET'])
 @level_required(3)
 def folders():
-    form = FolderForm()
     folders = Folder.get_all()
+    folder  = None
 
-    
+    if request.args.get('edit') and request.args.get('edit') != 1:
+        folder = Folder.query.get(request.args.get('edit'))
+        form = FolderForm(obj=folder)
+        if form.validate_on_submit():
+            form.populate_obj(folder)
+            folder.modified = 'NOW()'
+            folder.update()
+            flash(messages['updated']+' ('+str(folder)+')')
+            return redirect(url_for('admin.folders'))
+    else:
+        form = FolderForm()
+        if form.validate_on_submit():
+            folder = Folder()
+            form.populate_obj(folder)
+            folder.created = 'NOW()'
+            folder.parent  = 1
+            Folder.query.add(folder)
+            Folder.build_guid()
+            flash(messages['added']+' ('+str(folder)+')')
+            return redirect(url_for('admin.folders'))
 
-    if form.validate_on_submit():
-        folder = Folder()
-        form.populate_obj(folder)
-        folder.created = 'NOW()'
-        folder.parent  = 1
-        Folder.query.add(folder)
-        return redirect(url_for('admin.folders'))
-
-    return render_template('admin/folders.html', folders=folders, title='Folders', form=form)
+    return render_template('admin/folders.html', folders=folders, folder=folder, title=gettext('Categories'), form=form)
 
 
 """
@@ -45,7 +71,7 @@ def folders():
 @level_required(4)
 def users():
     users = User.query.get_all()
-    return render_template('admin/users.html', title='Users', users=users)
+    return render_template('admin/users.html', title=gettext('Users'), users=users)
 
 @admin.route('/users/edit', methods=['POST', 'GET'])
 @level_required(4)
@@ -59,9 +85,10 @@ def users_edit(id_user=None):
     if form.validate_on_submit():
         form.populate_obj(user)
         User.query.update(user)
-        return redirect(url_for('admin.users_edit', id=user.id))
+        flash(messages['updated']+' ('+str(user)+')')
+        return redirect(url_for('admin.users'))
 
-    return render_template('admin/users_edit.html', title='Users', user=user, form=form)
+    return render_template('admin/users_edit.html', title=gettext('Edit - Users'), user=user, form=form)
 
 @admin.route('/users/new', methods=['POST', 'GET'])
 @level_required(4)
@@ -72,9 +99,10 @@ def users_new():
         user = User()
         form.populate_obj(user)
         User.query.add(user)
+        flash(messages['added']+' ('+str(user)+')')
         return redirect(url_for('admin.users'))
 
-    return render_template('admin/users_new.html', title='Users',  form=form)
+    return render_template('admin/users_new.html', title=gettext('New - Users'),  form=form)
 
 @admin.route('/users/me', methods=['POST', 'GET'])
 @login_required
@@ -99,5 +127,5 @@ def ajax_folders():
                 folder.parent = item['parent_id']
 
                 folder.modified = 'NOW()'
-                Folder.query.update(folder)
+                folder.update()
     return ''

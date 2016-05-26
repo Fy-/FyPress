@@ -1,72 +1,51 @@
 # -*- coding: UTF-8 -*-
 from flask.ext.babel import lazy_gettext as gettext
-from fypress.utils import tree, OrderedDefaultDict
+from fypress.utils import TreeHTML
+from fypress.utils import slugify, url_unique
 import fy_mysql, pprint
 
+class Post(fy_mysql.Base):
+    post_id               = fy_mysql.Column(etype='int', primary_key=True)
+    post_folder           = fy_mysql.Column(etype='int') 
+    post_user_id          = fy_mysql.Column(etype='int')
+    post_parent           = fy_mysql.Column(etype='int')
+    post_guid             = fy_mysql.Column(etype='string', unique=True)
+    post_modified         = fy_mysql.Column(etype='datetime')
+    post_created          = fy_mysql.Column(etype='datetime')
+    post_content          = fy_mysql.Column(etype='string')
+    post_title            = fy_mysql.Column(etype='string')
+    post_excerpt          = fy_mysql.Column(etype='string')
+    post_status           = fy_mysql.Column(etype='string', allowed=('publish','draft','pending','trash','inherit')) 
+    post_comment_status   = fy_mysql.Column(etype='string', allowed=('open', 'close')) 
+    post_comment_count    = fy_mysql.Column(etype='int')
+    post_slug             = fy_mysql.Column(etype='string', unique=True)
+    post_type             = fy_mysql.Column(etype='string')
+    post_meta             = fy_mysql.Column(meta=True)
 
-class TreeHTML(object):
-    def __init__(self, items):
-        self.html       = ''
-        self.items      = items
-        self.tritems    = []
+    def create(self):
+        # Todo: create post, add_revision, update folder count.
+        pass
 
-        self.convert()
+    def update(self):
+        pass
 
-        self.json_rdy   = self.convert_to_json(self.tritems)
+    def move(self):
+        pass
 
-    def convert(self):
-        for item in self.items:
-            self.tritems.append((item.id, item, item.left, item.right, item.parent))
+    def add_revision(self):
+        pass
 
-    def generate(self, items=False, cls=''):
-        if items == False:
-            items = self.json_rdy
+    def get_revisions(self):
+        pass
 
-        self.html += '<ol class="{}">'.format(cls)
-        for item in items:
-            root = 'panel-info'
-            self.html += '<li id="folder_{}">'.format(item['data'].id)
+    def delete(self):
+        pass
 
-            if item['data'].id == 1:
-                root = 'panel-success root'
+    def get_uid(self):
+        pass
 
-            self.html += """
-                <div class="panel  {0}">
-                    <div class="panel-heading">
-                        {1}
-                        <span title="Click to delete item." data-id="{2}" class="deleteMenu btn btn-warning btn-xs"><i class="fa fa-times-circle" aria-hidden="true"></i> Delete</span>
-                        <a title="Click to edit item." data-id="{2}" class="btn btn-info btn-xs editMenu "><i class="fa fa-pencil" aria-hidden="true"></i> Edit</a>
-                    </div>
-                    <div class="panel-body">
-                        {3}
-                    </div>
-                </div>
-            """.format(root, item['data'].name, item['data'].id, item['data'].content)
-
-            if item.has_key('children'):
-                self.generate(item['children'])
-
-            self.html += '</li>'
-        self.html += '</ol>'
-
-        return self.html 
-
-    @staticmethod
-    def convert_to_json(data):
-        node_index = dict()
-        parent_index = dict()
-        for node in data:
-            node_index[node[0]] = node
-            parent_index.setdefault(node[4],[]).append(node)
-
-        def process_node(index):
-            result = { 'data' : node_index[index][1] }
-            for node in parent_index.get(index,[]):
-                result.setdefault('children',[]).append(process_node(node[0]))
-            return result
-
-        node = process_node(1)
-        return [node]
+    def get_folders(self):
+        pass
 
 class Folder(fy_mysql.Base):
     # /sql/folder.sql
@@ -75,40 +54,79 @@ class Folder(fy_mysql.Base):
     folder_left             = fy_mysql.Column(etype='int')
     folder_right            = fy_mysql.Column(etype='int')
     folder_depth            = fy_mysql.Column(etype='int')
+    folder_guid             = fy_mysql.Column(etype='string', unique=True)
     folder_slug             = fy_mysql.Column(etype='string', unique=True)
+    folder_posts            = fy_mysql.Column(etype='int')
     folder_name             = fy_mysql.Column(etype='string', unique=True)
     folder_modified         = fy_mysql.Column(etype='datetime')
     folder_created          = fy_mysql.Column(etype='datetime')
     folder_content          = fy_mysql.Column(etype='string')
     folder_seo_content      = fy_mysql.Column(etype='string')
 
+    @property
+    def slug(self):
+        if self.__dict__.has_key('slug'):
+            return self.__dict__['slug']
+
+    @slug.setter
+    def slug(self, value):
+        self.__dict__['slug'] = slugify(value)
+
+
+    def update(self):
+        Folder.query.update(self)
+        self.build_guid()
+
+    def update_guid(self):
+        query = """
+          SELECT
+            GROUP_CONCAT(parent.folder_slug SEPARATOR '/') AS path
+          FROM
+            fypress_folder AS node,
+            fypress_folder AS parent
+          WHERE
+            node.folder_left BETWEEN parent.folder_left AND parent.folder_right AND node.folder_id={0}
+          ORDER BY
+            parent.folder_left""".format(self.id)
+
+        self.guid = url_unique(Folder.query.raw(query).one()[0]['path'], Folder, self.id)
+
+        Folder.query.update(self)
+
+    @staticmethod
+    def build_guid():
+        folders = Folder.query.get_all()
+        for folder in folders:
+            folder.update_guid()
+
     @staticmethod
     def get_all():
         query = """
             SELECT
-              node.folder_seo_content,
-              node.folder_created,
-              node.folder_modified,
-              node.folder_parent,
-              node.folder_name,
-              node.folder_depth,
-              node.folder_id,
-              node.folder_left,
-              node.folder_content,
-              node.folder_slug,
-              node.folder_right
+                node.folder_seo_content,
+                node.folder_created,
+                node.folder_modified,
+                node.folder_parent,
+                node.folder_name,
+                node.folder_depth,
+                node.folder_posts,
+                node.folder_id,
+                node.folder_left,
+                node.folder_content,
+                node.folder_slug,
+                node.folder_right
             FROM
-              fypress_folder AS node,
-              fypress_folder AS parent
+                fypress_folder AS node,
+                fypress_folder AS parent
             WHERE
-              node.folder_left BETWEEN parent.folder_left AND parent.folder_right
+                node.folder_left BETWEEN parent.folder_left AND parent.folder_right
             GROUP BY
-              node.folder_id
+                node.folder_id
             ORDER BY
-              node.folder_left, node.folder_id
+                node.folder_left, node.folder_id
         """
 
         folders = Folder.query.sql(query).all(array=True)
         tree = TreeHTML(folders)
-        return tree.generate(False, 'sortable')
+        return tree.generate_folders_admin(False, 'sortable')
 

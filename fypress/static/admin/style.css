@@ -29,6 +29,7 @@
 h1 { font-size: 24px; }
 h2 { font-size: 20px; }
 h3 { font-size: 16px; font-weight: bold; }
+h4 { font-size: 13px; font-weight: bold }
 
 /*
     SEO Preview
@@ -68,21 +69,17 @@ h3 { font-size: 16px; font-weight: bold; }
     padding: 0;
      margin-top: 5px;
 }
-.sortable li div {
-
+.nav-drag {
     cursor: move;
     margin: 0;
-
 }
-
 .sortable .panel-body {
-    padding-left: 10px;
-    padding-right: 10px;
-    padding-top: 5px;
-    padding-bottom: 5px;
+    padding: 0;
 }
-
-
+.sortable .table {
+    border: 0;
+    margin: 0;
+}
 .mjs-nestedSortable-error {
     background: #fbe3e4;
     border-color: transparent;

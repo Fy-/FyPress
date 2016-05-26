@@ -1,13 +1,15 @@
 {% macro render_field(field, label_visible=true) -%}
-
     <div class="form-group {% if field.errors %}has-error{% endif %} {{ kwargs.pop('class_', '') }}">
         {% if (field.type != 'HiddenField' and field.type !='CSRFTokenField') and label_visible %}
-            <label for="{{ field.id }}" class="control-label">{{ field.label }}</label>
+            <label for="fp_{{ field.id }}" class="control-label">{{ field.label }}</label>
         {% endif %}
-        {{ field(class_='form-control', **kwargs) }}
+        {{ field(class_='form-control', id='fp_'~id, **kwargs) }}
+        {% if field.description and not field.errors %}
+            <p class="help-block">{{ field.description|safe }}</p>
+        {% endif %}
         {% if field.errors %}
             {% for e in field.errors %}
-                <p class="help-block">{{ e }}</p>
+                <p class="error help-block">{{ e }}  {% if field.description %}<small>({{ field.description|safe }})</small>{% endif %}</p>
             {% endfor %}
         {% endif %}
     </div>
@@ -25,7 +27,7 @@
     {% for value, label, _ in field.iter_choices() %}
         <div class="radio">
             <label>
-                <input type="radio" name="{{ field.id }}" id="{{ field.id }}" value="{{ value }}">{{ label }}
+                <input type="radio" name="{{ field.id }}" id="fp_{{ field.id }}" value="{{ value }}">{{ label }}
             </label>
         </div>
     {% endfor %}

@@ -28,11 +28,12 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.12/js/jquery.dataTables.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.12/js/dataTables.bootstrap.min.js"></script>
         <script src="//cdn.datatables.net/responsive/2.1.0/js/dataTables.responsive.min.js"></script>
-
-
-
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/speakingurl/9.0.0/speakingurl.min.js"></script>
         <script src="//cdn.datatables.net/responsive/2.1.0/js/responsive.bootstrap.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/nestedSortable/2.0.0/jquery.mjs.nestedSortable.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/speakingurl/9.0.0/speakingurl.min.js"></script>
+        <script src="/static/admin/admin.js"></script>
+
         <!--[if lt IE 9]>
             <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
             <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
@@ -195,16 +196,8 @@
                         
                         {% if g.user.has_level(3) %}
                             <li>
-                                <a href="#"><i class="fa fa-folder-open-o fa-fw"></i> {{ _('Categories') }}<span class="fa arrow"></span></a>
-                                <ul class="nav nav-second-level">
-                                    <li>
-                                        <a href="{{ url_for('admin.folders') }}">{{ _('All Categories') }}</a>
-                                    </li>
-                                    <li>
-                                        <a href="/admin/post/new">{{ _('Add New') }}</a>
-                                    </li>
-                                </ul>
-                            </li>                  
+                                <a href="{{ url_for('admin.folders') }}"><i class="fa fa-folder-open-o fa-fw"></i> {{ _('Categories') }}</a>
+                            </li>           
                         {% endif %}
 
                         {% if g.user.has_level(1) %}
@@ -303,6 +296,19 @@
         </nav>
         <div id="page-wrapper">
             <div class="container-fluid">
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                    <br />
+                    <div class="alert alert-info">
+                        <h4>{{_('Messages')}} :</h4>
+                        <ul>
+                        {% for message in messages %}
+                            <li>{{ message }}</li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                {% endwith %}
                 <div class="row">
                     {% block content %}{% endblock %}
 
