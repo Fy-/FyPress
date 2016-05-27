@@ -24,6 +24,15 @@
 }
 
 /*
+    RTE
+*/
+.fy_rte {
+    margin-bottom: 5px;
+}
+div.mce-edit-area{
+    padding: 25px;
+}
+/*
     Titles
 */
 h1 { font-size: 24px; }

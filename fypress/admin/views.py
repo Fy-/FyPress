@@ -25,7 +25,9 @@ def root():
 @admin.route('/posts/new')
 @level_required(1)
 def posts_add():
-    return render_template('admin/posts_new.html', title=gettext('New - Posts'))
+    folders = Folder.get_all()
+
+    return render_template('admin/posts_new.html', folders=folders, title=gettext('New - Posts'))
 
 
 
@@ -36,7 +38,7 @@ def posts_add():
 @admin.route('/folders/all', methods=['POST', 'GET'])
 @level_required(3)
 def folders():
-    folders = Folder.get_all()
+    folders = Folder.get_all(True)
     folder  = None
 
     if request.args.get('edit') and request.args.get('edit') != 1:

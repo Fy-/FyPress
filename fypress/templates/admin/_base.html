@@ -20,6 +20,7 @@
         <link href="/static/admin/style.css" rel="stylesheet">
     {% endblock %}
     {% block js %}
+        <script src='//cdn.tinymce.com/4/tinymce.min.js'></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha/js/bootstrap.min.js"></script>
@@ -205,10 +206,10 @@
                                 <a href="#"><i class="fa fa-file-text-o fa-fw"></i> Posts<span class="fa arrow"></span></a>
                                 <ul class="nav nav-second-level">
                                     <li>
-                                        <a href="/admin/posts">All posts</a>
+                                        <a href="/admin/posts/all">All posts</a>
                                     </li>
                                     <li>
-                                        <a href="/admin/post/new">Add New</a>
+                                        <a href="{{ url_for('admin.posts_add') }}">{{ _('Add New') }}</a>
                                     </li>
                                 </ul>
                             </li>
@@ -222,7 +223,7 @@
                                         <a href="/admin/posts/type/page">All Pages</a>
                                     </li>
                                     <li>
-                                        <a href="/admin/post/new/type/page">Add New</a>
+                                        <a href="/admin/posts/type/pagezz">{{ _('Add New') }}</a>
                                     </li>
                                 </ul>
                             </li>

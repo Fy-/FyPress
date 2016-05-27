@@ -100,7 +100,7 @@ class Folder(fy_mysql.Base):
             folder.update_guid()
 
     @staticmethod
-    def get_all():
+    def get_all(html = False):
         query = """
             SELECT
                 node.folder_seo_content,
@@ -126,7 +126,12 @@ class Folder(fy_mysql.Base):
                 node.folder_left, node.folder_id
         """
 
+
         folders = Folder.query.sql(query).all(array=True)
+        
+        if not html:
+            return folders
+            
         tree = TreeHTML(folders)
         return tree.generate_folders_admin(False, 'sortable')
 
