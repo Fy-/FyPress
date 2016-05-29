@@ -1,9 +1,9 @@
 # -*- coding: UTF-8 -*-
-from functools import wraps
-from flask import Blueprint, session, request, redirect, url_for, render_template, flash
+from flask import Blueprint, session, request, redirect, url_for, render_template, flash, jsonify, make_response
+from flask.views import MethodView
 from flask.ext.babel import lazy_gettext as gettext
 from fypress.user import level_required, login_required, User, UserEditForm, UserAddForm
-from fypress.item import FolderForm, Folder
+from fypress.item import FolderForm, Folder, Media
 import json
 
 admin = Blueprint('admin', __name__,  url_prefix='/admin')
@@ -26,9 +26,28 @@ def root():
 @level_required(1)
 def posts_add():
     folders = Folder.get_all()
+    return render_template('admin/posts_new.html', folders=folders, title=gettext('New - Post'))
 
-    return render_template('admin/posts_new.html', folders=folders, title=gettext('New - Posts'))
+"""
+    Medias
+"""
+@admin.route('/medias')
+@admin.route('/medias/all')
+@level_required(1)
+def medias():
+    medias =  Media.query.get_all(array=True, order='ORDER BY `media_modified` DESC')
 
+    return render_template('admin/medias.html',  medias=medias, title=gettext('Library - Medias'))
+
+@admin.route('/medias/add/web')
+@level_required(1)
+def medias_web():
+    return render_template('admin/medias_web.html',  title=gettext('Add from Web - Medias'))
+
+@admin.route('/medias/add/upload')
+@level_required(1)
+def medias_upload():
+    return render_template('admin/medias_upload.html',  title=gettext('Medias'))
 
 
 """
@@ -90,7 +109,7 @@ def users_edit(id_user=None):
         flash(messages['updated']+' ('+str(user)+')')
         return redirect(url_for('admin.users'))
 
-    return render_template('admin/users_edit.html', title=gettext('Edit - Users'), user=user, form=form)
+    return render_template('admin/users_edit.html', title=gettext('Edit - User'), user=user, form=form)
 
 @admin.route('/users/new', methods=['POST', 'GET'])
 @level_required(4)
@@ -104,7 +123,7 @@ def users_new():
         flash(messages['added']+' ('+str(user)+')')
         return redirect(url_for('admin.users'))
 
-    return render_template('admin/users_new.html', title=gettext('New - Users'),  form=form)
+    return render_template('admin/users_new.html', title=gettext('New - User'),  form=form)
 
 @admin.route('/users/me', methods=['POST', 'GET'])
 @login_required
@@ -113,9 +132,39 @@ def users_me():
 
 
 """
+    POST
+"""
+@admin.route('/medias/upload', methods=['POST'])
+@level_required(1)
+def post_media():
+    return Media.upload(request.files['qqfile'], request.form)
+
+
+@admin.route('/medias/upload/<uuid>', methods=['POST'])
+@level_required(1)
+def post_media_delete():
+    try:
+        #handle_delete(uuid)
+        return jsonify(success=True), 200
+    except Exception, e:
+        return jsonify(success=False, error=e.message), 400
+
+"""
     AJAX
 """
-@admin.route('/folders/update', methods=['POST', 'GET'])
+@admin.route('/medias/oembed/add', methods=['POST'])
+@level_required(1)
+def ajax_oembed_add():
+
+    return ''
+    
+@admin.route('/medias/oembed', methods=['POST'])
+@level_required(1)
+def ajax_oembed():
+    data = request.form.get('data')
+    return Media.add_from_web(data)
+
+@admin.route('/folders/update', methods=['POST'])
 @level_required(3)
 def ajax_folders():
     data = json.loads(request.form.get('data'))

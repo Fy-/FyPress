@@ -203,6 +203,24 @@
 
                         {% if g.user.has_level(1) %}
                             <li>
+                                <a href="#"><i class="fa fa fa-picture-o fa-fw"></i> {{ _('Medias') }}</a>
+                                <ul class="nav nav-second-level">
+                                    <li>
+                                        <a href="{{ url_for('admin.medias') }}">{{ _('Library') }}</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ url_for('admin.medias_upload') }}">{{ _('Add New (Upload)') }}</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ url_for('admin.medias_web') }}">{{ _('Add New (Web)') }}</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        {% endif %}
+
+
+                        {% if g.user.has_level(1) %}
+                            <li>
                                 <a href="#"><i class="fa fa-file-text-o fa-fw"></i> Posts<span class="fa arrow"></span></a>
                                 <ul class="nav nav-second-level">
                                     <li>
@@ -234,21 +252,6 @@
                                 <a href="/admin/comments"><i class="fa fa-comment-o fa-fw"></i> Comments <span class="badge alert-danger pull-right">1</span></a>
                             </li>
                         {% endif %}
-
-                        {% if g.user.has_level(1) %}
-                            <li>
-                                <a href="#"><i class="fa fa-picture-o fa-fw"></i> Media<span class="fa arrow"></span></a>
-                                <ul class="nav nav-second-level">
-                                    <li>
-                                        <a href="/admin/medias/">Library</a>
-                                    </li>
-                                    <li>
-                                        <a href="/admin/media/new">Add New</a>
-                                    </li>
-                                </ul>
-                            </li>
-                        {% endif %}
-
 
                         <li >
                             <a href="/admin/users"  ><i class="fa fa-user fa-fw"></i> {{ _('Users') }}<span class="fa arrow"></span></a>

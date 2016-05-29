@@ -1,0 +1,94 @@
+{% extends "admin/_base.html" %}
+{% block content %}
+    {% from 'macros/form.html' import render_form %}
+    <div class="col-lg-12">
+        <h1 class="page-header"><i class="fa fa fa-picture-o fa-fw"></i> {{ _('Medias') }}</h1>
+
+        <ul class="nav nav-tabs">
+          <li role="presentation"><a href="{{url_for('admin.medias_upload')}}">{{ _('Add New (Upload)') }}</a></li>
+          <li role="presentation" class="active"><a href="{{url_for('admin.medias_web')}}">{{ _('Add New (Web)') }}</a></li>
+          <li role="presentation"><a href="{{url_for('admin.medias')}}">{{ _('Library') }}</a></li>
+        </ul>
+
+        <div class="medias-box">
+            <form class="form" id="add_oembed">
+                <div class="form-group">
+                    <label for="media_url">{{ _('Media URL')}} </label>
+                    <input type="text" class="form-control" id="media_url" placeholder="https://www.youtube.com/watch?v=m8e-FF8MsqU">
+                    <span class="help-block">{{_('URL of your media, for example: <b>https://www.youtube.com/watch?v=m8e-FF8MsqU</b>')}}</span>
+                </div>
+                <button type="submit" class="btn btn-default">{{_('Add')}}</button>
+            </form>
+            <br />
+            <div id="result">
+
+            </div>
+        </div>   
+    </div>
+    <script>
+      var current = null;
+
+      var fy_oembed_add = function() {
+        $.post('{{ url_for('admin.ajax_oembed_add') }}', {data: current}).done(
+          function(data) {
+            console.log(data);
+          });
+      };
+
+      $(document).ready(function(){
+        $('#add_oembed').submit(function(e) {
+          current = null
+          e.preventDefault();
+          if ($('#media_url').val()) {
+            $('#result').html('<div class="alert alert-info"><i class="fa fa-spinner spin-it" aria-hidden="true"></i> </span> {{ _("Grabbing data") }}</div>');
+            $.post( '{{ url_for('admin.ajax_oembed') }}', {data: $('#media_url').val()}).done(
+              function(data) {
+                if (data.result == 0) {
+                  $('#result').html(' <div class="alert alert-danger">{{ _("Invalid Media URL") }}</div>');
+                } else {
+                  if (data.result.title) {
+                    title = ' <h2 style="margin-top: 0"><i class="fa '+data.result.fa+'"></i> '+data.result.title+'</h2>'
+                  } else {
+                    title = ' <h2 style="margin-top: 0"><i class="fa '+data.result.fa+'"></i> '+data.result.provider_name+'</h2>'
+                  }
+
+                  var result = {}
+                  if (data.result.title) {
+                    result['title'] = data.result.title;
+                  }
+                  if (data.result.thumbnail_url) {
+                    result['thumbnail'] = data.result.thumbnail_url;
+                  }
+                  result['fa']      = data.result.fa;
+                  result['url']     = $('#media_url').val();
+                  result['html']    = data.result.html
+                  result['oembed']  = JSON.stringify(data.result)
+                  current = result
+
+                  var str = '\
+                    <div class="alert alert-success">\
+                      <div class="row">\
+                        <div class="col-lg-6">\
+                          <div class="embed-responsive embed-responsive-4by3">'+data.result.html+'</div>\
+                        </div>\
+                        <div class="col-lg-6  text-right">\
+                          '+title+'\
+                          <br />\
+                          <a href="javascript:fy_oembed_add();" id="fy_oembed_add" class="btn btn-lg btn-success"><i class="fa fa fa-picture-o fa-fw"></i> \
+                          {{_("Add  to Library" )}}</a>\
+                        </div>\
+                      </div>\
+                    </div>\
+                  ';
+
+                  html = $.parseHTML(str);
+
+                  $('#result').html(html);
+                }
+              }
+            );
+          }
+        });
+      });
+    </script>
+{% endblock %}

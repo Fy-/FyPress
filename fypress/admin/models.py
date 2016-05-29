@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-import fy_mysql 
+import fy_mysql
 
 class Option(fy_mysql.Base):
     # /sql/option.sql

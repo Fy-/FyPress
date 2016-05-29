@@ -1,0 +1,63 @@
+{% extends "admin/_base.html" %}
+{% block content %}
+    {% from 'macros/form.html' import render_form %}
+    <form>
+        <div class="col-lg-9">
+            <h1 class="page-header"><i class="fa fa-file-text-o fa-fw"></i> {{ _('Add new post') }}</h1>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">{{ _('Title') }}</label>
+                    <input type="text" class="form-control" id="fy_title" placeholder="{{_('Title')}}">
+                    <p class="help-block">
+                        <strong>{{_('Permalink')}}:</strong> 
+                        <a href="">http://127.0.0.1:5000/test/fypress/test</a> 
+                        <a title="{{_('Edit')}}"  class="btn btn-info btn-xs  "><i class="fa fa-pencil" aria-hidden="true"></i> {{_('Edit')}}</a>
+                    </p>
+                </div>
+              <div class="form-group">
+                <div class="fy_rte">
+                    <a title="{{_('Add media')}}" id="fp_add_media"  class="btn btn-default"><i class="fa fa-picture-o" aria-hidden="true"></i> {{_('Media Library')}}</a>
+                    <a title="{{_('Add media')}}" id="fp_add_media"  class="btn btn-default"><i class="fa fa-picture-o" aria-hidden="true"></i> {{_('Add GIF')}}</a>
+                    <a title="{{_('Add media')}}" id="fp_add_media"  class="btn btn-default"><i class="fa fa-picture-o" aria-hidden="true"></i> {{_('Distant Media')}}</a>
+                </div>
+                <textarea class="form-control" name="fp_content" id="fp_content"></textarea>
+              </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="panel panel-default" style="margin-top: 75px;">
+                <div class="panel-heading">
+                   <strong>{{ _('Publication') }}</strong>
+                </div>
+                <div class="panel-body">
+                    <div><span class="text-muted">{{ _('Status') }}</span></div>
+                    <div><span class="text-muted">{{ _('Publish') }}</span></div>
+                    <br />
+                    <a href="" class="btn btn-default pull-left"><i class="fa fa-hdd-o" aria-hidden="true"></i> {{ _('Save') }}</a> 
+                    <a href="" class="btn btn-success  pull-right"><i class="fa fa-check-circle" aria-hidden="true"></i> {{ _('Publish') }}</a>
+                </div>  
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                   <strong>{{ _('Category') }}</strong>
+                </div>
+                <div class="panel-body">
+                        <select id="fp_folder" name="fp_folder" class="form-control">
+                            {% for folder in folders %}
+                                <option value="{{folder.id}}">{% for n in range(0,folder.depth) %}&nbsp;&nbsp;&nbsp;{% endfor %}{{folder.name}}</option>
+                            {% endfor %}
+                        </select>
+                </div>  
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                   <strong>{{ _('Featured image') }}</strong>
+                </div>
+                <div class="panel-body">
+
+                </div>  
+            </div>
+        </div>
+    </form>
+    <script src='/static/admin/tinymce.js'></script>
+{% endblock %}

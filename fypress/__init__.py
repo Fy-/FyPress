@@ -1,11 +1,21 @@
 # -*- coding: UTF-8 -*-
+from werkzeug.contrib.fixers import ProxyFix
+from werkzeug import SharedDataMiddleware
+
 from flask import Flask, session, g
 from flask.ext.babel import Babel
 import fy_mysql
 
-
 app   = Flask(__name__)
 app.config.from_object('config')
+app.wsgi_app = ProxyFix(app.wsgi_app)
+
+### Statics ###
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_DIRECTORY'], filename)
+
+app.add_url_rule(app.config['UPLOAD_DIRECTORY_URL']+'<filename>', 'uploaded_file', build_only=True)
+app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {app.config['UPLOAD_DIRECTORY_URL']:  app.config['UPLOAD_DIRECTORY']})
 
 ### Babel ###
 babel = Babel(app)
@@ -34,3 +44,4 @@ from admin import admin_blueprint
 ### Load Blueprints ###
 app.register_blueprint(user_blueprint)
 app.register_blueprint(admin_blueprint)
+

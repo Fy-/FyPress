@@ -1,0 +1,27 @@
+{% extends "admin/_base.html" %}
+
+{% block content %}
+    {% from 'macros/form.html' import render_form %}
+    <div class="col-lg-12">
+        <h1 class="page-header"><i class="fa fa-picture-o fa-fw"></i> {{ _('Medias') }}</h1>
+
+        <ul class="nav nav-tabs">
+          <li role="presentation"><a href="{{url_for('admin.medias_upload')}}">{{ _('Add New (Upload)') }}</a></li>
+          <li role="presentation"><a href="{{url_for('admin.medias_web')}}">{{ _('Add New (Web)') }}</a></li>
+          <li role="presentation" class="active"><a href="{{url_for('admin.medias')}}">{{ _('Library') }}</a></li>
+        </ul>
+
+        <div class="medias-box">
+            <div class="row">
+            {% for media in medias %}
+              <div class="pull-left media-item" >
+                <a href="#" class="thumbnail">
+                  <i class="fa {{media.icon}}"></i>
+                  <img src="{{media.urlify('thumbnail-s')}}" alt="{{media.name}}" />
+                </a>
+              </div>
+            {% endfor %}
+        </div>   
+    </div>
+
+{% endblock %}
