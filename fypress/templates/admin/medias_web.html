@@ -1,13 +1,18 @@
-{% extends "admin/_base.html" %}
+{% if request.args.get('parent') %}
+  {% extends "admin/_base_empty.html" %}
+{% else %}
+  {% extends "admin/_base.html" %}
+{% endif %}
+
 {% block content %}
     {% from 'macros/form.html' import render_form %}
     <div class="col-lg-12">
         <h1 class="page-header"><i class="fa fa fa-picture-o fa-fw"></i> {{ _('Medias') }}</h1>
 
         <ul class="nav nav-tabs">
-          <li role="presentation"><a href="{{url_for('admin.medias_upload')}}">{{ _('Add New (Upload)') }}</a></li>
-          <li role="presentation" class="active"><a href="{{url_for('admin.medias_web')}}">{{ _('Add New (Web)') }}</a></li>
-          <li role="presentation"><a href="{{url_for('admin.medias')}}">{{ _('Library') }}</a></li>
+          <li role="presentation"><a href="{{url_for('admin.medias_upload', parent=request.args.get('parent'))}}">{{ _('Add New (Upload)') }}</a></li>
+          <li role="presentation" class="active"><a href="{{url_for('admin.medias_web', parent=request.args.get('parent'))}}">{{ _('Add New (Web)') }}</a></li>
+          <li role="presentation"><a href="{{url_for('admin.medias', parent=request.args.get('parent'))}}">{{ _('Library') }}</a></li>
         </ul>
 
         <div class="medias-box">
@@ -31,7 +36,9 @@
       var fy_oembed_add = function() {
         $.post('{{ url_for('admin.ajax_oembed_add') }}', {data: current}).done(
           function(data) {
-            console.log(data);
+            if (data.success) {
+              window.location.href = '{{url_for('admin.medias', parent=request.args.get('parent'))}}'
+            }
           });
       };
 
@@ -55,15 +62,21 @@
                   var result = {}
                   if (data.result.title) {
                     result['title'] = data.result.title;
+                  } else {
+                    if (data.result.provider_name == 'Twitter') {
+                      result['title'] = 'Tweet par '+data.result.author_name+': '+data.result.url
+                    }
                   }
                   if (data.result.thumbnail_url) {
                     result['thumbnail'] = data.result.thumbnail_url;
                   }
+                  result['service'] = data.result.service
                   result['fa']      = data.result.fa;
                   result['url']     = $('#media_url').val();
                   result['html']    = data.result.html
                   result['oembed']  = JSON.stringify(data.result)
-                  current = result
+                  result['var']     = false
+                  current = JSON.stringify(result);
 
                   var str = '\
                     <div class="alert alert-success">\

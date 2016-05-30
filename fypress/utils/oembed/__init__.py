@@ -1,4 +1,6 @@
 # -*- coding: UTF-8 -*-
+from __future__ import unicode_literals
+
 __import__('pkg_resources').declare_namespace(__name__)
 import re, requests
 
@@ -14,11 +16,11 @@ class Sites(object):
 
         return cls._instance
 
-    def add(self, identifier, oembed, icon='fa fa-star'):
+    def add(self, identifier, oembed, icon='fa-star', name=''):
         if not self.first:
             self.first = True
 
-        self.sources[identifier] = (oembed, icon)
+        self.sources[identifier] = (oembed, icon, name)
 
     def get(self, url):
         for key in self.sources:
@@ -42,7 +44,11 @@ class FyOembed(object):
             if result.has_key('error'):
                 return False
 
+
+
             result['fa'] = oembed_url[1]
+            result['service'] = oembed_url[2]
+               
             return  result
         else: 
             return False
@@ -58,7 +64,7 @@ class FyOembed(object):
                 'http://dai.ly/*'
             )
             for r in regex:
-                self.sites.add(r, 'https://www.dailymotion.com/services/oembed', 'fa-video-camera')
+                self.sites.add(r, 'https://www.dailymotion.com/services/oembed', 'fa-video-camera', 'Dailymotion')
 
             # Youtube
             regex = (         
@@ -83,7 +89,7 @@ class FyOembed(object):
                 'https?://.*youtube\\.com/watch.*'
             )
             for r in regex:
-                self.sites.add(r, 'https://www.youtube.com/oembed?scheme=https&', 'fa-youtube')
+                self.sites.add(r, 'https://www.youtube.com/oembed?scheme=https&', 'fa-youtube', 'Youtube')
 
             # Vimeo
             regex = (
@@ -92,13 +98,13 @@ class FyOembed(object):
                 'https?://www\\.vimeo\\.com/.*'
             )
             for r in regex:
-                self.sites.add(r, 'https://vimeo.com/api/oembed.json', 'fa-vimeo')
+                self.sites.add(r, 'https://vimeo.com/api/oembed.json', 'fa-vimeo', 'vimeo')
 
             # Instagram
-            self.sites.add('https?://www\\.instagram\\.com/p/.*', 'https://api.instagram.com/oembed/', 'fa-instagram')
+            self.sites.add('https?://www\\.instagram\\.com/p/.*', 'https://api.instagram.com/oembed/', 'fa-instagram', 'Instagram')
 
             # imgur
-            self.sites.add('https?://.*imgur\\.com/.*', 'https://api.imgur.com/oembed', 'fa-file-image-o')
+            self.sites.add('https?://.*imgur\\.com/.*', 'https://api.imgur.com/oembed', 'fa-file-image-o', 'imgur')
 
             # Flickr
             regex = (
@@ -106,10 +112,10 @@ class FyOembed(object):
                 'http://flic\\.kr/.*'
             )
             for r in regex:
-                self.sites.add(r, 'https://www.flickr.com/services/oembed/', 'fa-flickr')
+                self.sites.add(r, 'https://www.flickr.com/services/oembed/', 'fa-flickr', 'Flickr')
 
             # Mixcloud
-            self.sites.add('https?://www\\.mixcloud\\.com/.*/.*/', 'https://www.mixcloud.com/oembed', 'fa-mixcloud')
+            self.sites.add('https?://www\\.mixcloud\\.com/.*/.*/', 'https://www.mixcloud.com/oembed', 'fa-mixcloud', 'Mixcloud')
 
             # Soundcloud
             regex = (
@@ -119,7 +125,7 @@ class FyOembed(object):
                 'https?://soundcloud\\.com/.*/sets/.*'
             )
             for r in regex:
-                self.sites.add(r, 'https://soundcloud.com/oembed', 'fa-soundcloud')
+                self.sites.add(r, 'https://soundcloud.com/oembed', 'fa-soundcloud', 'Soundcloud')
 
             # Spotify
             regex = (
@@ -127,10 +133,10 @@ class FyOembed(object):
                 "^http(?:s)?://spoti\\.fi/.+$"
             )
             for r in regex:
-                self.sites.add(r, 'https://embed.spotify.com/oembed/', 'fa-spotify')
+                self.sites.add(r, 'https://embed.spotify.com/oembed/', 'fa-spotify', 'Spotify')
 
             # Twitter
-            self.sites.add('https?://(www\.)?twitter.com/\S+/status(es)?/\S+', 'https://api.twitter.com/1/statuses/oembed.json', 'fa-twitter')
+            self.sites.add('https?://(www\.)?twitter.com/\S+/status(es)?/\S+', 'https://api.twitter.com/1/statuses/oembed.json', 'fa-twitter', 'Twitter')
 
             # Scribd
             regex = (
@@ -140,4 +146,4 @@ class FyOembed(object):
                 'http://www\\.scribd\\.com/mobile/documents/.*'
             )
             for r in regex:
-                self.sites.add('https?://(www\.)?scribd\.com/\S*', 'http://www.scribd.com/services/oembed', 'fa-scribd')
+                self.sites.add('https?://(www\.)?scribd\.com/\S*', 'http://www.scribd.com/services/oembed', 'fa-scribd', 'Scibd')

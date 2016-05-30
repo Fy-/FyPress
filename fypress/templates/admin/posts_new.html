@@ -1,4 +1,13 @@
 {% extends "admin/_base.html" %}
+{% block css %}
+    {{ super() }}
+    <link href="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.1/summernote.css" rel="stylesheet">
+{% endblock %}
+{% block js %}
+    {{ super() }}
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.1/summernote.js"></script>
+{% endblock %}
+
 {% block content %}
     {% from 'macros/form.html' import render_form %}
     <form>
@@ -15,11 +24,10 @@
                 </div>
               <div class="form-group">
                 <div class="fy_rte">
-                    <a title="{{_('Add media')}}" id="fp_add_media"  class="btn btn-default"><i class="fa fa-picture-o" aria-hidden="true"></i> {{_('Media Library')}}</a>
+                    <a title="{{_('Add media')}}" id="fp_add_media"  data-toggle="modal" data-target="#fp_medias_modal" class="btn btn-default"><i class="fa fa-picture-o" aria-hidden="true"></i> {{_('Media Library')}}</a>
                     <a title="{{_('Add media')}}" id="fp_add_media"  class="btn btn-default"><i class="fa fa-picture-o" aria-hidden="true"></i> {{_('Add GIF')}}</a>
-                    <a title="{{_('Add media')}}" id="fp_add_media"  class="btn btn-default"><i class="fa fa-picture-o" aria-hidden="true"></i> {{_('Distant Media')}}</a>
                 </div>
-                <textarea class="form-control" name="fp_content" id="fp_content"></textarea>
+                <div id="fpcontent"></div>
               </div>
         </div>
         <div class="col-lg-3">
@@ -59,5 +67,104 @@
             </div>
         </div>
     </form>
-    <script src='/static/admin/tinymce.js'></script>
+    
+{% endblock %}
+
+{% block footer %}
+    <div class="modal fade" id="fp_medias_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-10">
+                            <div id="fp_media_loader"></div>
+                            <iframe id="fp_media_frame" src="" style="width: 100%;" frameborder="0" allowtransparency="true"></iframe>
+                        </div>
+                        <div class="col-lg-2">
+                            <div id="fp_media_selected" class="pull-left alert alert-success" style="margin: 0; width: 100%;">{{_('No media selected')}}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div id="fp_insert_btn"><button type="button" class="btn btn-default" data-dismiss="modal">Close</button> </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function() {
+          $('#fpcontent').summernote({
+            minHeight: 500,
+            focus: true, 
+            toolbar: [
+                    ['style', ['style']],
+                    ['font', ['bold', 'underline', 'clear']],
+                    ['fontname', ['fontname']],
+                    ['color', ['color']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['table', ['table']],
+                    ['insert', ['link']],
+                    ['view', ['fullscreen', 'codeview']]
+              ],
+          });
+          console.log('lol')
+        });
+
+        var selected = null;
+
+        $('#fp_media_frame').on('load', function(){
+            $('#fp_insert_btn').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+            $('#fp_media_selected').html('{{_('No media selected')}}');
+            $('#fp_media_loader').empty();
+
+
+            var $iframe = $(this).contents()
+            $(this).height( $iframe.find('body').height() );
+
+            $iframe.find('.fp_media').click(function() {
+                $('#fp_media_selected').empty();
+                selected = null;
+                $iframe.find('.fp_media').removeClass('media-selected');
+                $( this ).addClass('media-selected');
+                var c_media = $(this).clone()
+                $.get( '{{url_for('admin.ajax_get_media')}}?id='+$(this).attr('id'), function(data) {
+                    var html = ''
+                    if (data.data.var) {
+                        html = '<br /><select class="form-control" id="fp_media_format">'
+                        html += '<option value="'+data.data.guid+'">Original file</option>'
+
+                        Object.keys(data.data.var).forEach(function(key) {
+                            html += '<option value="'+data.data.var[key].guid+'">'+data.data.var[key].name+'</option>'
+                        });
+                        html += '</select>'
+
+                        selected = '<img src="{{flask_config['UPLOAD_DIRECTORY_URL']}}'+data.data.guid+'" alt="'+data.data.name+'" />'
+                    } else {
+                        selected = '<div class="media">'+data.data.html+'</div>'
+                    }
+                    $('#fp_media_selected').append(c_media)
+                    $('#fp_media_selected').append(html)
+
+                    $('#fp_media_format').change(function() {
+                        selected = '<img src="{{flask_config['UPLOAD_DIRECTORY_URL']}}'+$('#fp_media_format').val()+'" alt="'+data.data.name+'" />'
+                    });
+                });
+                $('#fp_insert_btn').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button> <a  href="javascript:insert_content()" class="btn btn-primary">Insert</a>');
+            });
+        });
+
+        var insert_content = function() {
+            //tinymce.get('fp_content').insertContent(selected);
+            console.log(selected)
+            document.execCommand('insertHtml', null, selected);
+            $('#fp_medias_modal').modal('hide')
+        };
+        $('#fp_medias_modal').on('shown.bs.modal', function (e) {
+            if ($('#fp_media_frame').attr('src') == '') {
+                $('#fp_media_loader').html('<i class="fa fa-spinner spin-it fat-icon"></i>')
+                $('#fp_media_frame').attr('src', '{{ url_for('admin.medias', parent=1)}}');    
+            }
+        });
+        
+    </script>
 {% endblock %}

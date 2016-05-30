@@ -1,4 +1,9 @@
-{% extends "admin/_base.html" %}
+{% if request.args.get('parent') %}
+  {% extends "admin/_base_empty.html" %}
+{% else %}
+  {% extends "admin/_base.html" %}
+{% endif %}
+
 {% block css %}
     <link href="https://cdnjs.cloudflare.com/ajax/libs/file-uploader/5.9.0/all.fine-uploader/fine-uploader-new.min.css" rel="stylesheet">
     {{ super() }}
@@ -98,9 +103,9 @@
         <h1 class="page-header"><i class="fa fa fa-picture-o fa-fw"></i> {{ _('Medias') }}</h1>
 
         <ul class="nav nav-tabs">
-          <li role="presentation" class="active"><a href="{{url_for('admin.medias_upload')}}">{{ _('Add New (Upload)') }}</a></li>
-          <li role="presentation"><a href="{{url_for('admin.medias_web')}}">{{ _('Add New (Web)') }}</a></li>
-          <li role="presentation"><a href="{{url_for('admin.medias')}}">{{ _('Library') }}</a></li>
+          <li role="presentation" class="active"><a href="{{url_for('admin.medias_upload', parent=request.args.get('parent'))}}">{{ _('Add New (Upload)') }}</a></li>
+          <li role="presentation"><a href="{{url_for('admin.medias_web',  parent=request.args.get('parent'))}}">{{ _('Add New (Web)') }}</a></li>
+          <li role="presentation"><a href="{{url_for('admin.medias', parent=request.args.get('parent'))}}">{{ _('Library') }}</a></li>
         </ul>
 
         <div class="medias-box">

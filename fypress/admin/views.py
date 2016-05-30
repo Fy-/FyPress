@@ -4,14 +4,11 @@ from flask.views import MethodView
 from flask.ext.babel import lazy_gettext as gettext
 from fypress.user import level_required, login_required, User, UserEditForm, UserAddForm
 from fypress.item import FolderForm, Folder, Media
+from fypress.admin.static import messages
+
 import json
 
 admin = Blueprint('admin', __name__,  url_prefix='/admin')
-
-messages = {
-    'updated'   : gettext('Item updated'),
-    'added'     : gettext('Item added')
-}
 
 @admin.route('/')
 @login_required
@@ -152,11 +149,25 @@ def post_media_delete():
 """
     AJAX
 """
+@admin.route('/medias/get')
+@level_required(1)
+def ajax_get_media():
+    media = Media.query.get(request.args.get('id').replace('media_', ''))
+    result = {}
+    result['name'] = media.name
+    result['icon'] = media.icon
+    result['guid'] = media.guid
+    if media.type == 'image':
+        result['var'] = media.data['var']
+    if media.type == 'oembed':
+        result['html'] = media.html
+        
+    return jsonify(data=result)
+
 @admin.route('/medias/oembed/add', methods=['POST'])
 @level_required(1)
 def ajax_oembed_add():
-
-    return ''
+    return Media.add_oembed(request.form)
     
 @admin.route('/medias/oembed', methods=['POST'])
 @level_required(1)

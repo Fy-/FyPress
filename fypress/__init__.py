@@ -28,7 +28,7 @@ db 	= fy_mysql.flask(app)
 def inject_options():
     from fypress.admin import Option
     from fy_mysql.sql import FyMySQL
-    return dict(options=Option.auto_load(), queries=FyMySQL._instance.queries, debug=app.config['DEBUG'])
+    return dict(options=Option.auto_load(), queries=FyMySQL._instance.queries, debug=app.config['DEBUG'], flask_config=app.config)
 
 @app.before_request
 def before_request():

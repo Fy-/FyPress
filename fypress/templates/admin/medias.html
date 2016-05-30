@@ -1,4 +1,8 @@
-{% extends "admin/_base.html" %}
+{% if request.args.get('parent') %}
+  {% extends "admin/_base_empty.html" %}
+{% else %}
+  {% extends "admin/_base.html" %}
+{% endif %}
 
 {% block content %}
     {% from 'macros/form.html' import render_form %}
@@ -6,18 +10,23 @@
         <h1 class="page-header"><i class="fa fa-picture-o fa-fw"></i> {{ _('Medias') }}</h1>
 
         <ul class="nav nav-tabs">
-          <li role="presentation"><a href="{{url_for('admin.medias_upload')}}">{{ _('Add New (Upload)') }}</a></li>
-          <li role="presentation"><a href="{{url_for('admin.medias_web')}}">{{ _('Add New (Web)') }}</a></li>
-          <li role="presentation" class="active"><a href="{{url_for('admin.medias')}}">{{ _('Library') }}</a></li>
+          <li role="presentation"><a href="{{url_for('admin.medias_upload', parent=request.args.get('parent'))}}">{{ _('Add New (Upload)') }}</a></li>
+          <li role="presentation"><a href="{{url_for('admin.medias_web', parent=request.args.get('parent'))}}">{{ _('Add New (Web)') }}</a></li>
+          <li role="presentation" class="active"><a href="{{url_for('admin.medias', parent=request.args.get('parent'))}}">{{ _('Library') }}</a></li>
         </ul>
 
         <div class="medias-box">
             <div class="row">
             {% for media in medias %}
               <div class="pull-left media-item" >
-                <a href="#" class="thumbnail">
-                  <i class="fa {{media.icon}}"></i>
-                  <img src="{{media.urlify('thumbnail-s')}}" alt="{{media.name}}" />
+                <a href="#" class="thumbnail fp_media" id="media_{{media.id}}">
+                  <i class="fa {{media.icon}} media-icon"></i>
+                  {% if media.urlify('thumbnail-s') %}
+                    <img src="{{media.urlify('thumbnail-s')}}" alt="{{media.name}}" />
+                  {% else %}
+                    <div class="img-black"><div class="vcenter">{{media.name}}</div></div>
+                  {% endif %}
+                  <div class="media-item-footer"><i class="fa {{media.icon}}"></i> {% if media.data.provider %}{{media.data.provider}}{% else %}{{_('Upload')}}{% endif %}</div>
                 </a>
               </div>
             {% endfor %}

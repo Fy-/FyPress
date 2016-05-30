@@ -1,11 +1,14 @@
 # -*- coding: UTF-8 -*-
-from flask import jsonify
+from flask import jsonify, flash
 from flask.ext.babel import lazy_gettext as gettext
 from werkzeug import secure_filename
-import hashlib, os, datetime, shutil, magic, json
+from nested_encode import encode_nested
+import hashlib, os, datetime, shutil, magic, json, urllib2
 
 from fypress import app
 from fypress.utils import TreeHTML, slugify, url_unique, oembed, FyImage
+from fypress.admin.static import messages
+
 import fy_mysql
 
 class Media(fy_mysql.Base):
@@ -22,7 +25,6 @@ class Media(fy_mysql.Base):
     media_data            = fy_mysql.Column(etype='json')
     media_icon            = fy_mysql.Column(etype='string')
     media_html            = fy_mysql.Column(etype='string')
-    media_childs          = fy_mysql.Column(childs=True)
 
     def generate_html(self):
         pass
@@ -39,8 +41,70 @@ class Media(fy_mysql.Base):
     @staticmethod
     def add_from_web(url):
         oembed_ = oembed().get(url) 
-
         return jsonify(result=oembed_)
+
+    @staticmethod
+    def add_oembed(attrs):
+        data = json.loads(attrs['data'])
+        data['oembed'] =  json.loads(data['oembed'])
+        
+        now = datetime.datetime.now()
+        media_hash          = Media.hash_string(data['url'])
+
+        if Media.query.exist('hash', media_hash):
+            media = Media.query.filter(hash=media_hash).one()
+            media.modified = 'NOW()'
+            Media.query.update(media)
+            return jsonify(success=True), 200
+        
+        media = Media()
+        media.hash          = media_hash
+        media.modified      = 'NOW()'
+        media.type          = 'oembed'
+        media.name          = data['title']
+        media.guid          = "{}/{}/".format(now.year, now.month)+media_hash
+        media.source        = data['url']
+        media.icon          = data['fa']
+        media.html          = data['html']
+        media.data          = {}
+
+        media.data['provider_url'] = data['oembed']['provider_url'].encode('utf8')
+        media.data['provider']     = data['oembed']['service']
+        if data['oembed'].has_key('author_name'):
+            media.data['author_name']  = data['oembed']['author_name']
+            media.data['author_url']   = data['oembed']['author_url']
+        else:
+            media.data['author_name']  = ''
+            media.data['author_url']   = ''
+
+        Media.query.add(media)
+
+        if data['oembed'].has_key('thumbnail_url'):
+            response = urllib2.urlopen(data['oembed']['thumbnail_url'])
+            Media.upload_save(response, os.path.join(Media.upload_path('CHUNKS_DIRECTORY'), media_hash))
+
+            mime = magic.Magic(mime=True)
+            mime_file = mime.from_file(os.path.join(Media.upload_path('CHUNKS_DIRECTORY'), media_hash))
+            mimes = {'image/jpeg': 'jpg', 'image/jpg': 'jpg', 'image/png':'png'}
+
+            ext         = '.'+mimes[mime_file]
+            filename    = 'oembed-'+media_hash+ext
+            fdir        = Media.upload_path('UPLOAD_DIRECTORY')
+            fpath       = os.path.join(fdir, filename)
+
+            shutil.move(os.path.join(Media.upload_path('CHUNKS_DIRECTORY'), media_hash), fpath)
+
+            images      = FyImage(fpath).generate()
+            sizes = {}
+            for image in images:
+                sizes[image[3]] = {'name': image[1], 'source': os.path.join(Media.upload_path('UPLOAD_DIRECTORY'), image[0]), 'guid': "{}/{}/".format(now.year, now.month)+image[2]}
+
+            media.data['var'] = sizes
+            Media.query.update(media)
+
+        flash(messages['added']+' ('+str(media)+')')
+
+        return jsonify(success=True), 200
 
     @staticmethod
     def upload_path(config):
@@ -56,7 +120,7 @@ class Media(fy_mysql.Base):
             os.makedirs(os.path.dirname(path))
 
         with open(path, 'wb+') as destination:
-            destination.write(f.stream.read())
+            destination.write(f.read())
 
     @staticmethod
     def upload_combine_chunks(total_parts, total_size, source_folder, dest):
@@ -132,6 +196,8 @@ class Media(fy_mysql.Base):
 
             media.data = {'var':sizes}
             Media.query.update(media)
+            
+        flash(messages['added']+' ('+str(media)+')')
 
         return jsonify(success=True), 200
 
