@@ -1,11 +1,17 @@
 {% extends "admin/_base.html" %}
 {% block css %}
     {{ super() }}
-    <link href="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.1/summernote.css" rel="stylesheet">
+    <!--<link href="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.1/summernote.css" rel="stylesheet">-->
 {% endblock %}
 {% block js %}
     {{ super() }}
+    <!--
     <script src="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.1/summernote.js"></script>
+    -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/4.3.12/jquery.tinymce.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/4.3.12/tinymce.min.js"></script>
+    <script src="/static/admin/tinymce.js"></script>
+
 {% endblock %}
 
 {% block content %}
@@ -27,6 +33,7 @@
                     <a title="{{_('Add media')}}" id="fp_add_media"  data-toggle="modal" data-target="#fp_medias_modal" class="btn btn-default"><i class="fa fa-picture-o" aria-hidden="true"></i> {{_('Media Library')}}</a>
                     <a title="{{_('Add media')}}" id="fp_add_media"  class="btn btn-default"><i class="fa fa-picture-o" aria-hidden="true"></i> {{_('Add GIF')}}</a>
                 </div>
+                <textarea id="tinymce" name="content"></textarea>
                 <div id="fpcontent"></div>
               </div>
         </div>
@@ -92,6 +99,7 @@
         </div>
     </div>
     <script>
+        /*
         $(document).ready(function() {
           $('#fpcontent').summernote({
             minHeight: 500,
@@ -107,7 +115,13 @@
                     ['view', ['fullscreen', 'codeview']]
               ],
           });
-          console.log('lol')
+        });
+        */
+        
+        $(document).on('focusin', function(e) {
+          if ($(e.target).closest(".mce-window").length) {
+            e.stopImmediatePropagation();
+          }
         });
 
         var selected = null;
@@ -119,7 +133,7 @@
 
 
             var $iframe = $(this).contents()
-            $(this).height( $iframe.find('body').height() );
+            $(this).height( $iframe.find('body').height() +250 );
 
             $iframe.find('.fp_media').click(function() {
                 $('#fp_media_selected').empty();
@@ -138,15 +152,15 @@
                         });
                         html += '</select>'
 
-                        selected = '<img src="{{flask_config['UPLOAD_DIRECTORY_URL']}}'+data.data.guid+'" alt="'+data.data.name+'" />'
+                        selected = '<img class="img-thumbnail" src="{{flask_config['UPLOAD_DIRECTORY_URL']}}'+data.data.guid+'" alt="'+data.data.name+'" />'
                     } else {
-                        selected = '<div class="media">'+data.data.html+'</div>'
+                        selected = '<div class="media">'+data.data.html+'</div><p></p>'
                     }
                     $('#fp_media_selected').append(c_media)
                     $('#fp_media_selected').append(html)
 
                     $('#fp_media_format').change(function() {
-                        selected = '<img src="{{flask_config['UPLOAD_DIRECTORY_URL']}}'+$('#fp_media_format').val()+'" alt="'+data.data.name+'" />'
+                        selected = '<img class="img-thumbnail" src="{{flask_config['UPLOAD_DIRECTORY_URL']}}'+$('#fp_media_format').val()+'" alt="'+data.data.name+'" />'
                     });
                 });
                 $('#fp_insert_btn').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button> <a  href="javascript:insert_content()" class="btn btn-primary">Insert</a>');
@@ -154,9 +168,8 @@
         });
 
         var insert_content = function() {
-            //tinymce.get('fp_content').insertContent(selected);
-            console.log(selected)
-            document.execCommand('insertHtml', null, selected);
+            tinymce.get('tinymce').insertContent(selected);
+            //document.execCommand('insertHtml', null, selected);
             $('#fp_medias_modal').modal('hide')
         };
         $('#fp_medias_modal').on('shown.bs.modal', function (e) {
