@@ -1,12 +1,12 @@
 # -*- coding: UTF-8 -*-
-import fy_mysql
+from fypress.utils import mysql
 
-class Option(fy_mysql.Base):
+class Option(mysql.Base):
     # /sql/option.sql
-    option_id               = fy_mysql.Column(etype='int', primary_key=True)
-    option_name             = fy_mysql.Column(etype='string', unique=True)
-    option_value            = fy_mysql.Column(etype='string')
-    option_load             = fy_mysql.Column(etype='int')
+    option_id               = mysql.Column(etype='int', primary_key=True)
+    option_name             = mysql.Column(etype='string', unique=True)
+    option_value            = mysql.Column(etype='string')
+    option_load             = mysql.Column(etype='int')
 
     def __init__(self):
         pass

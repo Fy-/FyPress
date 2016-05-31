@@ -10,7 +10,7 @@
         <!-- /.panel-heading -->
         <div class="panel-body">
             <div class="dataTable_wrapper table-responsive"> 
-                <table class="table table-striped table-bordered table-hover" id="dataTables-users">
+                <table class="table table-striped table-hover" id="dataTables-users">
                     <thead>
                         <tr>
                             <th>{{ _('ID') }}</th>
@@ -23,18 +23,18 @@
                     </thead>
                     <tbody>
                         {% for user in users %}
-                            <tr class="odd gradeX">
-                                <td> {{user.id}}</td>
-                                <td>
+                            <tr class="odd">
+                                <td class="col-md-1"> {{user.id}}</td>
+                                <td class="col-md-4">
                                     <a href="{{url_for('admin.users_edit')}}?id={{user.id}}"><img class="user-avatar" src="{{user.gravatar(40)}}" alt="{{user.login}}" /></a>
                                     <a href="{{url_for('admin.users_edit')}}?id={{user.id}}"><strong>{{user.login}}</strong></a>
                                     <br />
                                     <small class="text-muted"><a href="{{url_for('admin.users_edit')}}?id={{user.id}}">Edit</a> | <a class="ldanger" href="">Delete</a></small>
                                 </td>
-                                <td>{{user.firstname}} {{user.lastname}}</td>
-                                <td>{{user.nicename}}</td>
-                                <td><a href="mailto:{{user.email}}">{{user.email}}</a></td>
-                                <td>{{user.role}}</td>
+                                <td class="col-md-2">{{user.firstname}} {{user.lastname}}</td>
+                                <td class="col-md-2">{{user.nicename}}</td>
+                                <td class="col-md-2"><a href="mailto:{{user.email}}">{{user.email}}</a></td>
+                                <td class="col-md-1">{{user.role}}</td>
                             </tr>
                         {% endfor %}
                 </tbody>
@@ -42,7 +42,7 @@
                 <script>
                     $(document).ready(function() {
                         $('#dataTables-users').DataTable({
-                            responsive: true,
+                            responsive: false,
                             paging: false,
                             info: false
                         });

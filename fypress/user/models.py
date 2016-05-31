@@ -2,22 +2,23 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import session
 from flask.ext.babel import lazy_gettext as gettext
-import fy_mysql, urllib, hashlib
+from fypress.utils import mysql
+import urllib, hashlib
 
-class User(fy_mysql.Base):
+class User(mysql.Base):
     # /sql/user.sql
-    user_id                 = fy_mysql.Column(etype='int', primary_key=True)
-    user_login              = fy_mysql.Column(etype='string', unique=True)
-    user_email              = fy_mysql.Column(etype='string', unique=True)
-    user_password           = fy_mysql.Column(etype='string')
-    user_nicename           = fy_mysql.Column(etype='string')
-    user_firstname          = fy_mysql.Column(etype='string')
-    user_lastname           = fy_mysql.Column(etype='string')
-    user_url                = fy_mysql.Column(etype='string')
-    user_registered         = fy_mysql.Column(etype='datetime')
-    user_activation_key     = fy_mysql.Column(etype='string')
-    user_status             = fy_mysql.Column(etype='int')
-    user_meta               = fy_mysql.Column(meta=True)
+    user_id                 = mysql.Column(etype='int', primary_key=True)
+    user_login              = mysql.Column(etype='string', unique=True)
+    user_email              = mysql.Column(etype='string', unique=True)
+    user_password           = mysql.Column(etype='string')
+    user_nicename           = mysql.Column(etype='string')
+    user_firstname          = mysql.Column(etype='string')
+    user_lastname           = mysql.Column(etype='string')
+    user_url                = mysql.Column(etype='string')
+    user_registered         = mysql.Column(etype='datetime')
+    user_activation_key     = mysql.Column(etype='string')
+    user_status             = mysql.Column(etype='int')
+    user_meta               = mysql.Column(meta=True)
 
     roles                   = {
         0: gettext('Member'),

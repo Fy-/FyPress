@@ -223,7 +223,7 @@
                                 <a href="#"><i class="fa fa-file-text-o fa-fw"></i> Posts<span class="fa arrow"></span></a>
                                 <ul class="nav nav-second-level">
                                     <li>
-                                        <a href="/admin/posts/all">All posts</a>
+                                        <a href="{{ url_for('admin.posts') }}">All posts</a>
                                     </li>
                                     <li>
                                         <a href="{{ url_for('admin.posts_add') }}">{{ _('Add New') }}</a>

@@ -3,7 +3,7 @@
         {% if (field.type != 'HiddenField' and field.type !='CSRFTokenField') and label_visible %}
             <label for="fp_{{ field.id }}" class="control-label">{{ field.label }}</label>
         {% endif %}
-        {{ field(class_='form-control', id='fp_'~id, **kwargs) }}
+        {{ field(class_='form-control', id='fp_'~field.id, **kwargs) }}
         {% if field.description and not field.errors %}
             <p class="help-block">{{ field.description|safe }}</p>
         {% endif %}

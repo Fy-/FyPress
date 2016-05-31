@@ -3,7 +3,9 @@ from flask import Blueprint, session, request, redirect, url_for, render_templat
 from flask.views import MethodView
 from flask.ext.babel import lazy_gettext as gettext
 from fypress.user import level_required, login_required, User, UserEditForm, UserAddForm
-from fypress.item import FolderForm, Folder, Media, Post
+from fypress.folder import FolderForm, Folder
+from fypress.media import Media
+from fypress.post import Post
 from fypress.admin.static import messages
 
 import json
@@ -15,10 +17,17 @@ admin = Blueprint('admin', __name__,  url_prefix='/admin')
 def root():
     return render_template('admin/index.html', title='Admin')
 
-
 """
     Posts
 """
+@admin.route('/posts')
+@admin.route('/posts/all')
+@level_required(1)
+def posts():
+    posts = Post.query.filter(status='draft').all(array=True)+Post.query.filter(status='published').all(array=True)
+
+    return render_template('admin/posts.html', title=gettext('Posts'), posts=posts)
+
 @admin.route('/posts/new', methods=['POST', 'GET'])
 @level_required(1)
 def posts_add():
@@ -26,18 +35,20 @@ def posts_add():
 
     if request.args.get('edit'):
         post = Post.query.get(request.args.get('edit'))
-        if post.parent:
-            return redirect(url_for('admin.posts_add', edit=post.parent))
-        if request.form:
-            post_id = Post.update(request.form, post)
-            return redirect(url_for('admin.posts_add', edit=post_id))
+        if post:
+            if post.parent:
+                return redirect(url_for('admin.posts_add', edit=post.parent))
+            if request.form:
+                post_id = Post.update(request.form, post)
+                return redirect(url_for('admin.posts_add', edit=post_id))
+        else:
+            return '404'
     else:
         if request.form:
             post_id = Post.create(request.form)
             return redirect(url_for('admin.posts_add', edit=post_id))
 
     folders = Folder.get_all()
-    post.dump()
     return render_template('admin/posts_new.html', folders=folders, post=post, title=gettext('New - Post'))
 
 """
@@ -103,7 +114,7 @@ def folders():
 @admin.route('/users/all')
 @level_required(4)
 def users():
-    users = User.query.get_all()
+    users = User.query.get_all(array=True)
     return render_template('admin/users.html', title=gettext('Users'), users=users)
 
 @admin.route('/users/edit', methods=['POST', 'GET'])
