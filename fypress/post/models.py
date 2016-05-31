@@ -5,11 +5,13 @@ from BeautifulSoup import *
 
 from fypress.utils import slugify, url_unique
 from fypress.folder import Folder
+from fypress.media import Media
 from fypress.utils import mysql
 
 class Post(mysql.Base):
     post_id               = mysql.Column(etype='int', primary_key=True)
     post_folder_id        = mysql.Column(etype='int') 
+    post_image_id         = mysql.Column(etype='int') 
     post_user_id          = mysql.Column(etype='int')
     post_parent           = mysql.Column(etype='int')
     post_guid             = mysql.Column(etype='string', unique=True)
@@ -25,6 +27,7 @@ class Post(mysql.Base):
     post_type             = mysql.Column(etype='string')
     post_meta             = mysql.Column(meta=True)
     post_folder           = mysql.Column(object=Folder, link='folder_id')
+    post_image            = mysql.Column(object=Media, link='image_id')
 
     txt_to_status         = {
         'published' : gettext('Published'),

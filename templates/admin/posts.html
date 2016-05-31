@@ -23,8 +23,11 @@
                         {% for post in posts %}
                             <tr class="odd ">
                                 <td class="col-md-1">#{{post.id}}</td>
-                                <td class="col-md-6">{{post.title}}</td>
-                                <td class="col-md-2">{{post.folder_id}}</td>
+                                <td class="col-md-6">
+                                    <img style="width: 40px; margin-right: 10px;" class="pull-left" src="{{post.image.urlify('thumbnail-s')}}" alt="{{post.title}}" /> 
+                                    {{post.title}}
+                                </td>
+                                <td class="col-md-2">{{post.folder.name}}</td>
                                 <td class="col-md-1">{{post.comment_count}}</td>
                                 <td class="col-md-12">{{post.modified}}</td>
                             </tr>

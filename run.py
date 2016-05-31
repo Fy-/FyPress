@@ -7,5 +7,5 @@ def main():
     return 0
 
 if __name__ == '__main__':
-    status = main()
-    sys.exit()
+     main()
+     sys.exit()

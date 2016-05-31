@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-05-24 18:03+0200\n"
+"POT-Creation-Date: 2016-05-31 23:56+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,52 +17,352 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.3.4\n"
 
-#: ../templates/admin/_base.html:191 ../templates/admin/users_edit.html:5
-msgid "User Profile"
+#: ../fypress/admin/static.py:5
+msgid "Item updated"
 msgstr ""
 
-#: ../templates/admin/_base.html:194
-msgid "Logout"
+#: ../fypress/admin/static.py:6
+msgid "Item added"
 msgstr ""
 
-#: ../templates/admin/_base.html:268
-msgid "All Users"
+#: ../fypress/admin/views.py:29 ../templates/admin/posts.html:5
+msgid "Posts"
 msgstr ""
 
-#: ../templates/admin/_base.html:271
-msgid "Add New"
+#: ../fypress/admin/views.py:52
+msgid "New - Post"
 msgstr ""
 
-#: ../templates/admin/_base.html:274
-msgid "Your profile"
+#: ../fypress/admin/views.py:63
+msgid "Library - Medias"
 msgstr ""
 
-#: ../templates/admin/users.html:4 ../templates/admin/users.html:7
+#: ../fypress/admin/views.py:68
+msgid "Add from Web - Medias"
+msgstr ""
+
+#: ../fypress/admin/views.py:73 ../templates/admin/_base.html:205
+#: ../templates/admin/medias.html:10 ../templates/admin/medias_upload.html:103
+#: ../templates/admin/medias_web.html:10
+msgid "Medias"
+msgstr ""
+
+#: ../fypress/admin/views.py:107 ../templates/admin/_base.html:199
+#: ../templates/admin/folders.html:30
+msgid "Categories"
+msgstr ""
+
+#: ../fypress/admin/views.py:118 ../templates/admin/_base.html:256
+#: ../templates/admin/users.html:5
 msgid "Users"
 msgstr ""
 
-#: ../templates/admin/users.html:15
-msgid "ID"
+#: ../fypress/admin/views.py:135
+msgid "Edit - User"
 msgstr ""
 
-#: ../templates/admin/users.html:16 ../user/forms.py:7 ../user/forms.py:13
-#: ../user/forms.py:21
-msgid "Login"
+#: ../fypress/admin/views.py:149
+msgid "New - User"
 msgstr ""
 
-#: ../templates/admin/users.html:17
+#: ../fypress/folder/forms.py:9 ../templates/admin/users.html:18
 msgid "Name"
 msgstr ""
 
-#: ../templates/admin/users.html:18 ../user/forms.py:15 ../user/forms.py:31
+#: ../fypress/folder/forms.py:9
+msgid "The name is how it appears on your site."
+msgstr ""
+
+#: ../fypress/folder/forms.py:10 ../templates/admin/posts_new.html:27
+msgid "Slug"
+msgstr ""
+
+#: ../fypress/folder/forms.py:10 ../templates/admin/posts_new.html:30
+msgid "The slug is the URL-friendly version of the name."
+msgstr ""
+
+#: ../fypress/folder/forms.py:11
+msgid "Content"
+msgstr ""
+
+#: ../fypress/folder/forms.py:12
+msgid "SEO Content"
+msgstr ""
+
+#: ../fypress/post/models.py:30 ../templates/admin/posts_new.html:52
+msgid "Published"
+msgstr ""
+
+#: ../fypress/post/models.py:31
+msgid "Draft"
+msgstr ""
+
+#: ../fypress/post/models.py:32
+msgid "Deleted"
+msgstr ""
+
+#: ../fypress/post/models.py:33
+msgid "Revision"
+msgstr ""
+
+#: ../fypress/user/forms.py:8 ../fypress/user/forms.py:14
+#: ../fypress/user/forms.py:22 ../templates/admin/users.html:17
+msgid "Login"
+msgstr ""
+
+#: ../fypress/user/forms.py:9 ../fypress/user/forms.py:24
+msgid "Password"
+msgstr ""
+
+#: ../fypress/user/forms.py:10
+msgid "Remember Me"
+msgstr ""
+
+#: ../fypress/user/forms.py:15 ../fypress/user/forms.py:30
+msgid "E-Mail"
+msgstr ""
+
+#: ../fypress/user/forms.py:16 ../fypress/user/forms.py:31
+#: ../templates/admin/users.html:19
 msgid "Nicename"
 msgstr ""
 
-#: ../templates/admin/users.html:19
-msgid "Contact"
+#: ../fypress/user/forms.py:17 ../fypress/user/forms.py:32
+msgid "Firstname"
+msgstr ""
+
+#: ../fypress/user/forms.py:18 ../fypress/user/forms.py:33
+msgid "Lastname"
+msgstr ""
+
+#: ../fypress/user/forms.py:19 ../fypress/user/forms.py:34
+msgid "URL"
+msgstr ""
+
+#: ../fypress/user/forms.py:25
+msgid "Repeat Password"
+msgstr ""
+
+#: ../fypress/user/forms.py:27
+msgid "Passwords must match"
+msgstr ""
+
+#: ../fypress/user/forms.py:42
+msgid "Login already taken"
+msgstr ""
+
+#: ../fypress/user/forms.py:46
+msgid "E-Mail already taken"
+msgstr ""
+
+#: ../fypress/user/models.py:24
+msgid "Member"
+msgstr ""
+
+#: ../fypress/user/models.py:25
+msgid "Contributor"
+msgstr ""
+
+#: ../fypress/user/models.py:26
+msgid "Author"
+msgstr ""
+
+#: ../fypress/user/models.py:27
+msgid "Editor"
+msgstr ""
+
+#: ../fypress/user/models.py:28
+msgid "Administrator"
+msgstr ""
+
+#: ../templates/admin/403.html:27 ../templates/admin/404.html:27
+msgid "The server understood the request, but is refusing to fulfill it."
+msgstr ""
+
+#: ../templates/admin/403.html:28 ../templates/admin/404.html:28
+msgid "Please GTFO ❤‿❤"
+msgstr ""
+
+#: ../templates/admin/_base.html:173 ../templates/admin/users_edit.html:5
+msgid "User Profile"
+msgstr ""
+
+#: ../templates/admin/_base.html:176
+msgid "Logout"
+msgstr ""
+
+#: ../templates/admin/_base.html:208 ../templates/admin/medias.html:15
+#: ../templates/admin/medias_upload.html:108
+#: ../templates/admin/medias_web.html:15
+msgid "Library"
+msgstr ""
+
+#: ../templates/admin/_base.html:211 ../templates/admin/medias.html:13
+#: ../templates/admin/medias_upload.html:106
+#: ../templates/admin/medias_web.html:13
+msgid "Add New (Upload)"
+msgstr ""
+
+#: ../templates/admin/_base.html:214 ../templates/admin/medias.html:14
+#: ../templates/admin/medias_upload.html:107
+#: ../templates/admin/medias_web.html:14
+msgid "Add New (Web)"
+msgstr ""
+
+#: ../templates/admin/_base.html:229 ../templates/admin/_base.html:243
+#: ../templates/admin/_base.html:263
+msgid "Add New"
+msgstr ""
+
+#: ../templates/admin/_base.html:260
+msgid "All Users"
+msgstr ""
+
+#: ../templates/admin/_base.html:267
+msgid "Your profile"
+msgstr ""
+
+#: ../templates/admin/_base.html:306 ../templates/admin/_base_empty.html:54
+msgid "Messages"
+msgstr ""
+
+#: ../templates/admin/folders.html:6
+msgid "Add Category"
+msgstr ""
+
+#: ../templates/admin/folders.html:7 ../templates/admin/folders.html:19
+#: ../templates/admin/posts_new.html:57 ../templates/admin/posts_new.html:64
+msgid "Save"
+msgstr ""
+
+#: ../templates/admin/folders.html:9 ../templates/admin/folders.html:21
+msgid "SEO Preview"
+msgstr ""
+
+#: ../templates/admin/folders.html:18
+msgid "Edit Category"
+msgstr ""
+
+#: ../templates/admin/medias.html:29
+msgid "Upload"
+msgstr ""
+
+#: ../templates/admin/medias_web.html:21
+msgid "Media URL"
+msgstr ""
+
+#: ../templates/admin/medias_web.html:23
+msgid ""
+"URL of your media, for example: <b>https://www.youtube.com/watch?v=m8e-"
+"FF8MsqU</b>"
+msgstr ""
+
+#: ../templates/admin/medias_web.html:25
+msgid "Add"
+msgstr ""
+
+#: ../templates/admin/medias_web.html:50
+msgid "Grabbing data"
+msgstr ""
+
+#: ../templates/admin/medias_web.html:54
+msgid "Invalid Media URL"
+msgstr ""
+
+#: ../templates/admin/medias_web.html:91
+msgid "Add  to Library"
+msgstr ""
+
+#: ../templates/admin/posts.html:8 ../templates/admin/users.html:8
+msgid "Filter"
+msgstr ""
+
+#: ../templates/admin/posts.html:15 ../templates/admin/users.html:16
+msgid "ID"
+msgstr ""
+
+#: ../templates/admin/posts.html:16 ../templates/admin/posts_new.html:23
+#: ../templates/admin/posts_new.html:24
+msgid "Title"
+msgstr ""
+
+#: ../templates/admin/posts.html:17 ../templates/admin/posts_new.html:72
+msgid "Category"
+msgstr ""
+
+#: ../templates/admin/posts.html:18
+msgid "Comments"
+msgstr ""
+
+#: ../templates/admin/posts.html:19
+msgid "Date"
+msgstr ""
+
+#: ../templates/admin/posts_new.html:21
+msgid "Edit post"
+msgstr ""
+
+#: ../templates/admin/posts_new.html:21
+msgid "Add new post"
+msgstr ""
+
+#: ../templates/admin/posts_new.html:32
+msgid "Final URL"
+msgstr ""
+
+#: ../templates/admin/posts_new.html:38 ../templates/admin/posts_new.html:39
+msgid "Add media"
+msgstr ""
+
+#: ../templates/admin/posts_new.html:38
+msgid "Media Library"
+msgstr ""
+
+#: ../templates/admin/posts_new.html:39
+msgid "Add GIF"
+msgstr ""
+
+#: ../templates/admin/posts_new.html:47
+msgid "Publication"
+msgstr ""
+
+#: ../templates/admin/posts_new.html:51
+msgid "Status"
+msgstr ""
+
+#: ../templates/admin/posts_new.html:53
+msgid "History"
+msgstr ""
+
+#: ../templates/admin/posts_new.html:53
+msgid "revisions"
+msgstr ""
+
+#: ../templates/admin/posts_new.html:58 ../templates/admin/posts_new.html:65
+msgid "Publish"
+msgstr ""
+
+#: ../templates/admin/posts_new.html:60
+msgid "Save as draft"
+msgstr ""
+
+#: ../templates/admin/posts_new.html:62
+msgid "Save and publish"
+msgstr ""
+
+#: ../templates/admin/posts_new.html:85
+msgid "Featured image"
+msgstr ""
+
+#: ../templates/admin/posts_new.html:107 ../templates/admin/posts_new.html:153
+msgid "No media selected"
 msgstr ""
 
 #: ../templates/admin/users.html:20
+msgid "Contact"
+msgstr ""
+
+#: ../templates/admin/users.html:21
 msgid "Role"
 msgstr ""
 
@@ -74,35 +374,7 @@ msgstr ""
 msgid "Back to All Users"
 msgstr ""
 
-#: ../user/forms.py:8 ../user/forms.py:23
-msgid "Password"
-msgstr ""
-
-#: ../user/forms.py:9
-msgid "Remember Me"
-msgstr ""
-
-#: ../user/forms.py:14 ../user/forms.py:30
-msgid "E-Mail"
-msgstr ""
-
-#: ../user/forms.py:16 ../user/forms.py:32
-msgid "Firstname"
-msgstr ""
-
-#: ../user/forms.py:17 ../user/forms.py:33
-msgid "Lastname"
-msgstr ""
-
-#: ../user/forms.py:18 ../user/forms.py:34
-msgid "URL"
-msgstr ""
-
-#: ../user/forms.py:24
-msgid "Repeat Password"
-msgstr ""
-
-#: ../user/forms.py:27
-msgid "Passwords must match"
+#: ../templates/admin/users_new.html:5 ../templates/admin/users_new.html:8
+msgid "Add new user"
 msgstr ""
 
