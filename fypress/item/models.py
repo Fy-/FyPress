@@ -1,8 +1,8 @@
 # -*- coding: UTF-8 -*-
-from flask import jsonify, flash
+from flask import jsonify, flash, g, request
 from flask.ext.babel import lazy_gettext as gettext
 from werkzeug import secure_filename
-from nested_encode import encode_nested
+from BeautifulSoup import *
 import hashlib, os, datetime, shutil, magic, json, urllib2
 
 from fypress import app
@@ -222,7 +222,7 @@ class Media(fy_mysql.Base):
 
 class Post(fy_mysql.Base):
     post_id               = fy_mysql.Column(etype='int', primary_key=True)
-    post_folder           = fy_mysql.Column(etype='int') 
+    post_folder_id        = fy_mysql.Column(etype='int') 
     post_user_id          = fy_mysql.Column(etype='int')
     post_parent           = fy_mysql.Column(etype='int')
     post_guid             = fy_mysql.Column(etype='string', unique=True)
@@ -231,19 +231,123 @@ class Post(fy_mysql.Base):
     post_content          = fy_mysql.Column(etype='string')
     post_title            = fy_mysql.Column(etype='string')
     post_excerpt          = fy_mysql.Column(etype='string')
-    post_status           = fy_mysql.Column(etype='string', allowed=('publish','draft','pending','trash','inherit')) 
+    post_status           = fy_mysql.Column(etype='string', allowed=('publish','draft','pending','trash','revision')) 
     post_comment_status   = fy_mysql.Column(etype='string', allowed=('open', 'close')) 
     post_comment_count    = fy_mysql.Column(etype='int')
     post_slug             = fy_mysql.Column(etype='string', unique=True)
     post_type             = fy_mysql.Column(etype='string')
     post_meta             = fy_mysql.Column(meta=True)
 
-    def create(self):
-        # Todo: create post, add_revision, update folder count.
-        pass
+    txt_to_status         = {
+        'publish'   : gettext('Public'),
+        'draft'     : gettext('Draft'),
+        'trash'     : gettext('Deleted'),
+        'revision'  : gettext('Revision')
+    }
 
-    def update(self):
-        pass
+    @property
+    def slug(self):
+        if self.__dict__.has_key('slug'):
+            return self.__dict__['slug']
+
+    @slug.setter
+    def slug(self, value):
+        self.__dict__['slug'] = slugify(value)
+
+    @staticmethod
+    def update(form, post):
+        status = 'draft'
+        if request.args.get('action') == 'publish':
+            status = 'publish'
+        if request.args.get('action') == 'draft':
+            status = 'draft'
+
+        post.dump()
+        post.title          = form['title']
+        post.content        = form['content']
+        post.folder_id      = form['folder']
+        post.modified       = 'NOW()'
+        post.status         = status
+        post.excerpt        = post.get_excerpt()
+
+        Post.query.update(post)
+        post_id = post.id
+        post.create_revision()
+        
+        try:
+            limit = Post.query.raw('SELECT post_id FROM fypress_post WHERE post_parent="{}" AND post_status="revision" ORDER BY post_id DESC LIMIT 5,1'.format(post_id)).all()
+            Post.query.sql('DELETE FROM _table_ WHERE post_parent="{}" AND post_status="revision"  AND post_id <= {}'.format(post_id, limit[0]['post_id'])).execute()
+        except:
+            pass
+
+        return post_id
+
+    @staticmethod
+    def create(form):
+        # Todo: create post, add_revision, update folder count.
+        status = 'draft'
+        if request.args.get('action') == 'publish':
+            status = 'publish'
+
+        slug = form['title']
+        if form.has_key('slug'):
+            slug = form['slug']
+
+        post = Post()
+        post.title          = form['title']
+        post.content        = form['content']
+        post.folder_id      = form['folder']
+        post.user_id        = g.user.id
+        post.parent         = 0
+        post.modified       = 'NOW()'
+        post.created        = 'NOW()'
+        post.excerpt        = post.get_excerpt()
+        post.status         = status
+        post.comment_status = 'open'
+        post.comment_count  = 0
+        post.slug           = slug
+        post.guid           = post.guid_generate()
+
+        Post.query.add(post)
+        post_id = post.id
+        post.create_revision()
+        return post_id
+
+    def create_revision(self):
+        post        = self
+        post.parent = post.id
+        post.id     = ''
+        post.guid   = post.guid_generate(rev=True)
+        post.status = 'revision'
+        Post.query.add(post)
+        return True
+
+    def guid_generate(self, rev=False):
+        count = ''
+        if rev:
+            count = Folder.query.filter(id_parent=rev).count()
+            count = '-'+str(count)
+
+        path = Folder.query.get(self.folder_id)
+        path = path.guid
+        name = self.slug + count
+        guid = url_unique(path+'/'+self.slug, Post)
+
+        return guid
+
+
+    def get_excerpt(self, size=255):
+        # https://github.com/dziegler/excerpt_extractor/tree/master
+
+        soup = Post.except_utils_rm_headers(BeautifulSoup(self.content))
+        text = ''.join(soup.findAll(text=True)).split('\n')
+        description = max((len(i.strip()),i) for i in text)[1].strip()[0:size]
+        return description   
+    
+    @staticmethod
+    def except_utils_rm_headers(soup):
+        [[tree.extract() for tree in soup(elem)] for elem in ('h1','h2','h3','h4','h5','h6')]
+        return soup
 
     def move(self):
         pass

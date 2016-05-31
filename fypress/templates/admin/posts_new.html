@@ -16,15 +16,15 @@
 
 {% block content %}
     {% from 'macros/form.html' import render_form %}
-    <form>
+    <form method="POST" action="" role="form">
         <div class="col-lg-9">
-            <h1 class="page-header"><i class="fa fa-file-text-o fa-fw"></i> {{ _('Add new post') }}</h1>
+            <h1 class="page-header"><i class="fa fa-file-text-o fa-fw"></i>{% if post.id %}{{ _('Edit post') }}{% else %}{{ _('Add new post') }}{% endif %}</h1>
                 <div class="form-group">
                     <label for="exampleInputEmail1">{{ _('Title') }}</label>
-                    <input type="text" class="form-control" id="fy_title" placeholder="{{_('Title')}}">
+                    <input type="text" class="form-control" name="title" id="fy_title" value="{{post.title}}" placeholder="{{_('Title')}}">
                     <p class="help-block">
                         <strong>{{_('Permalink')}}:</strong> 
-                        <a href="">http://127.0.0.1:5000/test/fypress/test</a> 
+                        <a href="">http://127.0.0.1:5000/{{post.guid}}.html</a> 
                         <a title="{{_('Edit')}}"  class="btn btn-info btn-xs  "><i class="fa fa-pencil" aria-hidden="true"></i> {{_('Edit')}}</a>
                     </p>
                 </div>
@@ -33,8 +33,7 @@
                     <a title="{{_('Add media')}}" id="fp_add_media"  data-toggle="modal" data-target="#fp_medias_modal" class="btn btn-default"><i class="fa fa-picture-o" aria-hidden="true"></i> {{_('Media Library')}}</a>
                     <a title="{{_('Add media')}}" id="fp_add_media"  class="btn btn-default"><i class="fa fa-picture-o" aria-hidden="true"></i> {{_('Add GIF')}}</a>
                 </div>
-                <textarea id="tinymce" name="content"></textarea>
-                <div id="fpcontent"></div>
+                <textarea id="tinymce" name="content">{{post.content}}</textarea>
               </div>
         </div>
         <div class="col-lg-3">
@@ -43,11 +42,22 @@
                    <strong>{{ _('Publication') }}</strong>
                 </div>
                 <div class="panel-body">
-                    <div><span class="text-muted">{{ _('Status') }}</span></div>
-                    <div><span class="text-muted">{{ _('Publish') }}</span></div>
+                    {% if post.id %}
+                        <div><span class="text-muted">{{ _('Status') }}</span>: <b>{{post.txt_to_status[post.status]}}</b></div>
+                        <div><span class="text-muted">{{ _('Published') }}</span>: <b>{{post.created}}</b></div>
+                    {% endif %}
                     <br />
-                    <a href="" class="btn btn-default pull-left"><i class="fa fa-hdd-o" aria-hidden="true"></i> {{ _('Save') }}</a> 
-                    <a href="" class="btn btn-success  pull-right"><i class="fa fa-check-circle" aria-hidden="true"></i> {{ _('Publish') }}</a>
+                    {% if not post.id %}
+                        <button type="submit" formaction="?action=save" class="btn btn-default pull-left"><i class="fa fa-hdd-o" aria-hidden="true"></i> {{ _('Save') }}</button> 
+                        <button type="submit" formaction="?action=publish" class="btn btn-success  pull-right"><i class="fa fa-check-circle" aria-hidden="true"></i> {{ _('Publish') }}</button>
+                    {% elif post.status == 'publish' %}
+                        <button type="submit" formaction="?action=draft&amp;edit={{post.id}}" class="btn btn-default pull-left"><i class="fa fa-hdd-o" aria-hidden="true"></i> {{ _('Save as draft') }}</button> 
+
+                        <button type="submit" formaction="?action=save&amp;edit={{post.id}}" class="btn btn-success pull-right"><i class="fa fa-hdd-o" aria-hidden="true"></i> {{ _('Save and publish') }}</button> 
+                    {% elif post.status == 'draft' or post.status == 'trash' %}
+                        <button type="submit" formaction="?action=save&amp;edit={{post.id}}" class="btn btn-default pull-left"><i class="fa fa-hdd-o" aria-hidden="true"></i> {{ _('Save') }}</button> 
+                        <button type="submit" formaction="?action=publish&amp;edit={{post.id}}" class="btn btn-success  pull-right"><i class="fa fa-check-circle" aria-hidden="true"></i> {{ _('Publish') }}</button>
+                    {% endif %}
                 </div>  
             </div>
 
@@ -56,9 +66,9 @@
                    <strong>{{ _('Category') }}</strong>
                 </div>
                 <div class="panel-body">
-                        <select id="fp_folder" name="fp_folder" class="form-control">
+                        <select id="fp_folder" name="folder" class="form-control" autocomplete="off" >
                             {% for folder in folders %}
-                                <option value="{{folder.id}}">{% for n in range(0,folder.depth) %}&nbsp;&nbsp;&nbsp;{% endfor %}{{folder.name}}</option>
+                                <option {% if post.folder_id == folder.id %}selected="selected"{% endif %} value="{{folder.id}}">{% for n in range(0,folder.depth) %}&nbsp;&nbsp;&nbsp;{% endfor %}{{folder.name}}</option>
                             {% endfor %}
                         </select>
                 </div>  
@@ -78,14 +88,14 @@
 {% endblock %}
 
 {% block footer %}
-    <div class="modal fade" id="fp_medias_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal fade" id="fp_medias_modal" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-lg-10">
                             <div id="fp_media_loader"></div>
-                            <iframe id="fp_media_frame" src="" style="width: 100%;" frameborder="0" allowtransparency="true"></iframe>
+                            <iframe id="fp_media_frame" src="" style="width: 100%; height: 0;"  width="100%" height="0" frameborder="0" ></iframe>
                         </div>
                         <div class="col-lg-2">
                             <div id="fp_media_selected" class="pull-left alert alert-success" style="margin: 0; width: 100%;">{{_('No media selected')}}</div>
@@ -123,17 +133,26 @@
             e.stopImmediatePropagation();
           }
         });
+        $(document).ready(function() {
+            $('#fp_media_frame').height( $(window).height() - 170 );
+            $('#fp_media_frame').css('display', 'none')
+        });
 
         var selected = null;
 
         $('#fp_media_frame').on('load', function(){
+            $('#fp_media_frame').css('display', 'block')
             $('#fp_insert_btn').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
             $('#fp_media_selected').html('{{_('No media selected')}}');
             $('#fp_media_loader').empty();
 
 
             var $iframe = $(this).contents()
-            $(this).height( $iframe.find('body').height() +250 );
+            
+            $iframe.find('.nav a').click(function() {
+                $iframe.find('.medias-box').html('<div style="text-align: center"><i class="fa fa-spinner spin-it fat-icon"></i></div>');
+
+            });
 
             $iframe.find('.fp_media').click(function() {
                 $('#fp_media_selected').empty();
@@ -173,8 +192,9 @@
             $('#fp_medias_modal').modal('hide')
         };
         $('#fp_medias_modal').on('shown.bs.modal', function (e) {
+            
             if ($('#fp_media_frame').attr('src') == '') {
-                $('#fp_media_loader').html('<i class="fa fa-spinner spin-it fat-icon"></i>')
+                $('#fp_media_loader').append('<i class="fa fa-spinner spin-it "></i>')
                 $('#fp_media_frame').attr('src', '{{ url_for('admin.medias', parent=1)}}');    
             }
         });

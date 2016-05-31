@@ -1,2 +1,2 @@
 from forms import FolderForm
-from models import Folder, Media
+from models import Folder, Media, Post

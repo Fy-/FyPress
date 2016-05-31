@@ -3,7 +3,7 @@ from flask import Blueprint, session, request, redirect, url_for, render_templat
 from flask.views import MethodView
 from flask.ext.babel import lazy_gettext as gettext
 from fypress.user import level_required, login_required, User, UserEditForm, UserAddForm
-from fypress.item import FolderForm, Folder, Media
+from fypress.item import FolderForm, Folder, Media, Post
 from fypress.admin.static import messages
 
 import json
@@ -19,11 +19,26 @@ def root():
 """
     Posts
 """
-@admin.route('/posts/new')
+@admin.route('/posts/new', methods=['POST', 'GET'])
 @level_required(1)
 def posts_add():
+    post = Post()
+
+    if request.args.get('edit'):
+        post = Post.query.get(request.args.get('edit'))
+        if post.parent:
+            return redirect(url_for('admin.posts_add', edit=post.parent))
+        if request.form:
+            post_id = Post.update(request.form, post)
+            return redirect(url_for('admin.posts_add', edit=post_id))
+    else:
+        if request.form:
+            post_id = Post.create(request.form)
+            return redirect(url_for('admin.posts_add', edit=post_id))
+
     folders = Folder.get_all()
-    return render_template('admin/posts_new.html', folders=folders, title=gettext('New - Post'))
+    post.dump()
+    return render_template('admin/posts_new.html', folders=folders, post=post, title=gettext('New - Post'))
 
 """
     Medias

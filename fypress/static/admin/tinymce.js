@@ -27,7 +27,7 @@ tinymce.init({
     valid_children : "+a[div], +div[*]",
     extended_valid_elements : "div[*]",
     content_css: [ 'https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css', '/static/admin/rte.css'],
-    body_class: "container",
+    body_class: "tinymce-editor-body",
     theme: "modern",
     skin: "lightgray",  
     style_formats: [{

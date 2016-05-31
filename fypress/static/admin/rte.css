@@ -24,3 +24,6 @@ blockquote p {
 hr {
     border-color: #ccc;
 }
+.tinymce-editor-body {
+  padding: 25px !important;
+}
