@@ -24,7 +24,11 @@
                             <tr class="odd ">
                                 <td class="col-md-1">#{{post.id}}</td>
                                 <td class="col-md-6">
-                                    <img style="width: 40px; margin-right: 10px;" class="pull-left" src="{{post.image.urlify('thumbnail-s')}}" alt="{{post.title}}" /> 
+                                    {% if post.image.id %}
+                                        <img style="width: 40px; margin-right: 10px;" class="pull-left" src="{{post.image.urlify('thumbnail-s')}}" alt="{{post.title}}" /> 
+                                    {% else %}
+
+                                    {% endif %}
                                     {{post.title}}
                                 </td>
                                 <td class="col-md-2">{{post.folder.name}}</td>

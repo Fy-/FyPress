@@ -25,7 +25,6 @@ def root():
 @level_required(1)
 def posts():
     posts = Post.query.filter(status='draft').all(array=True)+Post.query.filter(status='published').all(array=True)
-    posts[0].dump()
     return render_template('admin/posts.html', title=gettext('Posts'), posts=posts)
 
 @admin.route('/posts/new', methods=['POST', 'GET'])
