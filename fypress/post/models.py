@@ -36,6 +36,8 @@ class Post(mysql.Base):
         'revision'  : gettext('Revision')
     }
 
+
+
     @property
     def slug(self):
         if self.__dict__.has_key('slug'):
@@ -44,6 +46,17 @@ class Post(mysql.Base):
     @slug.setter
     def slug(self, value):
         self.__dict__['slug'] = slugify(value)
+
+    @staticmethod
+    def count_by_status():
+        query = """SELECT 
+            (SELECT COUNT(*) FROM fypress_post) AS total,
+            (SELECT COUNT(*) FROM fypress_post WHERE post_status = 'published') AS published,
+            (SELECT COUNT(*) FROM fypress_post WHERE post_status = 'draft') AS draft,
+            (SELECT COUNT(*) FROM fypress_post WHERE post_status = 'trash') AS trash
+        """
+
+        return Post.query.raw(query).result()[0]
 
     @staticmethod
     def update(form, post):
@@ -70,6 +83,7 @@ class Post(mysql.Base):
         Post.query.update(post)
         post_id = post.id
         post.create_revision()
+        post.folder.count_posts()
 
         return post_id
 
@@ -98,8 +112,9 @@ class Post(mysql.Base):
         post.comment_count  = 0
         post.slug           = slug
         post.guid           = post.guid_generate()
-
         Post.query.add(post)
+        post.folder.count_posts()
+
         post_id = post.id
         post.create_revision()
         return post_id
@@ -114,7 +129,6 @@ class Post(mysql.Base):
         return True
 
     def guid_generate(self, rev=False):
-        print 'REV:', str(rev)
         count = ''
         if rev:
             count = Post.query.filter(parent=rev).all(array=True)
@@ -124,7 +138,12 @@ class Post(mysql.Base):
         path = Folder.query.get(self.folder_id)
         path = path.guid
         name = self.slug + count
-        guid = url_unique(path+'/'+name, Post)
+        
+        if self.id:
+            guid = url_unique(path+'/'+name, Post, self.id)
+        else:
+            guid = url_unique(path+'/'+name, Post)
+
         if guid[0] == '/':
             guid = guid[1:]
 
@@ -145,7 +164,7 @@ class Post(mysql.Base):
         return soup
 
     def count_revs(self):
-        return Post.query.filter(parent=1).count()
+        return Post.query.count(parent=1)
 
     def move(self):
         pass

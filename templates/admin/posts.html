@@ -2,10 +2,14 @@
 
 {% block content %}
 <div class="col-lg-12">
-    <h1 class="page-header"><i class="fa fa-file-text-o  fa-fw"></i> {{ _('Posts') }}</h1>
+    <h1 class="page-header"><i class="fa fa-file-text-o  fa-fw"></i> {{ _('Posts') }} <a href="{{ url_for('admin.posts_add') }}" class="btn btn-default ">{{ _('Add New')}}</a></h1>
     <div class="panel panel-default">
         <div class="panel-heading">
-           {{ _('Filter') }}: All | Published | Drafts
+            {{ _('Filter') }}: 
+            <a {% if not filter %} class="active-filter"{% endif %} href="{{ url_for('admin.posts')}}">All</a> ({{numbers['total']}}) | 
+            <a {% if filter == 'published' %} class="active-filter"{% endif %} href="{{ url_for('admin.posts', filter='published')}}">Published</a> ({{numbers['published']}}) | 
+            <a {% if filter == 'draft' %} class="active-filter"{% endif %} href="{{ url_for('admin.posts', filter='draft')}}">Drafts</a> ({{numbers['draft']}}) |
+            <a {% if filter == 'trash' %} class="active-filter"{% endif %} href="{{ url_for('admin.posts', filter='trash')}}">Trash</a> ({{numbers['trash']}})
         </div>
         <div class="panel-body">
             <div class="dataTable_wrapper table-responsive"> 
@@ -21,30 +25,51 @@
                     </thead>
                     <tbody>
                         {% for post in posts %}
-                            <tr class="odd ">
-                                <td class="col-md-1">#{{post.id}}</td>
+                            <tr class="odd" >
+                                <td class="col-md-1">
+                                    <div class="col-md-6">
+                                        <input type="checkbox" value="{{post.id}}" name="post[]">
+                                    </div>
+                                    <div class="col-md-6">
+                                        #{{post.id}}
+                                    </div>
+                                </td>
                                 <td class="col-md-6">
                                     {% if post.image.id %}
-                                        <img style="width: 40px; margin-right: 10px;" class="pull-left" src="{{post.image.urlify('thumbnail-s')}}" alt="{{post.title}}" /> 
+                                        <img  class="pull-left thumbnail-table" src="{{post.image.urlify('thumbnail-s')}}" alt="{{post.title}}" /> 
                                     {% else %}
-
+                                         <img class="pull-left thumbnail-table" src="/static/images/empty.png" /> 
                                     {% endif %}
+                                    <a href="{{url_for('admin.posts_add', edit=post.id) }}">
                                     {{post.title}}
+                                    </a>
+                                    <br />
+                                    <small class="text-muted">
+                                        <a href="{{url_for('admin.posts_add', edit=post.id) }}">{{_('Edit')}}</a> | 
+                                        <a class="ldanger" href="">{{_('Delete')}}</a> | 
+                                        <a href="">{{_('Preview')}}</a> |
+                                        <em>{{options.url}}{{post.guid}}</em>
+                                    </small>
                                 </td>
-                                <td class="col-md-2">{{post.folder.name}}</td>
-                                <td class="col-md-1">{{post.comment_count}}</td>
-                                <td class="col-md-12">{{post.modified}}</td>
+                                <td class="col-md-2">
+                                    <small><i class="fa fa-folder-open-o fa-fw"></i> /{{post.folder.guid}}</small>
+                                    <br />
+                                    <strong>{{post.folder.name}}</strong>
+                                </td>
+                                <td class="col-md-1" style="vertical-align: middle"><i class="fa fa-comment" aria-hidden="true"></i> {{post.comment_count}}</td>
+                                <td class="col-md-12" style="vertical-align: middle"><abbr title="{{post.modified}}">{{post.modified}}</abbr></td>
                             </tr>
                         {% endfor %}
                 </tbody>
                 </table>
                 <script>
                     $(document).ready(function() {
-                        $('#dataTables-posts').DataTable({
+                        /*$('#dataTables-posts').DataTable({
                             responsive: false,
                             paging: false,
-                            info: false
-                        });
+                            info: false,
+                            search: false
+                        });*/
                     });
                 </script>
             </div>

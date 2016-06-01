@@ -26,10 +26,11 @@
                             <tr class="odd">
                                 <td class="col-md-1"> {{user.id}}</td>
                                 <td class="col-md-4">
-                                    <a href="{{url_for('admin.users_edit')}}?id={{user.id}}"><img class="user-avatar" src="{{user.gravatar(40)}}" alt="{{user.login}}" /></a>
+                                    <a href="{{url_for('admin.users_edit')}}?id={{user.id}}"><img class="thumbnail-table pull-left" src="{{user.gravatar(40)}}" alt="{{user.login}}" /></a>
                                     <a href="{{url_for('admin.users_edit')}}?id={{user.id}}"><strong>{{user.login}}</strong></a>
                                     <br />
-                                    <small class="text-muted"><a href="{{url_for('admin.users_edit')}}?id={{user.id}}">Edit</a> | <a class="ldanger" href="">Delete</a></small>
+                                    <small class="text-muted">
+                                        <a href="{{url_for('admin.users_edit')}}?id={{user.id}}">Edit</a> | <a class="ldanger" href="">Delete</a></small>
                                 </td>
                                 <td class="col-md-2">{{user.firstname}} {{user.lastname}}</td>
                                 <td class="col-md-2">{{user.nicename}}</td>

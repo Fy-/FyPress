@@ -28,9 +28,10 @@ class TreeHTML(object):
                     <div class="panel-success root">
                         <div class="panel-heading">
                             <i class="fa fa-folder-open-o fa-fw"></i> {0}
+                            <div class="pull-right"><i class="fa fa-file-text-o fa-fw"></i> {2}</div>
                         </div>
                     </div>
-                """.format(item['data'].name, item['data'].id)
+                """.format(item['data'].name, item['data'].id, item['data'].posts)
             else:
                 self.html += ("""
                     <div class="panel panel-info nav-drag">

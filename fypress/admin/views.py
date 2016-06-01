@@ -24,8 +24,13 @@ def root():
 @admin.route('/posts/all')
 @level_required(1)
 def posts():
-    posts = Post.query.filter(status='draft').all(array=True)+Post.query.filter(status='published').all(array=True)
-    return render_template('admin/posts.html', title=gettext('Posts'), posts=posts)
+    numbers = Post.count_by_status()
+    if not request.args.get('filter'):
+        posts   = Post.query.where(' _table_.post_status != "revision"').order_by('modified').all(array=True)
+    else:
+        posts   = posts   = Post.query.filter(status=request.args.get('filter')).order_by('modified').all(array=True)
+
+    return render_template('admin/posts.html', title=gettext('Posts'), posts=posts, numbers=numbers, filter=request.args.get('filter'))
 
 @admin.route('/posts/new', methods=['POST', 'GET'])
 @level_required(1)

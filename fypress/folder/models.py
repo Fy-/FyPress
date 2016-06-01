@@ -1,5 +1,4 @@
 # -*- coding: UTF-8 -*-
-
 from fypress.utils import slugify, url_unique, TreeHTML
 from fypress.utils import mysql
 
@@ -28,10 +27,33 @@ class Folder(mysql.Base):
     def slug(self, value):
         self.__dict__['slug'] = slugify(value)
 
+    def link_posts(self):
+        from fypress.post import Post 
+        posts =  Post.query.filter(status='draft').all(array=True)+Post.query.filter(status='published').all(array=True)+Post.query.filter(status='trash').all(array=True)
+        for post in posts:
+            post.guid = post.guid_generate()
+            Post.query.update(post)
+
+    def count_posts(self):
+        query = """
+            UPDATE
+              fypress_folder
+            SET
+              fypress_folder.folder_posts =(
+                  SELECT
+                    COUNT(*)
+                  FROM
+                    fypress_post
+                  WHERE
+                    fypress_post.post_parent = 0 AND fypress_post.post_folder_id = fypress_folder.folder_id
+            )
+        """        
+        Folder.query.sql(query).execute()
 
     def update(self):
         Folder.query.update(self)
         self.build_guid()
+        self.link_posts()
 
     def update_guid(self):
         query = """

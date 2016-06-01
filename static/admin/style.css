@@ -1,3 +1,10 @@
+/* 
+    Global
+*/
+.active-filter {
+    font-weight: bold;
+    color: #000;
+}
 .user-avatar {
     float: left;
     margin-right: 5px;
@@ -17,10 +24,12 @@
     color: green;
     text-decoration: none;
 }
-
 .panel-logo {
     margin-top: 20px;
     text-align:center;
+}
+abbr {
+    border-width: 0 !important;
 }
 
 /* 
@@ -69,6 +78,12 @@
 /* 
     Media
 */
+.thumbnail-table {
+    padding: 2px;
+    border: 1px solid #cecece;
+    width: 40px; 
+    margin-right: 10px;
+}
 .fp_media_container {
 
 }
