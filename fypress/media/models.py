@@ -1,11 +1,13 @@
 # -*- coding: UTF-8 -*-
 from werkzeug import secure_filename
 from flask import flash, jsonify
-import datetime, magic, os, hashlib
+import datetime, magic, os, hashlib, json
 from fypress.utils import FyImage, FyOembed, slugify, url_unique
 from fypress.admin.static import messages
 from fypress.utils import mysql
 from config import config
+
+import urllib2, shutil
 
 class Media(mysql.Base):
     # todo allowed {type, icon, }
@@ -77,23 +79,23 @@ class Media(mysql.Base):
 
         if data['oembed'].has_key('thumbnail_url'):
             response = urllib2.urlopen(data['oembed']['thumbnail_url'])
-            Media.upload_save(response, os.path.join(Media.upload_path('CHUNKS_DIRECTORY'), media_hash))
+            Media.upload_save(response, os.path.join(Media.upload_path(config.CHUNKS_DIRECTORY), media_hash))
 
             mime = magic.Magic(mime=True)
-            mime_file = mime.from_file(os.path.join(Media.upload_path('CHUNKS_DIRECTORY'), media_hash))
+            mime_file = mime.from_file(os.path.join(Media.upload_path(config.CHUNKS_DIRECTORY), media_hash))
             mimes = {'image/jpeg': 'jpg', 'image/jpg': 'jpg', 'image/png':'png'}
 
             ext         = '.'+mimes[mime_file]
             filename    = 'oembed-'+media_hash+ext
-            fdir        = Media.upload_path('UPLOAD_DIRECTORY')
+            fdir        = Media.upload_path(config.UPLOAD_DIRECTORY)
             fpath       = os.path.join(fdir, filename)
 
-            shutil.move(os.path.join(Media.upload_path('CHUNKS_DIRECTORY'), media_hash), fpath)
+            shutil.move(os.path.join(Media.upload_path(config.CHUNKS_DIRECTORY), media_hash), fpath)
 
             images      = FyImage(fpath).generate()
             sizes = {}
             for image in images:
-                sizes[image[3]] = {'name': image[1], 'source': os.path.join(Media.upload_path('UPLOAD_DIRECTORY'), image[0]), 'guid': "{}/{}/".format(now.year, now.month)+image[2]}
+                sizes[image[3]] = {'name': image[1], 'source': os.path.join(Media.upload_path(config.UPLOAD_DIRECTORY), image[0]), 'guid': "{}/{}/".format(now.year, now.month)+image[2]}
 
             media.data['var'] = sizes
             Media.query.update(media)
@@ -106,7 +108,7 @@ class Media(mysql.Base):
     def upload_path(config):
         now = datetime.datetime.now()
         tmp = "{}/{}".format(now.year, now.month)
-        if config == 'CHUNKS_DIRECTORY':
+        if 'chunks' in config:
             return os.path.join(config)
         return os.path.join(config, tmp)
 

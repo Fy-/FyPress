@@ -2,14 +2,19 @@
 
 {% block content %}
 <div class="col-lg-12">
-    <h1 class="page-header"><i class="fa fa-file-text-o  fa-fw"></i> {{ _('Posts') }} <a href="{{ url_for('admin.posts_add') }}" class="btn btn-default ">{{ _('Add New')}}</a></h1>
+    <h1 class="page-header">
+        {% if page %}
+            <i class="fa fa-file-o  fa-fw"></i> {{ _('Pages') }} <a href="{{ url_for(urls~'_add') }}" class="btn btn-default ">{{ _('Add New')}}</a></h1>
+        {% else %}
+            <i class="fa fa-file-text-o  fa-fw"></i> {{ _('Posts') }} <a href="{{ url_for(urls~'_add') }}" class="btn btn-default ">{{ _('Add New')}}</a></h1>
+        {% endif %}
     <div class="panel panel-default">
         <div class="panel-heading">
             {{ _('Filter') }}: 
-            <a {% if not filter %} class="active-filter"{% endif %} href="{{ url_for('admin.posts')}}">All</a> ({{numbers['total']}}) | 
-            <a {% if filter == 'published' %} class="active-filter"{% endif %} href="{{ url_for('admin.posts', filter='published')}}">Published</a> ({{numbers['published']}}) | 
-            <a {% if filter == 'draft' %} class="active-filter"{% endif %} href="{{ url_for('admin.posts', filter='draft')}}">Drafts</a> ({{numbers['draft']}}) |
-            <a {% if filter == 'trash' %} class="active-filter"{% endif %} href="{{ url_for('admin.posts', filter='trash')}}">Trash</a> ({{numbers['trash']}})
+            <a {% if not filter %} class="active-filter"{% endif %} href="{{ url_for(urls)}}">All</a> ({{numbers['total']}}) | 
+            <a {% if filter == 'published' %} class="active-filter"{% endif %} href="{{ url_for(urls, filter='published')}}">Published</a> ({{numbers['published']}}) | 
+            <a {% if filter == 'draft' %} class="active-filter"{% endif %} href="{{ url_for(urls, filter='draft')}}">Drafts</a> ({{numbers['draft']}}) |
+            <a {% if filter == 'trash' %} class="active-filter"{% endif %} href="{{ url_for(urls, filter='trash')}}">Trash</a> ({{numbers['trash']}})
         </div>
         <div class="panel-body">
             <div class="dataTable_wrapper table-responsive"> 
@@ -38,17 +43,28 @@
                                     {% if post.image.id %}
                                         <img  class="pull-left thumbnail-table" src="{{post.image.urlify('thumbnail-s')}}" alt="{{post.title}}" /> 
                                     {% else %}
-                                         <img class="pull-left thumbnail-table" src="/static/images/empty.png" /> 
+                                        <img class="pull-left thumbnail-table" src="/static/images/empty.png" /> 
                                     {% endif %}
-                                    <a href="{{url_for('admin.posts_add', edit=post.id) }}">
+                                    {% if post.status != 'trash' %}<a href="{{url_for(urls~'_add', edit=post.id) }}">{% else %}<span class="text-muted">{% endif %}
                                     {{post.title}}
-                                    </a>
+                                    {% if post.status != 'trash' %}</a>{% else %}</span>{% endif %}
                                     <br />
                                     <small class="text-muted">
-                                        <a href="{{url_for('admin.posts_add', edit=post.id) }}">{{_('Edit')}}</a> | 
-                                        <a class="ldanger" href="">{{_('Delete')}}</a> | 
-                                        <a href="">{{_('Preview')}}</a> |
-                                        <em>{{options.url}}{{post.guid}}</em>
+                                        {% if post.status != 'trash' %}
+                                            <a href="{{url_for('admin.posts_add', edit=post.id) }}">{{_('Edit')}}</a> | 
+                                            {% if post.status == 'draft' %}
+                                                <a  href="{{ url_for('admin.posts_move', id=post.id, status='published') }}">{{_('Publish')}}</a> | 
+                                            {% elif post.status == 'published' %}
+                                                <a  href="{{ url_for('admin.posts_move', id=post.id, status='draft') }}">{{_('Unpublish')}}</a> | 
+                                            {% endif %}
+                                            <a class="ldanger" href="{{ url_for('admin.posts_move', id=post.id, status='trash') }}">{{_('Delete')}}</a> | 
+                                            <a href="">{{_('Preview')}}</a> |
+                                            <em>{{options.url}}{{post.guid}}</em>
+                                        {% else %}
+                                            <a  href="{{ url_for('admin.posts_move', id=post.id, status='draft') }}">{{_('Restore')}}</a> | 
+                                            <a  href="{{ url_for('admin.posts_move', id=post.id, status='published') }}">{{_('Publish')}}</a> |
+                                            <a class="ldanger" href="{{ url_for('admin.posts_move', id=post.id, status='trash') }}">{{_('Delete Permanently')}}</a> 
+                                        {% endif %}
                                     </small>
                                 </td>
                                 <td class="col-md-2">
@@ -62,16 +78,6 @@
                         {% endfor %}
                 </tbody>
                 </table>
-                <script>
-                    $(document).ready(function() {
-                        /*$('#dataTables-posts').DataTable({
-                            responsive: false,
-                            paging: false,
-                            info: false,
-                            search: false
-                        });*/
-                    });
-                </script>
             </div>
         </div>
     </div>

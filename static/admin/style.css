@@ -1,6 +1,12 @@
 /* 
     Global
 */
+.flash {
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    padding-left: 20px;
+    border-left: 10px solid #46b450;
+}
 .active-filter {
     font-weight: bold;
     color: #000;
@@ -110,13 +116,18 @@ abbr {
     text-decoration: none;
 }
 .img-black {
-    width: 150px;
+    width: 100%;
     height: 150px;
     background: rgba(0,0,0,0.95);
     text-align: center;
     padding: 10px;
     display: flex;
     align-items: center;
+    text-align: center;
+}
+.mediabox {
+    overflow: hidden;
+    height: 210px;
 }
 .media-item a:hover {
     text-decoration: none;
@@ -124,12 +135,15 @@ abbr {
 .media-icon {
     position: absolute;
     display: block;
-    width: 150px;
+    width: 100%;
     height: 150px;
     font-size: 100px;
     text-align: center;
     line-height: 150px;
     color: rgba(255,255,255,0.2);
+}
+.vcenter {
+    margin: 0 auto;
 }
 #fp_media_loader {
     text-align: center;

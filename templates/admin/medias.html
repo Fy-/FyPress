@@ -18,11 +18,11 @@
         <div class="medias-box">
             <div class="row">
             {% for media in medias %}
-              <div class="pull-left media-item" >
-                <a href="#" class="thumbnail fp_media" id="media_{{media.id}}">
+              <div class="col-md-2 col-xs-4 mediabox" >
+                <a href="#" class="thumbnail fp_media" data-type="{{media.type}}" id="media_{{media.id}}">
                   <i class="fa {{media.icon}} media-icon"></i>
                   {% if media.urlify('thumbnail-s') %}
-                    <img src="{{media.urlify('thumbnail-s')}}" alt="{{media.name}}" />
+                    <img src="{{media.urlify('thumbnail-s')}}"  alt="{{media.name}}" />
                   {% else %}
                     <div class="img-black"><div class="vcenter">{{media.name}}</div></div>
                   {% endif %}

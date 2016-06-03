@@ -1,24 +1,25 @@
 {% extends "admin/_base.html" %}
 {% block css %}
     {{ super() }}
-    <!--<link href="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.1/summernote.css" rel="stylesheet">-->
 {% endblock %}
 {% block js %}
     {{ super() }}
-    <!--
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.1/summernote.js"></script>
-    -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/4.3.12/jquery.tinymce.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/4.3.12/tinymce.min.js"></script>
     <script src="/static/admin/tinymce.js"></script>
-
 {% endblock %}
 
 {% block content %}
     {% from 'macros/form.html' import render_form %}
     <form method="POST" action="" role="form">
+        <input type="hidden" name="type" value="{% if page %}page{% else %}post{% endif %}" />
         <div class="col-lg-9">
-            <h1 class="page-header"><i class="fa fa-file-text-o fa-fw"></i>{% if post.id %}{{ _('Edit post') }}{% else %}{{ _('Add new post') }}{% endif %}</h1>
+            <h1 class="page-header">
+                {% if page %}
+                    <i class="fa fa-file-text-o fa-fw"></i>{% if post.id %}{{ _('Edit page') }}{% else %}{{ _('Add new page') }}{% endif %}</h1>
+                {% else %}
+                    <i class="fa fa-file-o fa-fw"></i>{% if post.id %}{{ _('Edit post') }}{% else %}{{ _('Add new post') }}{% endif %}</h1>
+                {% endif %}
                 <div class="form-group">
                     <label for="fp_title">{{ _('Title') }}</label>
                     <input type="text" class="form-control" name="title" id="fp_title" value="{% if post.title %}{{post.title}}{% endif %}" placeholder="{{_('Title')}}">
@@ -36,7 +37,6 @@
               <div class="form-group">
                 <div class="fp_rte">
                     <a title="{{_('Add media')}}" id="fp_add_media"  data-toggle="modal" data-target="#fp_medias_modal" class="btn btn-default"><i class="fa fa-picture-o" aria-hidden="true"></i> {{_('Media Library')}}</a>
-                    <a title="{{_('Add media')}}" id="fp_add_media"  class="btn btn-default"><i class="fa fa-picture-o" aria-hidden="true"></i> {{_('Add GIF')}}</a>
                 </div>
                 <textarea id="tinymce" name="content">{{post.content}}</textarea>
               </div>
@@ -82,10 +82,18 @@
 
             <div class="panel panel-default">
                 <div class="panel-heading">
-                   <strong>{{ _('Featured image') }}</strong>
+                   <strong>{{ _('Featured image') }}</strong> 
+                   <a href="#" data-toggle="modal" data-target="#fp_medias_modal" class="btn btn-xs btn-default pull-right" style="margin-left: 10px"><i class="fa fa-picture-o" aria-hidden="true"></i> {{_('Change')}}</a> 
+                   <a href="" class="btn btn-xs btn-default pull-right"><i class="fa fa-trash" aria-hidden="true"></i>
+ {{ _('Delete') }}</a>
                 </div>
-                <div class="panel-body">
-
+                <div class="panel-body" style="padding-bottom:0">
+                    {% if post.id and post.image.urlify('thumbnail-s') %}
+                        <img src="{{post.image.urlify('thumbnail-lg')}}" id="post_featured" style="width: 100%" class="thumbnail img-responsive"  alt="{{post.image.name}}" />
+                    {% else %}
+                        <img data-toggle="modal" data-target="#fp_medias_modal" src="/static/images/empty-lg.png" id="post_featured" style="cursor: pointer; width: 100%" class="thumbnail img-responsive"  alt="{{_('Empty')}}" />
+                    {% endif %}
+                    <input type="hidden" id="post_image" name="image" value="{% if post.id %}{{post.image.id or 0}}{% else %}0{% endif %}" />
                 </div>  
             </div>
         </div>
@@ -99,12 +107,14 @@
             <div class="modal-content">
                 <div class="modal-body">
                     <div class="row">
-                        <div class="col-lg-10">
+                        <div class="col-lg-9">
                             <div id="fp_media_loader"></div>
                             <iframe id="fp_media_frame" src="" style="width: 100%; height: 0;"  width="100%" height="0" frameborder="0" ></iframe>
                         </div>
-                        <div class="col-lg-2">
+                        <div class="col-lg-3">
                             <div id="fp_media_selected" class="pull-left alert alert-success" style="margin: 0; width: 100%;">{{_('No media selected')}}</div>
+                            <div class="clearfix"></div>
+                            <div id="fp_insert_btn" style="margin-top: 10px;"></div>
                         </div>
                     </div>
                 </div>
@@ -115,25 +125,6 @@
         </div>
     </div>
     <script>
-        /*
-        $(document).ready(function() {
-          $('#fpcontent').summernote({
-            minHeight: 500,
-            focus: true, 
-            toolbar: [
-                    ['style', ['style']],
-                    ['font', ['bold', 'underline', 'clear']],
-                    ['fontname', ['fontname']],
-                    ['color', ['color']],
-                    ['para', ['ul', 'ol', 'paragraph']],
-                    ['table', ['table']],
-                    ['insert', ['link']],
-                    ['view', ['fullscreen', 'codeview']]
-              ],
-          });
-        });
-        */
-        
         $(document).on('focusin', function(e) {
           if ($(e.target).closest(".mce-window").length) {
             e.stopImmediatePropagation();
@@ -146,10 +137,12 @@
         });
 
         var selected = null;
+        var selected_data = null;
+        var selected_id = 0;
 
         $('#fp_media_frame').on('load', function(){
             $('#fp_media_frame').css('display', 'block')
-            $('#fp_insert_btn').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+            $('#fp_insert_btn').empty();
             $('#fp_media_selected').html('{{_('No media selected')}}');
             $('#fp_media_loader').empty();
 
@@ -165,22 +158,24 @@
                 $('#fp_media_selected').empty();
                 selected = null;
                 $iframe.find('.fp_media').removeClass('media-selected');
-                $( this ).addClass('media-selected');
+                $(this).addClass('media-selected');
                 var c_media = $(this).clone()
+                selected_id = $(this).attr('id').replace('media_', '');
                 $.get( '{{url_for('admin.ajax_get_media')}}?id='+$(this).attr('id'), function(data) {
-                    var html = ''
+                    var html = '<pre>'+data.data.name+'</pre>'
+                    selected_data = data.data;
                     if (data.data.var) {
-                        html = '<br /><select class="form-control" id="fp_media_format">'
+                        html += '<div class="form-group"><label for="fp_media_format">{{ _('Image size') }}</label><select class="form-control" id="fp_media_format">'
                         html += '<option value="'+data.data.guid+'">Original file</option>'
 
                         Object.keys(data.data.var).forEach(function(key) {
                             html += '<option value="'+data.data.var[key].guid+'">'+data.data.var[key].name+'</option>'
                         });
-                        html += '</select>'
+                        html += '</select></div>'
 
                         selected = '<img class="img-thumbnail" src="{{flask_config['UPLOAD_DIRECTORY_URL']}}'+data.data.guid+'" alt="'+data.data.name+'" />'
                     } else {
-                        selected = '<div class="media">'+data.data.html+'</div><p></p>'
+                        selected = '<div class="media">'+data.data.html+'</div>'
                     }
                     $('#fp_media_selected').append(c_media)
                     $('#fp_media_selected').append(html)
@@ -189,13 +184,21 @@
                         selected = '<img class="img-thumbnail" src="{{flask_config['UPLOAD_DIRECTORY_URL']}}'+$('#fp_media_format').val()+'" alt="'+data.data.name+'" />'
                     });
                 });
-                $('#fp_insert_btn').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button> <a  href="javascript:insert_content()" class="btn btn-primary">Insert</a>');
+                console.log($(this).data('type'))
+                if ( $(this).data('type') == 'image') {
+                    $('#fp_insert_btn').html('<a  href="javascript:insert_featured()" class="btn btn-success">{{_('Post Featured')}}</a> <a  href="javascript:insert_content()" class="btn btn-primary pull-right ">{{_('Insert')}}</a>');
+                } else {
+                    $('#fp_insert_btn').html('<a  href="javascript:insert_content()" class="pull-right btn btn-primary">{{_('Insert')}}</a>');
+                }
             });
         });
-
+        var insert_featured = function() {
+            $('#post_featured').attr('src', '{{flask_config['UPLOAD_DIRECTORY_URL']}}'+selected_data.var['thumbnail-lg'].guid)
+            $('#post_image').val(selected_id)
+            $('#fp_medias_modal').modal('hide')
+        };
         var insert_content = function() {
             tinymce.get('tinymce').insertContent(selected);
-            //document.execCommand('insertHtml', null, selected);
             $('#fp_medias_modal').modal('hide')
         };
         $('#fp_medias_modal').on('shown.bs.modal', function (e) {

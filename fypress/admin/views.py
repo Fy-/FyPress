@@ -7,6 +7,7 @@ from fypress.folder import FolderForm, Folder
 from fypress.media import Media
 from fypress.post import Post
 from fypress.admin.static import messages
+from fypress.utils import get_redirect_target
 
 import json
 
@@ -17,43 +18,104 @@ admin = Blueprint('admin', __name__,  url_prefix='/admin')
 def root():
     return render_template('admin/index.html', title='Admin')
 
+
 """
-    Posts
+    Errors & Utils
 """
+@admin.route('/back')
+def back():
+    return redirect(get_redirect_target())
+
+def handle_404():
+    return render_template('admin/404.html', title=gettext('Error: 404')), 404
+
+def handle_403():
+    return render_template('admin/403.html', title=gettext('Error: 403')), 403
+
+
+"""
+    Posts & Pages
+"""
+@admin.route('/pages')
+@admin.route('/pages/all')
+@level_required(1)
+def pages():
+    return posts(True)
+
+@admin.route('/pages/edit', methods=['POST', 'GET'])
+@admin.route('/pages/new', methods=['POST', 'GET'])
+@level_required(1)
+def pages_add():
+    return posts_add(True)
+
 @admin.route('/posts')
 @admin.route('/posts/all')
 @level_required(1)
-def posts():
-    numbers = Post.count_by_status()
+def posts(page=False):
+    numbers = Post.count_by_status(page)
     if not request.args.get('filter'):
-        posts   = Post.query.where(' _table_.post_status != "revision"').order_by('modified').all(array=True)
+        if page:
+            posts   = Post.query.where(' _table_.post_status IN ("draft", "published") AND _table_.post_type="page"').order_by('modifid').all(array=True)
+        else:
+            posts   = Post.query.where(' _table_.post_status IN ("draft", "published") AND _table_.post_type="post"').order_by('modifid').all(array=True)
     else:
-        posts   = posts   = Post.query.filter(status=request.args.get('filter')).order_by('modified').all(array=True)
+        if page:
+            posts   = Post.query.filter(status=request.args.get('filter'), type='page').order_by('modified').all(array=True)
+        else:
+            posts   = Post.query.filter(status=request.args.get('filter'), type='post').order_by('modified').all(array=True)
 
-    return render_template('admin/posts.html', title=gettext('Posts'), posts=posts, numbers=numbers, filter=request.args.get('filter'))
 
+    if page:
+        urls = 'admin.pages'
+    else:
+        urls = 'admin.posts'
+
+    return render_template('admin/posts.html', title=gettext('Posts'), posts=posts, numbers=numbers, filter=request.args.get('filter'), page=page, urls=urls)
+
+@admin.route('/posts/move')
+@level_required(1)
+def posts_move():
+    post = Post.query.get(request.args.get('id'))
+    if post:
+        post.move(request.args.get('status'))
+        flash(messages['moved']+' to '+request.args.get('status')+' ('+str(post)+')')
+        return redirect(get_redirect_target())
+    else:
+        return handle_404()
+
+@admin.route('/posts/edit', methods=['POST', 'GET'])
 @admin.route('/posts/new', methods=['POST', 'GET'])
 @level_required(1)
-def posts_add():
+def posts_add(page=False):
     post = Post()
+
+    if page:
+        urls = 'admin.pages'
+    else:
+        urls = 'admin.posts'
 
     if request.args.get('edit'):
         post = Post.query.get(request.args.get('edit'))
         if post:
             if post.parent:
-                return redirect(url_for('admin.posts_add', edit=post.parent))
+                return redirect(url_for(urls+'_add', edit=post.parent))
             if request.form:
                 post_id = Post.update(request.form, post)
-                return redirect(url_for('admin.posts_add', edit=post_id))
+                flash(messages['updated']+' ('+str(post)+')')
+                return redirect(url_for(urls+'_add', edit=post_id))
         else:
-            return '404'
+            return handle_404()
     else:
         if request.form:
             post_id = Post.create(request.form)
-            return redirect(url_for('admin.posts_add', edit=post_id))
+            flash(messages['added']+' ('+str(post)+')')
+            return redirect(url_for(urls+'_add', edit=post_id))
 
     folders = Folder.get_all()
-    return render_template('admin/posts_new.html', folders=folders, post=post, title=gettext('New - Post'))
+
+
+
+    return render_template('admin/posts_new.html', folders=folders, post=post, title=gettext('New - Post'), page=page, urls=urls)
 
 """
     Medias
@@ -63,7 +125,6 @@ def posts_add():
 @level_required(1)
 def medias():
     medias =  Media.query.get_all(array=True, order='ORDER BY `media_modified` DESC')
-
     return render_template('admin/medias.html',  medias=medias, title=gettext('Library - Medias'))
 
 @admin.route('/medias/add/web')

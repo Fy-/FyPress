@@ -24,7 +24,6 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
         <script src="http://netdna.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.js"></script> 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/metisMenu/2.5.2/metisMenu.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/startbootstrap-sb-admin-2/1.0.8/js/sb-admin-2.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.12/js/jquery.dataTables.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.12/js/dataTables.bootstrap.min.js"></script>
         <script src="//cdn.datatables.net/responsive/2.1.0/js/dataTables.responsive.min.js"></script>
@@ -182,18 +181,6 @@
            <div class="navbar-default sidebar" role="navigation">
                 <div class="sidebar-nav navbar-collapse">
                     <ul class="nav" id="side-menu">
-                        <li class="sidebar-search">
-                            <div class="input-group custom-search-form">
-                                <input type="text" class="form-control" placeholder="Search...">
-                                <span class="input-group-btn">
-                                <button class="btn btn-default" type="button">
-                                    <i class="fa fa-search"></i>
-                                </button>
-                            </span>
-                            </div>
-                            <!-- /input-group -->
-                        </li>
-                        
                         {% if g.user.has_level(3) %}
                             <li>
                                 <a href="{{ url_for('admin.folders') }}"><i class="fa fa-folder-open-o fa-fw"></i> {{ _('Categories') }}</a>
@@ -201,9 +188,9 @@
                         {% endif %}
 
                         {% if g.user.has_level(1) %}
-                            <li>
-                                <a href="#"><i class="fa fa fa-picture-o fa-fw"></i> {{ _('Medias') }}</a>
-                                <ul class="nav nav-second-level">
+                            <li >
+                                <a href="#" ><i class="fa fa fa-picture-o fa-fw" ></i> {{ _('Medias') }}<span class="fa arrow"></span></a>
+                                <ul aria- class="nav nav-second-level">
                                     <li>
                                         <a href="{{ url_for('admin.medias') }}">{{ _('Library') }}</a>
                                     </li>
@@ -219,11 +206,11 @@
 
 
                         {% if g.user.has_level(1) %}
-                            <li>
-                                <a href="#"><i class="fa fa-file-text-o fa-fw"></i> Posts<span class="fa arrow"></span></a>
-                                <ul class="nav nav-second-level">
+                            <li class="active">
+                                <a href="#" aria-expanded="true"><i class="fa fa-file-text-o fa-fw"></i> {{_('Posts')}}<span class="fa arrow"></span></a>
+                                <ul aria-expanded="true" class="nav nav-second-level">
                                     <li>
-                                        <a href="{{ url_for('admin.posts') }}">All posts</a>
+                                        <a href="{{ url_for('admin.posts') }}">{{_('All posts')}}</a>
                                     </li>
                                     <li>
                                         <a href="{{ url_for('admin.posts_add') }}">{{ _('Add New') }}</a>
@@ -233,14 +220,14 @@
                         {% endif %}
 
                         {% if g.user.has_level(3) %}
-                            <li>
-                                <a href="#"><i class="fa fa-file-o fa-fw"></i> Pages<span class="fa arrow"></span></a>
-                                <ul class="nav nav-second-level">
+                            <li class="active">
+                                <a href="#" aria-expanded="true"><i class="fa fa-file-o fa-fw"></i> {{_('Pages')}}<span class="fa arrow"></span></a>
+                                <ul class="nav nav-second-level" aria-expanded="true">
                                     <li>
-                                        <a href="/admin/posts/type/page">All Pages</a>
+                                        <a href="{{ url_for('admin.pages') }}">{{_('All Pages')}}</a>
                                     </li>
                                     <li>
-                                        <a href="/admin/posts/type/pagezz">{{ _('Add New') }}</a>
+                                        <a href="{{ url_for('admin.pages_add') }}">{{ _('Add New') }}</a>
                                     </li>
                                 </ul>
                             </li>
@@ -302,13 +289,10 @@
                 {% with messages = get_flashed_messages() %}
                     {% if messages %}
                     <br />
-                    <div class="alert alert-info">
-                        <h4>{{_('Messages')}} :</h4>
-                        <ul>
+                    <div class="flash">
                         {% for message in messages %}
-                            <li>{{ message }}</li>
+                           {{ message }}
                         {% endfor %}
-                        </ul>
                     </div>
                     {% endif %}
                 {% endwith %}

@@ -1,39 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="FyPress - {{title}}">
-    <meta name="author" content="FyPress">
-    <title>{{options.name}} - {{title}}</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/startbootstrap-sb-admin-2/1.0.8/css/sb-admin-2.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-    <link href="/static/admin/style.css" rel="stylesheet">
-
-    <!--[if lt IE 9]>
-        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
+{% extends "admin/_base_empty.html" %}
+{% block content %}
     {% from 'macros/form.html' import render_form %}
-</head>
-
-<body>
-    <div class="container">
-        <div class="row">
-            <div class="col-md-4 col-md-offset-4">
-                <div class="login-panel panel panel-default">
-                    <div class="panel-logo"><img src="/static/images/fypress_50.png" alt="{{options.name}}"  /></div>
-                    <div class="panel-body">
-                        {{render_form(form, action_url='', btn_class="btn btn-lg btn-success btn-block")}}
-                    </div>
-                </div>
+    <div class="col-md-4 col-md-offset-4">
+        <div class="login-panel panel panel-default">
+            <div class="panel-logo"><img src="/static/images/fypress_50.png" alt="{{options.name}}"  /></div>
+            <div class="panel-body">
+                {{render_form(form, action_url='', btn_class="btn btn-lg btn-success btn-block")}}
             </div>
         </div>
     </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha/js/bootstrap.min.js"></script>
-</body>
-</html>
+{% endblock %}

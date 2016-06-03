@@ -32,8 +32,3 @@ def login():
 def logout():
     session.clear()
     return redirect(url_for('user.login'))
-
-@user.route('/not_authorize')
-def not_authorize():
-    return render_template('admin/403.html', title='Admin'), 403
-

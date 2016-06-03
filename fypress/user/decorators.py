@@ -17,7 +17,8 @@ def level_required(level):
                 return redirect(url_for('user.login', next=request.url))
 
             if g.user.status < level:
-                return redirect(url_for('user.not_authorize'))
+                from fypress.admin import handle_403
+                return handle_403()
 
             return f(*args, ** kwargs)
         return update_wrapper(wrapped_function, f)

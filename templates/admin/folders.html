@@ -6,24 +6,28 @@
             <h2>{{ _('Add Category') }}</h2>
             {{render_form(form, action_url='', btn_class="btn btn-success",  action_text=_('Save'))}}
 
+            <!--
             <h3>{{ _('SEO Preview')}}</h3>
+            
             <div class="seo-preview">
                 <span class="seo-preview-title">%%title%%</span>
                 <span class="seo-preview-url">{{options.url}}%%slug%%</span>
                 <span class="seo-preview-desc">%%description%%</span>
             </div>
+            -->
         </div>
     {% else %}
         <div class="col-lg-5">
             <h2>{{ _('Edit Category') }}: {{folder.name}}</h2>
             {{render_form(form, action_url='', btn_class="btn btn-success", action_text=_('Save'))}}
-
+            <!--
             <h3>{{ _('SEO Preview')}}</h3>
             <div class="seo-preview">
                 <span class="seo-preview-title">%%title%%</span>
                 <span class="seo-preview-url">{{options.url}}%%slug%%</span>
                 <span class="seo-preview-desc">%%description%%</span>
             </div>
+            -->
         </div>
     {% endif %}
     <div class="col-lg-7">

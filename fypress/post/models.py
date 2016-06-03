@@ -36,8 +36,6 @@ class Post(mysql.Base):
         'revision'  : gettext('Revision')
     }
 
-
-
     @property
     def slug(self):
         if self.__dict__.has_key('slug'):
@@ -48,13 +46,18 @@ class Post(mysql.Base):
         self.__dict__['slug'] = slugify(value)
 
     @staticmethod
-    def count_by_status():
+    def count_by_status(page=False):
+        if page:
+            add = 'AND post_type="page"'
+        else:
+            add = 'AND post_type="post"'
+
         query = """SELECT 
-            (SELECT COUNT(*) FROM fypress_post) AS total,
-            (SELECT COUNT(*) FROM fypress_post WHERE post_status = 'published') AS published,
-            (SELECT COUNT(*) FROM fypress_post WHERE post_status = 'draft') AS draft,
-            (SELECT COUNT(*) FROM fypress_post WHERE post_status = 'trash') AS trash
-        """
+            (SELECT COUNT(*) FROM fypress_post WHERE post_status != 'revision' {0}) AS total ,
+            (SELECT COUNT(*) FROM fypress_post WHERE post_status = 'published' {0}) AS published,
+            (SELECT COUNT(*) FROM fypress_post WHERE post_status = 'draft' {0}) AS draft,
+            (SELECT COUNT(*) FROM fypress_post WHERE post_status = 'trash' {0}) AS trash
+        """.format(add)
 
         return Post.query.raw(query).result()[0]
 
@@ -72,6 +75,7 @@ class Post(mysql.Base):
         if form.has_key('slug'):
             slug = form['slug']
 
+        print form
         post.title          = form['title']
         post.content        = form['content']
         post.folder_id      = form['folder']
@@ -80,9 +84,12 @@ class Post(mysql.Base):
         post.excerpt        = post.get_excerpt()
         post.slug           = slug
         post.guid           = post.guid_generate()
+        post.image_id  = form['image']
         Post.query.update(post)
         post_id = post.id
-        post.create_revision()
+        if post.status == 'published':
+            post.create_revision()
+
         post.folder.count_posts()
 
         return post_id
@@ -99,6 +106,7 @@ class Post(mysql.Base):
             slug = form['slug']
 
         post = Post()
+        post.id             = None
         post.title          = form['title']
         post.content        = form['content']
         post.folder_id      = form['folder']
@@ -112,11 +120,16 @@ class Post(mysql.Base):
         post.comment_count  = 0
         post.slug           = slug
         post.guid           = post.guid_generate()
+        post.image_id       = form['image']
+        post.type           = form['type']
+
         Post.query.add(post)
         post.folder.count_posts()
 
         post_id = post.id
-        post.create_revision()
+        if post.status == 'published':
+            post.create_revision()
+
         return post_id
 
     def create_revision(self):
@@ -164,22 +177,13 @@ class Post(mysql.Base):
         return soup
 
     def count_revs(self):
-        return Post.query.count(parent=1)
+        return Post.query.count(parent=self.id)
 
-    def move(self):
-        pass
+    def move(self, status='draft'):
+        self.status = status
+        Post.query.update(self)
 
-    def add_revision(self):
-        pass
-
-    def get_revisions(self):
-        pass
+        return self.id
 
     def delete(self):
-        pass
-
-    def get_uid(self):
-        pass
-
-    def get_folders(self):
         pass
