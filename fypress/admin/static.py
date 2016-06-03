@@ -4,5 +4,6 @@ from flask.ext.babel import lazy_gettext as gettext
 messages = {
     'updated'   : gettext('Item updated'),
     'added'     : gettext('Item added'),
-    'moved'     : gettext('Item moved')
+    'moved'     : gettext('Item moved'),
+    'deleted'   : gettext('Item deleted')
 }

@@ -8,30 +8,22 @@
     <meta name="author" content="FyPress">
 
     <title>{% block title %}{{title}} - {{options.name}}{% endblock %}</title>
-     <link rel=icon href=/static/images/fypress_icon_64.png sizes="any" type="image/png">
+     <link rel=icon href=/static/admin/images/fypress_icon_64.png sizes="any" type="image/png">
     {% block css %}
         <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/metisMenu/2.5.2/metisMenu.css" rel="stylesheet">
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.12/css/dataTables.bootstrap.min.css" rel="stylesheet">
         <link href="//cdn.datatables.net/responsive/2.1.0/css/responsive.bootstrap.min.css" rel="stylesheet" type="text/css">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/startbootstrap-sb-admin-2/1.0.8/css/sb-admin-2.min.css" rel="stylesheet">
         
-        <link href="/static/admin/style.css" rel="stylesheet">
+        <link href="/static/admin/css/style.css" rel="stylesheet">
     {% endblock %}
     {% block js %}
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
         <script src="http://netdna.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.js"></script> 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/metisMenu/2.5.2/metisMenu.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.12/js/jquery.dataTables.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.12/js/dataTables.bootstrap.min.js"></script>
-        <script src="//cdn.datatables.net/responsive/2.1.0/js/dataTables.responsive.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/speakingurl/9.0.0/speakingurl.min.js"></script>
-        <script src="//cdn.datatables.net/responsive/2.1.0/js/responsive.bootstrap.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/nestedSortable/2.0.0/jquery.mjs.nestedSortable.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/speakingurl/9.0.0/speakingurl.min.js"></script>
-        <script src="/static/admin/admin.js"></script>
+        <script src="/static/admin/js/main.js"></script>
 
         <!--[if lt IE 9]>
             <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
@@ -51,7 +43,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="{{url_for('admin.root')}}"><img src="/static/images/fypress_40.png" style="margin-top: -10px;" alt="{{options.name}}" /></a>
+                <a class="navbar-brand" href="{{url_for('admin.root')}}"><img src="/static/admin/images/fypress_40.png" style="margin-top: -10px;" alt="{{options.name}}" /></a>
             </div>
 
             <ul class="nav navbar-top-links navbar-right">
@@ -181,6 +173,12 @@
            <div class="navbar-default sidebar" role="navigation">
                 <div class="sidebar-nav navbar-collapse">
                     <ul class="nav" id="side-menu">
+                        {% if g.user.has_level(1) %}
+                            <li>
+                                <a href="{{ url_for('admin.root') }}"><i class="fa fa-tachometer" aria-hidden="true"></i> {{ _('Dashboard') }}</a>
+                            </li>           
+                        {% endif %}
+
                         {% if g.user.has_level(3) %}
                             <li>
                                 <a href="{{ url_for('admin.folders') }}"><i class="fa fa-folder-open-o fa-fw"></i> {{ _('Categories') }}</a>
@@ -300,6 +298,7 @@
                     {% block content %}{% endblock %}
 
                     {% if debug %}
+                        <!--
                         <div class="clearfix"></div>
                         <hr />
                         <div class="col-lg-12">
@@ -314,6 +313,7 @@
                                 </div>
                             </div>
                         </div>
+                        -->
                     {% endif %}
                </div>
                 <!-- /.row -->

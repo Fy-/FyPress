@@ -37,7 +37,10 @@
 abbr {
     border-width: 0 !important;
 }
-
+.popover {
+    width: 200px;
+    overflow: hidden
+}
 /* 
     Empty
 */ 

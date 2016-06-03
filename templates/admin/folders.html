@@ -1,35 +1,31 @@
 {% extends "admin/_base.html" %}
+{% block js %}
+    {{ super() }}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/speakingurl/9.0.0/speakingurl.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/nestedSortable/2.0.0/jquery.mjs.nestedSortable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-confirmation/1.0.5/bootstrap-confirmation.min.js"></script>
+{% endblock %}
+
 {% block content %}
     {% from 'macros/form.html' import render_form %}
-    {% if not request.args.get('edit') or request.args.get('edit') == '1' %}
-        <div class="col-lg-5">
+    <div class="col-lg-5">
+        {% if not request.args.get('edit') or request.args.get('edit') == '1' %}
             <h2>{{ _('Add Category') }}</h2>
             {{render_form(form, action_url='', btn_class="btn btn-success",  action_text=_('Save'))}}
-
-            <!--
-            <h3>{{ _('SEO Preview')}}</h3>
-            
-            <div class="seo-preview">
-                <span class="seo-preview-title">%%title%%</span>
-                <span class="seo-preview-url">{{options.url}}%%slug%%</span>
-                <span class="seo-preview-desc">%%description%%</span>
-            </div>
-            -->
-        </div>
-    {% else %}
-        <div class="col-lg-5">
+        {% else %}
             <h2>{{ _('Edit Category') }}: {{folder.name}}</h2>
             {{render_form(form, action_url='', btn_class="btn btn-success", action_text=_('Save'))}}
-            <!--
-            <h3>{{ _('SEO Preview')}}</h3>
-            <div class="seo-preview">
-                <span class="seo-preview-title">%%title%%</span>
-                <span class="seo-preview-url">{{options.url}}%%slug%%</span>
-                <span class="seo-preview-desc">%%description%%</span>
-            </div>
-            -->
+        {% endif %}
+
+        <!--
+        <h3>{{ _('SEO Preview')}}</h3>
+        <div class="seo-preview">
+            <span class="seo-preview-title">%%title%%</span>
+            <span class="seo-preview-url">{{options.url}}%%slug%%</span>
+            <span class="seo-preview-desc">%%description%%</span>
         </div>
-    {% endif %}
+        -->
+    </div>
     <div class="col-lg-7">
         <h2>{{ _('Categories') }}</h2>
         {{folders|safe}}
@@ -37,28 +33,6 @@
 
 
     <script>
-
-        $(document).ready(function(){
-            $('#fp_slug').slugify('#fp_name');
-
-            $('.sortable').nestedSortable({
-                handle: 'div',
-                items: 'li',
-                maxLevels: 5,
-                rootID: 'folder_1',
-                isTree: true,
-                toleranceElement: '> div',
-                excludeRoot: true,
-                protectRoot: true,
-                placeholder: 'placeholder',
-                forcePlaceholderSize: true,
-                tabSize: 40,
-                opacity: .6,
-                relocate: function() {
-                    arraied = $('ol.sortable').nestedSortable('toArray', {startDepthCount: 0});
-                    $.post( '{{ url_for('admin.ajax_folders') }}', {'data': JSON.stringify(arraied)} );
-                }
-            });
-        });
+        {% include 'admin/js/folders.js' %}
     </script>
 {% endblock %}

@@ -37,7 +37,7 @@ class TreeHTML(object):
                     <div class="panel panel-info nav-drag">
                         <div class="panel-heading">
                             {0}
-                            <span title="Click to delete item." data-id="{1}" class="deleteMenu btn btn-warning btn-xs"><i class="fa fa-times-circle" aria-hidden="true"></i> Delete</span>
+                            <a  href="javascript:void(0)" data-toggle="confirmation" data-target="{1}" data-placement="left" data-id="{1}" class="deleteMenu btn btn-warning btn-xs"><i class="fa fa-times-circle" aria-hidden="true"></i> Delete</a>
                             <a title="Click to edit item." data-id="{1}" href="{5}" class="btn btn-info btn-xs editMenu "><i class="fa fa-pencil" aria-hidden="true"></i> Edit</a>
                         </div>
                         <div class="panel-body">

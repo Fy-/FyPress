@@ -72,6 +72,17 @@ def posts(page=False):
 
     return render_template('admin/posts.html', title=gettext('Posts'), posts=posts, numbers=numbers, filter=request.args.get('filter'), page=page, urls=urls)
 
+@admin.route('/posts/delete')
+@level_required(4)
+def posts_delete():
+    post = Post.query.get(request.args.get('id'))
+    if post:
+        Post.delete(post)
+        flash(messages['deleted']+' ('+str(post)+')')
+        return redirect(get_redirect_target())
+    else:
+        return handle_404()
+
 @admin.route('/posts/move')
 @level_required(1)
 def posts_move():
@@ -270,15 +281,5 @@ def ajax_oembed():
 @level_required(3)
 def ajax_folders():
     data = json.loads(request.form.get('data'))
-    if data:
-        for item in data:
-            if item.has_key('id') and item['id'] != '1':
-                folder = Folder.query.get(item['id'])
-                folder.depth    = item['depth']
-                folder.left     = item['left']
-                folder.right    = item['right']
-                folder.parent = item['parent_id']
-
-                folder.modified = 'NOW()'
-                folder.update()
+    Folder.update_all(data)
     return ''

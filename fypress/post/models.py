@@ -75,7 +75,6 @@ class Post(mysql.Base):
         if form.has_key('slug'):
             slug = form['slug']
 
-        print form
         post.title          = form['title']
         post.content        = form['content']
         post.folder_id      = form['folder']
@@ -185,5 +184,10 @@ class Post(mysql.Base):
 
         return self.id
 
-    def delete(self):
-        pass
+    @staticmethod
+    def delete(post):
+        childs = Post.query.filter(parent=post.id).all(array=True)
+        for post in childs:
+            Post.query.delete(post)
+
+        Post.query.delete(post)

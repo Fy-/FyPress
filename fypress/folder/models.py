@@ -27,13 +27,6 @@ class Folder(mysql.Base):
     def slug(self, value):
         self.__dict__['slug'] = slugify(value)
 
-    def link_posts(self):
-        from fypress.post import Post 
-        posts =  Post.query.filter(status='draft').all(array=True)+Post.query.filter(status='published').all(array=True)+Post.query.filter(status='trash').all(array=True)
-        for post in posts:
-            post.guid = post.guid_generate()
-            Post.query.update(post)
-
     def count_posts(self):
         query = """
             UPDATE
@@ -50,10 +43,46 @@ class Folder(mysql.Base):
         """        
         Folder.query.sql(query).execute()
 
+    @staticmethod
+    def update_all(data):
+        if data:
+            exist = []
+            for item in data:
+                if item.has_key('id') and item['id'] != '1':
+                    exist.append(int(item['id']))
+                    folder = Folder.query.get(item['id'])
+                    folder.depth    = item['depth']
+                    folder.left     = item['left']
+                    folder.right    = item['right']
+                    folder.parent   = item['parent_id']
+
+                    folder.modified = 'NOW()'
+                    folder.update()
+            all_folders = []
+            folders = Folder.query.get_all(array=True)
+            for folder in folders:
+                all_folders.append(int(folder.id))
+
+            diff = [item for item in all_folders if item not in exist]
+            for item in diff:
+                if item != 1:
+                    from fypress.post import Post 
+                    posts = Post.query.filter(folder_id=item).all(array=True)
+                    for post in posts:
+                        post.folder_id = 1
+                        Post.query.update(post)
+                    Folder.query.delete(Folder.query.get(item))
+
+            for folder in folders:
+                folder.count_posts()
+
+            Folder.build_guid()
+            Folder.link_posts()
+
+
+
     def update(self):
         Folder.query.update(self)
-        self.build_guid()
-        self.link_posts()
 
     def update_guid(self):
         query = """
@@ -70,6 +99,14 @@ class Folder(mysql.Base):
         self.guid = url_unique(Folder.query.raw(query).one()[0]['path'], Folder, self.id)
 
         Folder.query.update(self)
+
+    @staticmethod
+    def link_posts():
+        from fypress.post import Post 
+        posts =  Post.query.filter(status='draft').all(array=True)+Post.query.filter(status='published').all(array=True)+Post.query.filter(status='trash').all(array=True)
+        for post in posts:
+            post.guid = post.guid_generate()
+            Post.query.update(post)
 
     @staticmethod
     def build_guid():

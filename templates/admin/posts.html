@@ -1,5 +1,10 @@
 {% extends "admin/_base.html" %}
 
+{% block js %}
+    {{ super() }}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-confirmation/1.0.5/bootstrap-confirmation.min.js"></script>
+{% endblock %}
+
 {% block content %}
 <div class="col-lg-12">
     <h1 class="page-header">
@@ -43,7 +48,7 @@
                                     {% if post.image.id %}
                                         <img  class="pull-left thumbnail-table" src="{{post.image.urlify('thumbnail-s')}}" alt="{{post.title}}" /> 
                                     {% else %}
-                                        <img class="pull-left thumbnail-table" src="/static/images/empty.png" /> 
+                                        <img class="pull-left thumbnail-table" src="/static/admin/images/empty.png" /> 
                                     {% endif %}
                                     {% if post.status != 'trash' %}<a href="{{url_for(urls~'_add', edit=post.id) }}">{% else %}<span class="text-muted">{% endif %}
                                     {{post.title}}
@@ -63,7 +68,7 @@
                                         {% else %}
                                             <a  href="{{ url_for('admin.posts_move', id=post.id, status='draft') }}">{{_('Restore')}}</a> | 
                                             <a  href="{{ url_for('admin.posts_move', id=post.id, status='published') }}">{{_('Publish')}}</a> |
-                                            <a class="ldanger" href="{{ url_for('admin.posts_move', id=post.id, status='trash') }}">{{_('Delete Permanently')}}</a> 
+                                            <a class="ldanger" data-toggle="confirmation"  data-placement="right" data-href="{{ url_for('admin.posts_delete', id=post.id) }}"  href="#">{{_('Delete Permanently')}}</a> 
                                         {% endif %}
                                     </small>
                                 </td>
@@ -82,4 +87,10 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block footer %}
+    <script>
+        {% include 'admin/js/posts.js' %}
+    </script>    
 {% endblock %}
