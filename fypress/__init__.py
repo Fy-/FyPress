@@ -60,10 +60,12 @@ class FyPress():
         ### Blueprints ###
         from user import user_blueprint
         from admin import admin_blueprint
+        from public import public_blueprint
 
         ### Load Blueprints ###
         self.app.register_blueprint(user_blueprint)
         self.app.register_blueprint(admin_blueprint)
+        self.app.register_blueprint(public_blueprint)
 
     @staticmethod
     def uploaded_file(filename):

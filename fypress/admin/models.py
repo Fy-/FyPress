@@ -19,3 +19,38 @@ class Option(mysql.Base):
             final[option.name] = option.value 
 
         return final
+
+    @staticmethod
+    def update(name, value):
+        option = Option.query.filter(name=name).one()
+        if option:
+            option.value = value
+            Option.query.update(option)
+        else:
+            option = Option()
+            option.name     = name
+            option.value    = value 
+            Option.query.add(option)
+
+    @staticmethod
+    def get(name):
+        option = Option.query.filter(name=name).one()
+        return option.value
+
+    @staticmethod
+    def get_settings(type='general'):
+        settings = {
+            'general': ['name', 'url', 'slogan']
+        }
+
+        class Result(object):
+            def set(self, name, value):
+                setattr(self, name, value)
+
+
+        result  = Result()
+        options = Option.query.where('_table_.option_name IN ("'+'","'.join(settings[type])+'")').all()
+        for option in options:
+            result.set(option.name, option.value)
+
+        return result

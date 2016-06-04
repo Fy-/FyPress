@@ -48,6 +48,7 @@ class Folder(mysql.Base):
         if data:
             exist = []
             for item in data:
+                print item
                 if item.has_key('id') and item['id'] != '1':
                     exist.append(int(item['id']))
                     folder = Folder.query.get(item['id'])
@@ -58,6 +59,7 @@ class Folder(mysql.Base):
 
                     folder.modified = 'NOW()'
                     folder.update()
+
             all_folders = []
             folders = Folder.query.get_all(array=True)
             for folder in folders:
@@ -120,16 +122,17 @@ class Folder(mysql.Base):
             SELECT
                 node.folder_seo_content,
                 node.folder_created,
-                node.folder_modified,
                 node.folder_parent,
                 node.folder_name,
                 node.folder_depth,
                 node.folder_posts,
                 node.folder_id,
                 node.folder_left,
+                node.folder_guid,
                 node.folder_content,
                 node.folder_slug,
-                node.folder_right
+                node.folder_right,
+                node.folder_modified
             FROM
                 fypress_folder AS node,
                 fypress_folder AS parent

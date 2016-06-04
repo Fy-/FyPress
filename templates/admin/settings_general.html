@@ -1,0 +1,15 @@
+{% extends "admin/_base.html" %}
+{% block content %}
+    {% from 'macros/form.html' import render_form %}
+    <div class="col-lg-12">
+        <h1 class="page-header">{{ _('') }}</h1>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+               <strong>{{ _('General Settings') }}</strong>
+            </div>
+            <div class="panel-body">
+                {{render_form(form, action_url='', btn_class="btn btn-lg btn-success ")}}
+            </div>
+        </div>
+    </div>
+{% endblock %}

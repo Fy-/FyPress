@@ -7,6 +7,8 @@ from fypress.folder import FolderForm, Folder
 from fypress.media import Media
 from fypress.post import Post
 from fypress.admin.static import messages
+from fypress.admin.forms import GeneralSettingsForm
+from fypress.admin.models import Option
 from fypress.utils import get_redirect_target, Paginator
 
 import json
@@ -32,6 +34,20 @@ def handle_404():
 def handle_403():
     return render_template('admin/403.html', title=gettext('Error: 403')), 403
 
+"""
+    Settings
+"""
+@admin.route('/settings/all', methods=['POST', 'GET'])
+@level_required(4)
+def settings_general():
+    form = GeneralSettingsForm(obj=Option.get_settings())
+
+    if form.validate_on_submit():
+        for data in form.data:
+            Option.update(data, form.data[data])
+        return redirect(url_for('admin.settings_general'))
+        
+    return render_template('admin/settings_general.html', form=form, title=gettext('General - Settings'))
 
 """
     Posts & Pages
@@ -197,8 +213,7 @@ def folders():
 def users():
     paginator = Paginator(
         query    = User.query.select_all(array=True),
-        page     = request.args.get('page'),
-        per_page = 12
+        page     = request.args.get('page')
     )
     return render_template('admin/users.html', title=gettext('Users'), users=paginator.items, pages=paginator.links)
 

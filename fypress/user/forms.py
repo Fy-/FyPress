@@ -7,7 +7,7 @@ from fypress.user.models import User
 class UserLoginForm(Form):
     login       = TextField(gettext(u'Login'), validators=[validators.required()])
     password    = PasswordField(gettext(u'Password'), validators=[validators.required()])
-    remember_me = BooleanField(gettext(u'Remember Me'))
+    #remember_me = BooleanField(gettext(u'Remember Me'))
     next        = HiddenField()
 
 class UserEditForm(Form):
