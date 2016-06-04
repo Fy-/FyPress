@@ -22,6 +22,7 @@
             <a {% if filter == 'trash' %} class="active-filter"{% endif %} href="{{ url_for(urls, filter='trash')}}">Trash</a> ({{numbers['trash']}})
         </div>
         <div class="panel-body">
+            {{pages|safe}}
             <div class="dataTable_wrapper table-responsive"> 
                 <table class="table table-striped  table-hover" id="dataTables-posts">
                     <thead>
@@ -84,6 +85,7 @@
                 </tbody>
                 </table>
             </div>
+            {{pages|safe}}
         </div>
     </div>
 </div>

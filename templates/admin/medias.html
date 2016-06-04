@@ -17,8 +17,9 @@
 
         <div class="medias-box">
             <div class="row">
+            {{pages|safe}}
             {% for media in medias %}
-              <div class="col-md-2 col-xs-4 mediabox" >
+              <div class="col-md-2 col-xs-4 mediabox" style="padding-left: 0px;">
                 <a href="#" class="thumbnail fp_media" data-type="{{media.type}}" id="media_{{media.id}}">
                   <i class="fa {{media.icon}} media-icon"></i>
                   {% if media.urlify('thumbnail-s') %}
@@ -30,6 +31,8 @@
                 </a>
               </div>
             {% endfor %}
+            <div class="clearfix"></div>
+            {{pages|safe}}
         </div>   
     </div>
 

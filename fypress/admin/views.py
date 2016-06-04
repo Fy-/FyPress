@@ -7,7 +7,7 @@ from fypress.folder import FolderForm, Folder
 from fypress.media import Media
 from fypress.post import Post
 from fypress.admin.static import messages
-from fypress.utils import get_redirect_target
+from fypress.utils import get_redirect_target, Paginator
 
 import json
 
@@ -55,22 +55,24 @@ def posts(page=False):
     numbers = Post.count_by_status(page)
     if not request.args.get('filter'):
         if page:
-            posts   = Post.query.where(' _table_.post_status IN ("draft", "published") AND _table_.post_type="page"').order_by('modifid').all(array=True)
+            query = Post.query.where(' _table_.post_status IN ("draft", "published") AND _table_.post_type="page"').order_by('modified')
         else:
-            posts   = Post.query.where(' _table_.post_status IN ("draft", "published") AND _table_.post_type="post"').order_by('modifid').all(array=True)
+            query = Post.query.where(' _table_.post_status IN ("draft", "published") AND _table_.post_type="post"').order_by('modified')
     else:
         if page:
-            posts   = Post.query.filter(status=request.args.get('filter'), type='page').order_by('modified').all(array=True)
+            query   = Post.query.filter(status=request.args.get('filter'), type='page').order_by('modified')
         else:
-            posts   = Post.query.filter(status=request.args.get('filter'), type='post').order_by('modified').all(array=True)
+            query   = Post.query.filter(status=request.args.get('filter'), type='post').order_by('modified')
 
+    paginator = Paginator(
+        query    = query,
+        page     = request.args.get('page')
+    )
 
-    if page:
-        urls = 'admin.pages'
-    else:
-        urls = 'admin.posts'
+    if page: urls = 'admin.pages'
+    else: urls = 'admin.posts'
 
-    return render_template('admin/posts.html', title=gettext('Posts'), posts=posts, numbers=numbers, filter=request.args.get('filter'), page=page, urls=urls)
+    return render_template('admin/posts.html', pages=paginator.links, title=gettext('Posts'), posts=paginator.items, numbers=numbers, filter=request.args.get('filter'), page=page, urls=urls)
 
 @admin.route('/posts/delete')
 @level_required(4)
@@ -100,10 +102,8 @@ def posts_move():
 def posts_add(page=False):
     post = Post()
 
-    if page:
-        urls = 'admin.pages'
-    else:
-        urls = 'admin.posts'
+    if page: urls = 'admin.pages'
+    else: urls = 'admin.posts'
 
     if request.args.get('edit'):
         post = Post.query.get(request.args.get('edit'))
@@ -135,8 +135,13 @@ def posts_add(page=False):
 @admin.route('/medias/all')
 @level_required(1)
 def medias():
-    medias =  Media.query.get_all(array=True, order='ORDER BY `media_modified` DESC')
-    return render_template('admin/medias.html',  medias=medias, title=gettext('Library - Medias'))
+    paginator = Paginator(
+        query    = Media.query.select_all(array=True).order_by('modified'),
+        page     = request.args.get('page'),
+        per_page = 12
+    )
+
+    return render_template('admin/medias.html',  medias=paginator.items, pages=paginator.links, title=gettext('Library - Medias'))
 
 @admin.route('/medias/add/web')
 @level_required(1)
@@ -190,8 +195,12 @@ def folders():
 @admin.route('/users/all')
 @level_required(4)
 def users():
-    users = User.query.get_all(array=True)
-    return render_template('admin/users.html', title=gettext('Users'), users=users)
+    paginator = Paginator(
+        query    = User.query.select_all(array=True),
+        page     = request.args.get('page'),
+        per_page = 12
+    )
+    return render_template('admin/users.html', title=gettext('Users'), users=paginator.items, pages=paginator.links)
 
 @admin.route('/users/edit', methods=['POST', 'GET'])
 @level_required(4)

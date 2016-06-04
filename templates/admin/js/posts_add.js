@@ -25,7 +25,10 @@ $('#fp_media_frame').on('load', function(){
     $iframe.find('.nav a').click(function() {
         $iframe.find('.medias-box').html('<div style="text-align: center"><i class="fa fa-spinner spin-it fat-icon"></i></div>');
     });
-
+    $iframe.find('nav a').click(function() {
+        $iframe.find('.medias-box').html('<div style="text-align: center"><i class="fa fa-spinner spin-it fat-icon"></i></div>');
+    });
+    
     $iframe.find('.fp_media').click(function() {
         $('#fp_media_selected').empty();
         selected = null;
