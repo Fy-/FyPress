@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<!--[if lt IE 7 ]><html class="ie ie6" lang="fr-FR" prefix="og: http://ogp.me/ns#"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="fr-FR" prefix="og: http://ogp.me/ns#"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="fr-FR" prefix="og: http://ogp.me/ns#"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!-->
+<html lang="en-US">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge" /><![endif]-->
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    {% block head %}{% endblock %}
+    {% block css %}
+        <link rel="stylesheet" href="/public/css/foundation.min.css">
+        <link rel="stylesheet" href="/public/css/prism.css" >
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="/public/css/nyx.css" />
+    {% endblock %}
+    <title>{{title(post or folder)}}</title>
+    <!--<link rel="canonical" href="{{options.url}}"/>-->
+    {% block microdata %}{% endblock %}
+    {% include "themes/Nyx/_schema/breadcrumb.html" %}
+</head>
+<body>
+    <div class="wrapper">
+        <header>
+            <div class="row">
+                <div class="large-12 columns">
+                    {% block header %}
+                        <h1><a href="/">{{options.name}}</a> <small>{{options.slogan}}</small></h1>
+                    {% endblock %}
+                    {% block nav %}
+
+                    <nav  class="top-bar">
+                        <section class="top-bar-left">
+                            <ul class="dropdown menu" data-dropdown-menu>
+                                <li><a href="/" {% if is_home %}class="active"{% endif %}>Home</a></li>
+                                <li><a href="/articles/" {% if folder and folder.guid == 'articles' %}class="active"{% endif %}>Articles</a></li>
+                            {{nav|safe}}
+                            </ul>
+                        </section >
+                        <section class="top-bar-right">
+                            <ul class="menu">
+                                <li><input type="search" placeholder="Search"></li>
+                                <li><button type="button" class="button">Search</button></li>
+                            </ul>
+                        </section>
+                    </nav>
+                    {% endblock %}
+                </div>
+            </div>
+        </header>
+        <main class="row">
+            <div class="large-12 columns">
+                {%block featured %}{% endblock %}
+            </div>
+            {% if sidebar %}
+                <section class="small-9 columns" id="content">
+            {% else %}
+                <section class="large-12 columns" id="content">
+            {% endif %}
+                {% if not is_home %}
+                    {% set bcitems = breadcrumb(post or folder) %}
+                    <nav aria-label="You are here:" role="navigation">
+                      <ul class="breadcrumbs">
+                        <li><a href="/">{{options.name}}</a></li>
+                            {% for item in bcitems %}
+                                {% if post %}
+                                    <li><a href="/{{item.guid}}/"> {{item.name}}</a></li>
+                                {% elif folder %}
+                                    {% if folder.guid == item.guid %}
+                                        <li>
+                                            <span class="show-for-sr">Current: </span> {{item.name}}
+                                        </li>    
+                                    {% else %}
+                                        <li><a href="/{{item.guid}}/"> {{item.name}}</a></li>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                            {% if post %}
+                                <li>
+                                    <span class="show-for-sr">Current: </span> {{post.title}}
+                                </li>                                
+                            {% endif %}
+                      </ul>
+                    </nav>
+                {% endif %}
+                {% block content %}{% endblock %}
+            </section>
+            {% if sidebar %}
+                <aside class="small-3 columns" id="sidebar">
+                    {% block sidebar %}
+                        <h2>Sidebar</h2>
+                    {% endblock %}
+                </aside>
+            {% endif %}
+        </main>
+        <div class="push"></div>
+    </div>
+    <footer id="footer">
+        <div class="row">
+            <section class="small-4 columns">
+                <h4>About</h4>
+            </section>
+            <section class="small-4 columns">
+                <h4>Recent posts</h4>
+            </section>
+            <section class="small-4 columns">
+                <h4>Follow {{options.name}}</h4>
+            </section>        
+            <section class="large-12 columns">
+                <small>Copyright 2016 &copy; <a href="{{options.url}}">{{options.name}}</a>  </small>
+            </section>    
+        </div>
+    </footer>
+    {% block scripts %}
+        <script src="/public/js/jquery.js"></script>
+        <script src="/public/js/foundation.min.js"></script>
+        <script src="/public/js/what-input.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-timeago/1.5.2/jquery.timeago.min.js"></script>
+        <script src="/public/js/nyx.js"></script>
+    {% endblock %}
+</body>
+</html>

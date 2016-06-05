@@ -81,8 +81,6 @@ class Folder(mysql.Base):
             Folder.build_guid()
             Folder.link_posts()
 
-
-
     def update(self):
         Folder.query.update(self)
 
@@ -103,6 +101,24 @@ class Folder(mysql.Base):
         Folder.query.update(self)
 
     @staticmethod
+    def get_path(self):
+        query = """
+          SELECT
+            parent.folder_seo_content, parent.folder_created, parent.folder_modified, parent.folder_parent, parent.folder_content, parent.folder_name, parent.folder_left, parent.folder_id, parent.folder_guid, parent.folder_posts, parent.folder_slug, parent.folder_depth, parent.folder_right
+          FROM
+            fypress_folder AS node,
+            fypress_folder AS parent
+          WHERE
+            node.folder_left BETWEEN parent.folder_left AND parent.folder_right AND node.folder_id={0}
+          ORDER BY
+            parent.folder_left
+
+           """.format(self.id)
+
+
+        return Folder.query.sql(query).all(array=True)
+
+    @staticmethod
     def link_posts():
         from fypress.post import Post 
         posts =  Post.query.filter(status='draft').all(array=True)+Post.query.filter(status='published').all(array=True)+Post.query.filter(status='trash').all(array=True)
@@ -115,6 +131,14 @@ class Folder(mysql.Base):
         folders = Folder.query.get_all(array=True)
         for folder in folders:
             folder.update_guid()
+
+    @staticmethod
+    def get_as_tree(mode='nav', current=''):
+        folders = Folder.get_all()
+        tree = TreeHTML(folders)
+
+        if mode == 'nav':
+            return tree.generate_folders_nav(current=current)
 
     @staticmethod
     def get_all(html = False):

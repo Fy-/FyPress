@@ -1,0 +1,35 @@
+{% extends "themes/Nyx/_base.html" %}
+
+{% block featured %}
+
+{% endblock %}
+{% block content %}
+    {% for item in paginator.items %}
+        <div class="row">
+            {% if item.image.id %}
+                <div class="large-4 columns">
+                    <a title="{{item.title}}" href="/{{item.guid}}.html"><img  class="thumbnail" src="{{item.image.urlify('thumbnail-lg')}}" alt="{{item.title}}" /></a>
+                </div>
+                <div class="large-8 columns">
+            {% else %}
+                <div class="large-12 columns">
+            {% endif %}
+                <h2><a href="/{{item.guid}}.html" rel="bookmark">{{item.title}}</a></h2>
+                <p>
+                    <small class="grey">
+                        <span><i class="fa fa-user"></i> By <a href="">{{item.user.nicename}}</a> &nbsp;&nbsp;</span>
+                        <span><i class="fa fa-clock-o"></i> <time class="timeago" datetime="{{item.created.isoformat()}}">{{item.created.isoformat()}}</time> &nbsp;&nbsp;</span>
+                        <span><i class="fa fa-comments"></i> {{item.comment_count}} comment &nbsp;&nbsp;</span>
+                        <ppan><i class="fa fa-folder-open-o"></i> <a href="/{{item.folder.guid}}/">/{{item.folder.guid}}</a></ppan>
+                    </small>
+                </p>
+                <p>
+                    {{item.excerpt}}...
+                </p>
+                <a class="small button float-right" title="{{item.title}}" href="/{{item.guid}}.html">Read more</a>
+            </div>
+        </div>
+        <hr />
+    {% endfor %}
+    {{paginator.links}}
+{% endblock %}

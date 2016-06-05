@@ -10,6 +10,7 @@ tinymce.init({
     keep_styles: false,
     end_container_on_empty_block: true,
     forced_root_block: '',
+    force_p_newlines: true,
     visualblocks_default_state: true,
     document_base_url : "http://127.0.0.1:5000",
     plugins: [

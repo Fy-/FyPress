@@ -28,9 +28,9 @@ class FyPress():
     def prepare(self):
         @self.app.context_processor
         def inject_options():
-            from fypress.admin import Option
             from fypress.utils.mysql.sql import FyMySQL
-            return dict(options=Option.auto_load(), queries=FyMySQL._instance.queries, debug=self.config.DEBUG, flask_config=self.app.config)
+
+            return dict(options=g.options, queries=FyMySQL._instance.queries, debug=self.config.DEBUG, flask_config=self.app.config)
 
         @self.app.before_request
         def before_request():
@@ -38,6 +38,9 @@ class FyPress():
             g.user = None
             if 'user_id' in session:
                 g.user = User.query.get(session['user_id'])
+
+            from fypress.admin import Option
+            g.options = Option.auto_load()
 
         if self.config.DEBUG:
             @self.app.before_request

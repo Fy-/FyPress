@@ -1,0 +1,54 @@
+{% if not is_home %}
+  {% set bcitems = breadcrumb(post or folder) %}
+  <script type='application/ld+json'>
+    {
+      "@context": "http://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 0,
+          "item": {
+            "@id": "{{options.url}}",
+            "name": "{{options.name}}"
+          }
+        },
+        {% set i = 1 %}
+        {% for item in bcitems %}
+          {% if post %}
+            {
+              "@type": "ListItem",
+              "position": {{i}},
+              "item": {
+                "@id": "{{options.url}}{{item.guid}}/",
+                "name": "{{item.name}}"
+              }
+            },
+          {% elif folder %}
+            {
+              "@type": "ListItem",
+              "position": {{i}},
+              "item": {
+                "@id": "{{options.url}}{{item.guid}}/",
+                "name": "{{item.name}}"
+              }
+            }
+            {% if folder.guid != item.guid %},{% endif %}
+          {% endif %}
+          {% set i = i + 1 %}
+        {% endfor %}
+        {% if post %}
+          {
+            "@type": "ListItem",
+            "position": {{i}},
+            "item": {
+              "@id": "{{options.url}}{{post.guid}}.html",
+              "name": "{{post.title}}"
+            }
+          }
+        {% endif %}
+      ]
+    }
+  </script>
+{% endif %}
+

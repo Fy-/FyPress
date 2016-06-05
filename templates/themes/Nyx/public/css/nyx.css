@@ -1,0 +1,157 @@
+/* Titles */
+@import url(https://fonts.googleapis.com/css?family=Roboto);
+h1,h2,h3,h4 {font-family: Roboto;}
+h1 { font-size: 2rem;}
+h2 { font-size: 1.5rem;}
+h3 { font-size: 1.2rem;}
+h4 { font-size: 1.2rem;}
+
+.post h2, h3, h4 { margin-top: 2rem; margin-bottom: 1rem;}
+
+/* Global */
+.grey {
+    color: #505050;
+}
+.wrapper {
+    min-height: 100%;
+    height: auto !important;
+    height: 100%;
+    margin: 0 auto -11rem;
+}
+a, .breadcrumbs a {
+    color: #544277;
+}
+a:focus, a:hover {
+    color: #433364;
+}
+.row {
+    max-width: 1210px;
+}
+.button {
+    background: #544277;
+}
+.button:hover, .button:focus {
+    background: #433364;
+}
+
+/* Pagination */
+.pagination .current { background: #544277; }
+
+/* Header */
+header {
+    background: #2c223f;
+}
+    header h1 a, header h1 a:hover {
+        color: #fff;   
+    }
+
+/* Main */
+#sidebar, #content {
+    margin-top: 20px;
+}
+
+
+/* Topbar */
+.top-bar, .top-bar ul {
+    background-color: #1e172a;
+}
+.top-bar a {
+    color: #fff;
+    font-family: Roboto;
+}
+
+.top-bar a:hover {
+    color: #9883c3;
+}
+.is-dropdown-submenu {
+    border: none;
+}
+.dropdown.menu > li.is-dropdown-submenu-parent > a::after {
+    border-color: #a48ed0 transparent transparent;
+}
+.top-bar .active {
+    color: #a48ed0;
+}
+
+/* Breadcrumbs */
+.breadcrumbs {
+}
+
+/* Footer */
+footer {
+    background: #2c223f;
+    color: #fff;
+}
+footer a {
+    color: #fff;
+    font-weight: bold;
+}
+footer a:hover {
+    color: #a48ed0;
+}
+footer, .push {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    height: 10rem;
+    overflow: hidden;
+}
+
+/* Featured */
+.orbit-slide h2 {
+    margin: 0;
+}
+.featured h1 {
+    background: rgba(0,0,0, 0.9);
+    position: relative;
+    margin-top: -70px;
+    height: 70px;
+    overflow: auto;
+    line-height: 70px;
+    padding: 0;
+    width: 100%;
+    color: #fff;
+    text-align: center;
+}
+
+/* Posts */
+.pull-left {
+    float: left;
+    margin-right: 10px;
+}
+.pull-right {
+    float: right;
+    margin-left: 10px;
+}
+.img-thumbnail {
+    border: 1px solid #cacaca;
+    padding: 5px;
+}
+.post, p  {
+    font-size: 0.9em;
+    text-align: justify;
+}
+code {
+    border: none;
+}
+blockquote {
+  background: #f9f9f9;
+  border-left: 10px solid #ccc;
+  margin: 1.5em 10px;
+  padding: 0.5em 10px;
+  quotes: "\201C""\201D""\2018""\2019";
+}
+blockquote:before {
+  color: #ccc;
+  content: open-quote;
+  font-size: 4em;
+  line-height: 0.1em;
+  margin-right: 0.25em;
+  vertical-align: -0.4em;
+}
+blockquote p {
+  display: inline;
+}
+.centered {
+    display: block;
+    margin: 0 auto;
+}

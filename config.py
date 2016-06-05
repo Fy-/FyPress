@@ -34,6 +34,7 @@ class Config(object):
 
     ### DEBUG ###
     DEBUG = True
+    CACHE = False
 
 config = Config
 

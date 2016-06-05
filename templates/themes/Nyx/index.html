@@ -1,0 +1,59 @@
+{% extends "themes/Nyx/_base.html" %}
+{% block microdata %}
+    <script type='application/ld+json'>
+        {
+            "@context":"http://schema.org",
+            "@type":"WebSite",
+            "url":"{{options.url}}",
+            "name":"{{options.name}}",
+            "potentialAction":{
+                "@type":"SearchAction",
+                "target":"{{options.url}}/?s={search_term_string}",
+                "query-input":"required name=search_term_string"
+            }
+        }
+        { 
+            "@context" : "http://schema.org",
+            "@type" : "Organization",
+            "name" : "{{options.name}}",
+            "logo" : "{{options.logo}}",
+            "url" : "{{options.url}}",
+            "sameAs" : [
+                "{{options.facebook}}",
+                "{{options.twitter}}"
+            ]
+        }
+    </script>
+{% endblock %}
+{% block featured %}
+    {% set posts = get_posts() %}
+    <div class="orbit" role="region" data-auto-play="false" aria-label="Featured" data-orbit data-options="animInFromLeft:fade-in; animInFromRight:fade-in; animOutToLeft:fade-out; animOutToRight:fade-out;">
+      <ul class="orbit-container">
+        <button class="orbit-previous"><span class="show-for-sr">Previous Slide</span>&#9664;&#xFE0E;</button>
+        <button class="orbit-next"><span class="show-for-sr">Next Slide</span>&#9654;&#xFE0E;</button>
+        {% set i = 0 %}
+        {% for post in posts %}
+            <li class="orbit-slide{% if i == 0 %} is-active{% endif %}">
+                <div>
+                    <a href="{{post.guid}}.html" title="{{post.title}}">
+                        <img  class="orbit-image" src="{{post.image.urlify('featured')}}" alt="{{post.title}}" /> 
+                        <figcaption class="orbit-caption"><h2>{{post.title}}</h2></figcaption>
+                    </a>
+                </div>
+            </li>
+            {% set i = i +1 %}
+        {% endfor %}
+      </ul>
+    </div>
+{% endblock %}
+{% block content %}
+    <section>
+        <h2>FyPress</h2>
+        {% set posts = get_posts() %}
+    </section>
+    <hr />
+    <section>
+        <h2>Themes</h2>
+    </section>
+{% endblock %}
+

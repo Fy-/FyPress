@@ -59,7 +59,7 @@
                     {% elif post.status == 'published' %}
                         <button type="submit" formaction="?action=draft&amp;edit={{post.id}}" class="btn btn-default pull-left"><i class="fa fa-hdd-o" aria-hidden="true"></i> {{ _('Save as draft') }}</button> 
 
-                        <button type="submit" formaction="?action=save&amp;edit={{post.id}}" class="btn btn-success pull-right"><i class="fa fa-hdd-o" aria-hidden="true"></i> {{ _('Save and publish') }}</button> 
+                        <button type="submit" formaction="?action=publish&amp;edit={{post.id}}" class="btn btn-success pull-right"><i class="fa fa-hdd-o" aria-hidden="true"></i> {{ _('Save and publish') }}</button> 
                     {% elif post.status == 'draft' or post.status == 'trash' %}
                         <button type="submit" formaction="?action=save&amp;edit={{post.id}}" class="btn btn-default pull-left"><i class="fa fa-hdd-o" aria-hidden="true"></i> {{ _('Save') }}</button> 
                         <button type="submit" formaction="?action=publish&amp;edit={{post.id}}" class="btn btn-success  pull-right"><i class="fa fa-check-circle" aria-hidden="true"></i> {{ _('Publish') }}</button>

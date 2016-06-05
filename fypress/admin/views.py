@@ -15,11 +15,15 @@ import json
 
 admin = Blueprint('admin', __name__,  url_prefix='/admin')
 
+@admin.after_request
+def clear_cache(response):
+    from fypress.public.decorators import cache
+    return response
+
 @admin.route('/')
 @login_required
 def root():
     return render_template('admin/index.html', title='Admin')
-
 
 """
     Errors & Utils
@@ -97,6 +101,7 @@ def posts_delete():
     if post:
         Post.delete(post)
         flash(messages['deleted']+' ('+str(post)+')')
+        print cache.clear()
         return redirect(get_redirect_target())
     else:
         return handle_404()

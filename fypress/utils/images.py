@@ -10,7 +10,7 @@ class FyImage(object):
         'thumbnail-lg'  : [270, 175, 'crop'],
         'medium'        : [400, 0, 'width'],
         'large'         : [800, 0, 'width'],
-        'featured'      : [1170, 300, 'contain']
+        'featured'      : [1180, 305, 'contain']
     }
 
     def __init__(self, src):

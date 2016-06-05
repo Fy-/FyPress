@@ -1,0 +1,46 @@
+{% extends "themes/Nyx/_base.html" %}
+{% block microdata %}
+    <script type='application/ld+json'>
+        {
+            "@context":"http://schema.org",
+            "@type":"WebSite",
+            "url":"{{options.url}}",
+            "name":"{{options.name}}",
+            "potentialAction":{
+                "@type":"SearchAction",
+                "target":"{{options.url}}/?s={search_term_string}",
+                "query-input":"required name=search_term_string"
+            }
+        }
+        { 
+            "@context" : "http://schema.org",
+            "@type" : "Organization",
+            "name" : "{{options.name}}",
+            "logo" : "{{options.logo}}",
+            "url" : "{{options.url}}",
+            "sameAs" : [
+                "{{options.facebook}}",
+                "{{options.twitter}}"
+            ]
+        }
+    </script>
+{% endblock %}
+{% block featured %}
+    {% if post.image_id != 0 %}
+        <div class="featured">
+            <img  class="orbit-image" src="{{post.image.urlify('featured')}}" alt="{{post.title}}" /> 
+            <h1>{{post.title}}</h1>
+        </div>
+    {% endif %}
+{% endblock %}
+{% block content %}
+    <h2>{{post.title}} <small><time class="timeago" datetime="{{post.created.isoformat()}}">{{post.created.isoformat()}}</time></small></h2>
+    <article class="post">
+        {{post.content|safe}}
+    </article>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="/public/js/prism.js"></script>
+{% endblock %}

@@ -69,7 +69,8 @@ class Post(mysql.Base):
 
         if request.args.get('action') == 'publish':
             status = 'published'
-            post.created = 'NOW()'
+            if post.status != 'published':
+                post.created = 'NOW()'
         if request.args.get('action') == 'draft':
             status = 'draft'
 
@@ -193,3 +194,6 @@ class Post(mysql.Base):
             Post.query.delete(post)
 
         Post.query.delete(post)
+
+def get_posts():
+    return Post.query.filter(status='published', type='post').order_by('created').limit(5, 0)

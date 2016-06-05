@@ -15,6 +15,44 @@ class TreeHTML(object):
         for item in self.items:
             self.tritems.append((item.id, item, item.left, item.right, item.parent))
 
+
+    def generate_folders_nav(self, items=False, cls='nav', current=''):
+        if items == False:
+            items = self.json_rdy[0]['children']
+
+        for item in items:
+            active = ''
+            if '/'+item['data'].guid+'/' in current:
+                active = 'class="active"'
+                
+            if item.has_key('children'):
+                self.html += ("""
+                    <li>
+                        <a  href="/{1}/" {2}>
+                            {0}
+                        </a>
+                        <ul class="menu vertical">
+
+                """).format(item['data'].name, item['data'].guid, active)
+
+                self.generate_folders_nav(item['children'], 'dropdown')
+
+                self.html += ("""
+                            </ul>
+                    </li>
+                """)
+            else:
+                self.html += ("""
+                    <li>
+                        <a {3} href="/{2}/">{1}</a>
+                    </li>
+                """).format(cls, item['data'].name, item['data'].guid, active)
+    
+
+        return self.html 
+
+ 
+
     def generate_folders_admin(self, items=False, cls=''):
         if items == False:
             items = self.json_rdy

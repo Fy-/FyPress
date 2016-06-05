@@ -34,8 +34,7 @@ var/
 pip-log.txt
 pip-delete-this-directory.txt
 
-# Uploads
+# FyPress
 media/*
-
-# Fy Mysql
-fy_mysql/
+cache/*
+templates/themes/_current/*

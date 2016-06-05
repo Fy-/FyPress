@@ -16,6 +16,19 @@ class Paginator(object):
             'disabled_link'     : '<li class="disabled"><a>{0}</a></li>',
             'container_start'   : '<nav><ul class="pagination{0}">',
             'container_end'     : '</ul></nav>'
+        },
+        'foundation': {
+            'prev_page'         : '<li class="pagination-previous"><a href="{0}">{1}</a></li>',
+            'next_page'         : '<li class="pagination-next"><a href="{0}">{1}</a></li>',
+            'next_page_disabled': '<li class="pagination-next disabled">{0}</li>',
+            'prev_page_disabled': '<li class="pagination-previous disabled">{0}</li>',
+            'prev_label'        : 'Previous <span class="show-for-sr">page</span>',
+            'next_label'        : 'Next <span class="show-for-sr">page</span></a>',
+            'current'           : '<li class="current"><span class="show-for-sr">You\'re on page</span> {0}</a></li>',
+            'link'              : '<li><a href="{0}">{1}</a></li>',
+            'disabled_link'     : '<li class="ellipsis" aria-hidden="true"></li>',
+            'container_start'   : '<ul class="pagination{0}" role="navigation" aria-label="Pagination">',
+            'container_end'     : '</ul>'
         }
     }
 
