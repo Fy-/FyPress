@@ -8,6 +8,64 @@ from fypress.folder import Folder
 from fypress.user import User
 from fypress.media import Media
 from fypress.utils import mysql
+from akismet import Akismet
+
+class Comment(mysql.Base):
+    comment_id               = mysql.Column(etype='int', primary_key=True)
+    comment_user_id          = mysql.Column(etype='int')
+    comment_post_id          = mysql.Column(etype='int')
+    comment_parent           = mysql.Column(etype='int')
+    comment_created          = mysql.Column(etype='datetime')
+    comment_content          = mysql.Column(etype='string')
+    comment_status           = mysql.Column(etype='string') 
+    comment_user_name        = mysql.Column(etype='string') 
+    comment_user_uri         = mysql.Column(etype='string') 
+    comment_user_email       = mysql.Column(etype='string') 
+    comment_user_ip          = mysql.Column(etype='string') 
+    comment_user             = mysql.Column(object=User, link='user_id')
+
+    @property
+    def uri(self):
+        if self.user_id != 0:
+            return self.user.url
+        else:
+            return self.user_uri
+
+    @property
+    def author(self):
+        if self.user_id != 0:
+            return self.user.nicename
+        else:
+            return self.user_name
+
+    @property
+    def email(self):
+        if self.user_id != 0:
+            return self.user.email
+        else:
+            return self.user_email
+
+    def gravatar(self, size=50):
+        default = "identicon"
+        gravatar_url = "http://www.gravatar.com/avatar/" + hashlib.md5(self.email.lower()).hexdigest() + "?"
+        gravatar_url += urllib.urlencode({'d':default, 's':str(size)})
+        return gravatar_url
+
+    @staticmethod
+    def check(comment):
+        from fypress.admin import Option
+        if False: #check akismetapikey, ip= request.remote_addr
+            akismet = Akismet('1ba29d6f120c', blog=Options.get('url'), user_agent=request.headers.get('User-Agent'))
+            rv = akismet.check(
+                comment.ip, 
+                request.headers.get('User-Agent'), 
+                comment_author=comment.author,
+                comment_author_email=comment.email, 
+                comment_author_url=comment.uri,
+                comment_content=comment.content
+            )
+
+            print rv
 
 class Post(mysql.Base):
     post_id               = mysql.Column(etype='int', primary_key=True)

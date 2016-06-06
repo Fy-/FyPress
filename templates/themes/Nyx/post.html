@@ -1,28 +1,7 @@
 {% extends "themes/Nyx/_base.html" %}
 {% block microdata %}
     <script type='application/ld+json'>
-        {
-            "@context":"http://schema.org",
-            "@type":"WebSite",
-            "url":"{{options.url}}",
-            "name":"{{options.name}}",
-            "potentialAction":{
-                "@type":"SearchAction",
-                "target":"{{options.url}}/?s={search_term_string}",
-                "query-input":"required name=search_term_string"
-            }
-        }
-        { 
-            "@context" : "http://schema.org",
-            "@type" : "Organization",
-            "name" : "{{options.name}}",
-            "logo" : "{{options.logo}}",
-            "url" : "{{options.url}}",
-            "sameAs" : [
-                "{{options.facebook}}",
-                "{{options.twitter}}"
-            ]
-        }
+
     </script>
 {% endblock %}
 {% block featured %}
@@ -33,6 +12,7 @@
         </div>
     {% endif %}
 {% endblock %}
+
 {% block content %}
     {% if post.image_id == 0 %}
         <h1>{{post.title}} <small><time class="timeago" datetime="{{post.created.isoformat()}}">{{post.created.isoformat()}}</time></small></h1>

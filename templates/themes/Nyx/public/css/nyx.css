@@ -120,7 +120,7 @@ footer .grey {
 .orbit-slide h2 {
     margin: 0;
 }
-.featured h1 {
+.featured h1, .featured h2 {
     background: rgba(0,0,0, 0.9);
     position: relative;
     margin-top: -70px;

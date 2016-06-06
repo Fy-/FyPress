@@ -79,13 +79,13 @@ def template():
     )
 
 @public.route('/')
-@cached()
+@cached(pretty=True)
 def root():
     index = Post.query.filter(folder_id=1, slug='index', status='published', type='page').one()
     return render_template(get_template('index.html'), index=index)
 
 @public.route('/<path:slug>.html')
-@cached()
+@cached(pretty=True)
 def is_post(slug):
     post = Post.query.filter(guid=slug).one()
     if post:
@@ -104,7 +104,7 @@ def is_post(slug):
     
 
 @public.route('/articles/')
-@cached()
+@cached(pretty=True)
 def posts():
     folder = Folder()
     folder.name = 'Articles'
@@ -119,7 +119,7 @@ def posts():
     return render_template(get_template('articles.html'), articles=articles, folder=folder)
 
 @public.route('/<path:slug>/')
-@cached()
+@cached(pretty=True)
 def is_folder(slug):
     folder = Folder.query.filter(guid=slug).one()
     if folder:

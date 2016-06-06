@@ -33,7 +33,7 @@
                         <span><i class="fa fa-user"></i> By <a href="">{{item.user.nicename}}</a> &nbsp;&nbsp;</span>
                         <span><i class="fa fa-clock-o"></i> <time class="timeago" datetime="{{item.created.isoformat()}}">{{item.created.isoformat()}}</time> &nbsp;&nbsp;</span>
                         <span><i class="fa fa-comments"></i> {{item.comment_count}} comment &nbsp;&nbsp;</span>
-                        <ppan><i class="fa fa-folder-open-o"></i> <a href="/{{item.folder.guid}}/">/{{item.folder.guid}}</a></ppan>
+                        <span><i class="fa fa-folder-open-o"></i> <a href="/{{item.folder.guid}}/">/{{item.folder.guid}}</a></ppan>
                     </small>
                 </p>
                 <p>
@@ -48,16 +48,18 @@
 {% endblock %}
 
 {% block sidebar %}
-    <h3>{{folder.name}}</h3>
-    <ul class="menu vertical">
-        {% for page in pages %}
-            {% if page.slug != 'index' %}
-                <li><a href="/{{page.guid}}.html">{{page.title}}</a></li>
-            {% endif %}
-        {% endfor %}
-    </ul>
+    {% if pages|length != 1 %}
+        <h3>{{folder.name}}</h3>
+        <ul class="menu vertical">
+            {% for page in pages %}
+                {% if page.slug != 'index' %}
+                    <li><a href="/{{page.guid}}.html">{{page.title}}</a></li>
+                {% endif %}
+            {% endfor %}
+        </ul>
 
-    <br /><br />
+        <br /><br />
+    {% endif %}
 {% endblock %}
 
 

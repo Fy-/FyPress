@@ -26,8 +26,8 @@
         <div class="row">
             <div class="large-12 columns">
                 {% block header %}
-                    <!--<h1><a href="/">{{options.name}}</a> <small>{{options.slogan}}</small></h1>-->
-                    <div id="logo">
+                    <h1><a href="/">{{options.name}}</a> <small>{{options.slogan}}</small></h1>
+                    <!--<div id="logo">
                     {% if is_home %}
                         <h1>
                     {% endif %}
@@ -35,24 +35,24 @@
                     {% if is_home %}
                         </h1>
                     {% endif %}
-                    </div>
+                    </div>-->
                 {% endblock %}
                 {% block nav %}
 
                 <nav  class="top-bar">
-                    <section class="top-bar-left">
+                    <div class="top-bar-left">
                         <ul class="dropdown menu" data-dropdown-menu>
                             <li><a href="/" {% if is_home %}class="active"{% endif %}>Home</a></li>
                             <li><a href="/articles/" {% if folder and folder.guid == 'articles' %}class="active"{% endif %}>Articles</a></li>
                         {{nav|safe}}
                         </ul>
-                    </section >
-                    <section class="top-bar-right">
+                    </div >
+                    <div class="top-bar-right">
                         <ul class="menu">
                             <li><input type="search" placeholder="Search"></li>
                             <li><button type="button" class="button">Search</button></li>
                         </ul>
-                    </section>
+                    </div>
                 </nav>
                 {% endblock %}
             </div>
@@ -63,13 +63,13 @@
             {%block featured %}{% endblock %}
         </div>
         {% if sidebar %}
-            <section class="large-9 columns" id="content">
+            <div class="large-9 columns" id="content">
         {% else %}
-            <section class="large-12 columns" id="content">
+            <div class="large-12 columns" id="content">
         {% endif %}
             {% if not is_home %}
                 {% set bcitems = breadcrumb(post or page or folder) %}
-                <nav aria-label="You are here:" role="navigation">
+                <nav aria-label="You are here:">
                   <ul class="breadcrumbs">
                     <li><a href="/">{{options.name}}</a></li>
                         {% for item in bcitems %}
@@ -95,7 +95,7 @@
                 </nav>
             {% endif %}
             {% block content %}{% endblock %}
-        </section>
+        </div>
         {% if sidebar %}
             <aside class="large-3 columns" id="sidebar">
                 {% block sidebar %}

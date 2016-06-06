@@ -28,11 +28,11 @@ class FyPress():
         self.app.run(host=host, port=port, debug=self.config.DEBUG)
 
     def prepare(self):
+        @self.app.before_request
+        def before_request():
+            g.start = time.time()
+            
         if self.config.DEBUG:
-            @self.app.before_request
-            def before_request():
-                g.start = time.time()
-
             @self.app.after_request
             def after_request(response):
                 diff = time.time() - g.start

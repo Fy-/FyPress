@@ -35,6 +35,7 @@ def before_request():
 @admin.after_request
 def clear_cache(response):
     from fypress.public.decorators import cache
+    print cache.clear()
     return response
 
 @admin.route('/')
@@ -118,7 +119,6 @@ def posts_delete():
     if post:
         Post.delete(post)
         flash(messages['deleted']+' ('+str(post)+')')
-        print cache.clear()
         return redirect(get_redirect_target())
     else:
         return handle_404()

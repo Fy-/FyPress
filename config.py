@@ -36,6 +36,15 @@ class Config(object):
     DEBUG = True
     CACHE = False
 
+    ### CACHE ###
+    CACHE_TYPE = 'memcached' # redis, memcached, file
+    CACHE_SERV = '127.0.0.1' # 127.0.0.1, 127.0.0.1, cache/ 
+
+
+class ConfigProd(Config):
+    DEBUG = True
+    CACHE = True
+
 config = Config
 
 del os
