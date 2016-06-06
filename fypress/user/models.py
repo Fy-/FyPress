@@ -6,7 +6,6 @@ from fypress.utils import mysql
 import urllib, hashlib
 
 class User(mysql.Base):
-    # /sql/user.sql
     user_id                 = mysql.Column(etype='int', primary_key=True)
     user_login              = mysql.Column(etype='string', unique=True)
     user_email              = mysql.Column(etype='string', unique=True)

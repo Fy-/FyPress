@@ -92,14 +92,14 @@ def posts(page=False):
     numbers = Post.count_by_status(page)
     if not request.args.get('filter'):
         if page:
-            query = Post.query.where(' _table_.post_status IN ("draft", "published") AND _table_.post_type="page"').order_by('modified')
+            query = Post.query.where(' _table_.post_status IN ("draft", "published") AND _table_.post_type="page"').order_by('created')
         else:
-            query = Post.query.where(' _table_.post_status IN ("draft", "published") AND _table_.post_type="post"').order_by('modified')
+            query = Post.query.where(' _table_.post_status IN ("draft", "published") AND _table_.post_type="post"').order_by('created')
     else:
         if page:
-            query   = Post.query.filter(status=request.args.get('filter'), type='page').order_by('modified')
+            query   = Post.query.filter(status=request.args.get('filter'), type='page').order_by('created')
         else:
-            query   = Post.query.filter(status=request.args.get('filter'), type='post').order_by('modified')
+            query   = Post.query.filter(status=request.args.get('filter'), type='post').order_by('created')
 
     paginator = Paginator(
         query    = query,

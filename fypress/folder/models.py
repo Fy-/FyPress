@@ -3,7 +3,6 @@ from fypress.utils import slugify, url_unique, TreeHTML
 from fypress.utils import mysql
 
 class Folder(mysql.Base):
-    # /sql/folder.sql
     folder_id               = mysql.Column(etype='int', primary_key=True)
     folder_parent           = mysql.Column(etype='int')
     folder_left             = mysql.Column(etype='int')

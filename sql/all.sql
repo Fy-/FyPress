@@ -1,12 +1,4 @@
 --
--- Base de données :  `fypress`
---
-
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET time_zone = "+00:00";
-
-
---
 -- Structure de la table `fypress_folder`
 --
 
@@ -71,14 +63,17 @@ CREATE TABLE `fypress_post` (
   `post_content` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
   `post_title` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `post_excerpt` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `post_status` set('publish','draft','pending','trash','revision') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'publish',
+  `post_status` set('published','draft','pending','trash','revision') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'draft',
   `post_comment_status` set('open','closed') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'open',
   `post_slug` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `post_modified` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `post_parent` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
   `post_guid` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `post_type` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT 'post',
-  `post_comment_count` bigint(20) NOT NULL DEFAULT '0'
+  `post_comment_count` bigint(20) NOT NULL DEFAULT '0',
+  `post_image_id` bigint(20) DEFAULT NULL,
+  `post_views` bigint(20) NOT NULL DEFAULT '0',
+  `post_nav` int(11) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -171,7 +166,10 @@ ALTER TABLE `fypress_post`
   ADD KEY `post_date` (`post_created`),
   ADD KEY `post_guid` (`post_guid`),
   ADD KEY `post_status` (`post_status`),
-  ADD KEY `post_folder_id` (`post_folder_id`);
+  ADD KEY `post_folder_id` (`post_folder_id`),
+  ADD KEY `post_image_id` (`post_image_id`),
+  ADD KEY `posts_views` (`post_views`),
+  ADD KEY `post_nav` (`post_nav`);
 
 --
 -- Index pour la table `fypress_post_meta`

@@ -2,7 +2,6 @@
 from fypress.utils import mysql
 
 class Option(mysql.Base):
-    # /sql/option.sql
     option_id               = mysql.Column(etype='int', primary_key=True)
     option_name             = mysql.Column(etype='string', unique=True)
     option_value            = mysql.Column(etype='string')
