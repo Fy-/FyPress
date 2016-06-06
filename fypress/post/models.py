@@ -30,6 +30,7 @@ class Post(mysql.Base):
     post_folder           = mysql.Column(object=Folder, link='folder_id')
     post_image            = mysql.Column(object=Media, link='image_id')
     post_user             = mysql.Column(object=User, link='user_id')
+    post_views            = mysql.Column(etype='int')
 
     txt_to_status         = {
         'published' : gettext('Published'),
@@ -195,5 +196,8 @@ class Post(mysql.Base):
 
         Post.query.delete(post)
 
-def get_posts():
-    return Post.query.filter(status='published', type='post').order_by('created').limit(5, 0)
+def get_posts(order='created', limit=5, type='post', folder=False):
+    if not folder:
+        return Post.query.filter(status='published', type=type).order_by(order).limit(limit, 0, array=True)
+    else:
+        return Post.query.filter(status='published', type=type, folder_id=folder).order_by(order).limit(limit, 0, array=True)

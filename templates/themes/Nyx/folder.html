@@ -1,37 +1,23 @@
 {% extends "themes/Nyx/_base.html" %}
-{% block microdata %}
-    <script type='application/ld+json'>
-        {
-            "@context":"http://schema.org",
-            "@type":"WebSite",
-            "url":"{{options.url}}",
-            "name":"{{options.name}}",
-            "potentialAction":{
-                "@type":"SearchAction",
-                "target":"{{options.url}}/?s={search_term_string}",
-                "query-input":"required name=search_term_string"
-            }
-        }
-        { 
-            "@context" : "http://schema.org",
-            "@type" : "Organization",
-            "name" : "{{options.name}}",
-            "logo" : "{{options.logo}}",
-            "url" : "{{options.url}}",
-            "sameAs" : [
-                "{{options.facebook}}",
-                "{{options.twitter}}"
-            ]
-        }
-    </script>
-{% endblock %}
 
 {% block content %}
     {% if folder.id != 1 %}
-        <h1>{{folder.name}}</h1>
-        <p>{{folder.content}}</p>
+        {% if not index %}
+            <h1>{{folder.name}}</h1>
+            <p>{{folder.content}}</p>
+        {% else %}
+            <article class="post">
+                <h1>{{folder.name}}</h1>
+                {{index.content|safe}}
+            </article>
+        {% endif %}
     {% endif %}
-    {% for item in paginator.items %}
+    {% if articles.items %}
+        {% if index %}
+            <h2>Last posts</h2>
+        {% endif %}
+    {% endif %}
+    {% for item in articles.items %}
         <div class="row">
             {% if item.image.id %}
                 <div class="large-4 columns">
@@ -41,7 +27,7 @@
             {% else %}
                 <div class="large-12 columns">
             {% endif %}
-                <h2><a href="/{{item.guid}}.html" rel="bookmark">{{item.title}}</a></h2>
+                <h3><a href="/{{item.guid}}.html" rel="bookmark">{{item.title}}</a></h3>
                 <p>
                     <small class="grey">
                         <span><i class="fa fa-user"></i> By <a href="">{{item.user.nicename}}</a> &nbsp;&nbsp;</span>
@@ -58,5 +44,25 @@
         </div>
         <hr />
     {% endfor %}
+    {{articles.links}}
 {% endblock %}
 
+{% block sidebar %}
+    <h3>{{folder.name}}</h3>
+    <ul class="menu vertical">
+        {% for page in pages %}
+            {% if page.slug != 'index' %}
+                <li><a href="/{{page.guid}}.html">{{page.title}}</a></li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+
+    <br /><br />
+{% endblock %}
+
+
+
+{% block scripts %}
+    {{ super() }}
+    <script src="/public/js/prism.js"></script>
+{% endblock %}

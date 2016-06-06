@@ -29,12 +29,14 @@
     {% if post.image_id != 0 %}
         <div class="featured">
             <img  class="orbit-image" src="{{post.image.urlify('featured')}}" alt="{{post.title}}" /> 
-            <h1>{{post.title}}</h1>
+            <h1>{{post.title}} <small><time class="timeago" datetime="{{post.created.isoformat()}}">{{post.created.isoformat()}}</time></small></h1>
         </div>
     {% endif %}
 {% endblock %}
 {% block content %}
-    <h2>{{post.title}} <small><time class="timeago" datetime="{{post.created.isoformat()}}">{{post.created.isoformat()}}</time></small></h2>
+    {% if post.image_id == 0 %}
+        <h1>{{post.title}} <small><time class="timeago" datetime="{{post.created.isoformat()}}">{{post.created.isoformat()}}</time></small></h1>
+    {% endif %}
     <article class="post">
         {{post.content|safe}}
     </article>

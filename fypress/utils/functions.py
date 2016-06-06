@@ -30,6 +30,7 @@ def slugify(text, delim=u'-'):
 
 def url_unique(url, Obj, ignore=False, sep='-'):
   exist = Obj.query.exist('guid', url, ignore)
+  print exist
   if not exist:
     return url
 

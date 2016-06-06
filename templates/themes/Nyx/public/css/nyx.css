@@ -4,20 +4,18 @@ h1,h2,h3,h4 {font-family: Roboto;}
 h1 { font-size: 2rem;}
 h2 { font-size: 1.5rem;}
 h3 { font-size: 1.2rem;}
-h4 { font-size: 1.2rem;}
+h4 { font-size: 1rem;}
 
-.post h2, h3, h4 { margin-top: 2rem; margin-bottom: 1rem;}
+.post h2, .post h3,  .post h4 { margin-top: 2rem; margin-bottom: 1rem;}
 
 /* Global */
+body, html {
+    height: auto;
+}
 .grey {
     color: #505050;
 }
-.wrapper {
-    min-height: 100%;
-    height: auto !important;
-    height: 100%;
-    margin: 0 auto -11rem;
-}
+
 a, .breadcrumbs a {
     color: #544277;
 }
@@ -33,7 +31,20 @@ a:focus, a:hover {
 .button:hover, .button:focus {
     background: #433364;
 }
+.fat {
+    font-size: 3rem;
+}
 
+/* Widgets */
+.widget h4 {
+    height: 20px;
+    overflow: hidden;
+    font-size: 0.95rem;
+    margin-bottom: 0;
+}
+.widget .widget-body {
+    padding-left: 0;
+}
 /* Pagination */
 .pagination .current { background: #544277; }
 
@@ -73,6 +84,11 @@ header {
     color: #a48ed0;
 }
 
+/* Menu */
+.menu .active > a {
+    background: #544277;
+}
+
 /* Breadcrumbs */
 .breadcrumbs {
 }
@@ -81,6 +97,10 @@ header {
 footer {
     background: #2c223f;
     color: #fff;
+    margin-top: 4rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    width: 100%;
 }
 footer a {
     color: #fff;
@@ -89,13 +109,13 @@ footer a {
 footer a:hover {
     color: #a48ed0;
 }
-footer, .push {
-    margin-top: 1rem;
-    padding-top: 1rem;
-    height: 10rem;
-    overflow: hidden;
-}
 
+footer h4 {
+    margin: 0;
+}
+footer .grey {
+    color: #dedede;
+}
 /* Featured */
 .orbit-slide h2 {
     margin: 0;
@@ -154,4 +174,19 @@ blockquote p {
 .centered {
     display: block;
     margin: 0 auto;
+}
+
+/* Thumbnail */
+.thumbnail {
+    background: #000
+}
+
+/* Logo */
+#logo h1 {
+    margin: 0;
+    padding: 0;
+}
+#logo {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
 }

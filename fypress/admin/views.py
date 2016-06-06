@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-from flask import Blueprint, session, request, redirect, url_for, render_template, flash, jsonify, make_response
+from flask import Blueprint, session, request, redirect, url_for, render_template, flash, jsonify, make_response, g
 from flask.views import MethodView
 from flask.ext.babel import lazy_gettext as gettext
 from fypress.user import level_required, login_required, User, UserEditForm, UserAddForm
@@ -14,6 +14,23 @@ from fypress.utils import get_redirect_target, Paginator
 import json
 
 admin = Blueprint('admin', __name__,  url_prefix='/admin')
+
+@admin.context_processor
+def inject_options():
+    from fypress.utils.mysql.sql import FyMySQL
+    from fypress import __version__, fypress
+    return dict(options=g.options, queries=FyMySQL._instance.queries, version=__version__, debug=fypress.config.DEBUG, flask_config=fypress.config)
+
+@admin.before_request
+def before_request():
+    from fypress.user import User
+    g.user = None
+    if 'user_id' in session:
+        g.user = User.query.get(session['user_id'])
+
+    from fypress.admin import Option
+    g.options = Option.auto_load()
+
 
 @admin.after_request
 def clear_cache(response):

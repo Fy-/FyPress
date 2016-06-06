@@ -7,6 +7,8 @@ from config import config
 from fypress.utils.mysql import FlaskFyMySQL
 import time
 
+__version__ = 0.1
+
 class FyPress():
     def __init__(self, config):
         self.config = config
@@ -26,22 +28,6 @@ class FyPress():
         self.app.run(host=host, port=port, debug=self.config.DEBUG)
 
     def prepare(self):
-        @self.app.context_processor
-        def inject_options():
-            from fypress.utils.mysql.sql import FyMySQL
-
-            return dict(options=g.options, queries=FyMySQL._instance.queries, debug=self.config.DEBUG, flask_config=self.app.config)
-
-        @self.app.before_request
-        def before_request():
-            from fypress.user import User
-            g.user = None
-            if 'user_id' in session:
-                g.user = User.query.get(session['user_id'])
-
-            from fypress.admin import Option
-            g.options = Option.auto_load()
-
         if self.config.DEBUG:
             @self.app.before_request
             def before_request():

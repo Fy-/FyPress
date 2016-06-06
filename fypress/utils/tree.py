@@ -18,8 +18,11 @@ class TreeHTML(object):
 
     def generate_folders_nav(self, items=False, cls='nav', current=''):
         if items == False:
-            items = self.json_rdy[0]['children']
-
+            try:
+                items = self.json_rdy[0]['children']
+            except:
+                return ''
+                
         for item in items:
             active = ''
             if '/'+item['data'].guid+'/' in current:

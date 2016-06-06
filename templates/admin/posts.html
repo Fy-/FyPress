@@ -38,12 +38,13 @@
                         {% for post in posts %}
                             <tr class="odd" >
                                 <td class="col-md-1">
-                                    <div class="col-md-6">
+                                    <!--<div class="col-md-6">
                                         <input type="checkbox" value="{{post.id}}" name="post[]">
                                     </div>
                                     <div class="col-md-6">
-                                        #{{post.id}}
-                                    </div>
+                                        
+                                    </div>-->
+                                    #{{post.id}}
                                 </td>
                                 <td class="col-md-6">
                                     {% if post.image.id %}
@@ -51,8 +52,10 @@
                                     {% else %}
                                         <img class="pull-left thumbnail-table" src="/static/admin/images/empty.png" /> 
                                     {% endif %}
+
                                     {% if post.status != 'trash' %}<a href="{{url_for(urls~'_add', edit=post.id) }}">{% else %}<span class="text-muted">{% endif %}
-                                    {{post.title}}
+                                            
+                                        {{post.title}}
                                     {% if post.status != 'trash' %}</a>{% else %}</span>{% endif %}
                                     <br />
                                     <small class="text-muted">
@@ -65,7 +68,9 @@
                                             {% endif %}
                                             <a class="ldanger" href="{{ url_for('admin.posts_move', id=post.id, status='trash') }}">{{_('Delete')}}</a> | 
                                             <a href="">{{_('Preview')}}</a> |
-                                            <em>{{options.url}}{{post.guid}}</em>
+                                            <em>
+                                                {{options.url}}{% if post.slug == 'index' %}{{post.folder.guid}}{% if post.folder.id != 1%}/{% endif %}{% else %}{{post.guid}}.html{% endif %}
+                                            </em>
                                         {% else %}
                                             <a  href="{{ url_for('admin.posts_move', id=post.id, status='draft') }}">{{_('Restore')}}</a> | 
                                             <a  href="{{ url_for('admin.posts_move', id=post.id, status='published') }}">{{_('Publish')}}</a> |
@@ -74,7 +79,16 @@
                                     </small>
                                 </td>
                                 <td class="col-md-2">
-                                    <small><i class="fa fa-folder-open-o fa-fw"></i> /{{post.folder.guid}}</small>
+                                    <small>
+                                            {% if post.slug == 'index' %}<span class="label label-success">INDEX</span>{% else %}
+                                                {% if post.type == 'page' %}
+                                                    <span class="label label-info">PAGE</span>
+                                                {% else %}
+                                                    <span class="label label-info">POST</span>
+                                                {% endif %}
+                                            {% endif %}
+                                            <i class="fa fa-folder-open-o fa-fw"></i> /{{post.folder.guid}} 
+                                    </small>
                                     <br />
                                     <strong>{{post.folder.name}}</strong>
                                 </td>

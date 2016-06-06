@@ -4,7 +4,7 @@
 
 {% endblock %}
 {% block content %}
-    {% for item in paginator.items %}
+    {% for item in articles.items %}
         <div class="row">
             {% if item.image.id %}
                 <div class="large-4 columns">
@@ -31,5 +31,5 @@
         </div>
         <hr />
     {% endfor %}
-    {{paginator.links}}
+    {{articles.links}}
 {% endblock %}

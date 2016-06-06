@@ -135,10 +135,26 @@ class Media(mysql.Base):
         fhash   = attrs['qquuid']
         upload_type = 'file'
         upload_icon = 'fa-file-o'
-        filename = url_unique(secure_filename(attrs['qqfilename']), Media)
+        filename = secure_filename(attrs['qqfilename'])
 
+        def is_unique(url):
+            now = datetime.datetime.now()
+            exist = Media.query.exist('guid', "{}/{}/".format(now.year, now.month)+url, False)
+            print exist
+            if not exist:
+                return url
+
+            i = 1
+            ext = url.split('.')
+            while Media.query.exist('guid',  "{}/{}/".format(now.year, now.month)+url, False):
+                add  = '{}{}'.format('-', i)
+                url = ext[0]+add+'.'+ext[1]
+                i += 1 
+
+            return url
+
+        filename = is_unique(filename)
         chunked = False
-
         fdir    = Media.upload_path(config.UPLOAD_DIRECTORY)
         fpath   = os.path.join(fdir, filename)
         

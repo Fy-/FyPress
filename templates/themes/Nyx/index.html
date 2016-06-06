@@ -10,18 +10,18 @@
                 "@type":"SearchAction",
                 "target":"{{options.url}}/?s={search_term_string}",
                 "query-input":"required name=search_term_string"
+            },
+            "headline": "{{options.slogan}}",
+            "author":  { 
+                "@type" : "Organization",
+                "name" : "{{options.name}}",
+                "logo" : "{{options.logo}}",
+                "url" : "{{options.url}}",
+                "sameAs" : [
+                    "{{options.facebook}}",
+                    "{{options.twitter}}"
+                ]
             }
-        }
-        { 
-            "@context" : "http://schema.org",
-            "@type" : "Organization",
-            "name" : "{{options.name}}",
-            "logo" : "{{options.logo}}",
-            "url" : "{{options.url}}",
-            "sameAs" : [
-                "{{options.facebook}}",
-                "{{options.twitter}}"
-            ]
         }
     </script>
 {% endblock %}
@@ -33,27 +33,28 @@
         <button class="orbit-next"><span class="show-for-sr">Next Slide</span>&#9654;&#xFE0E;</button>
         {% set i = 0 %}
         {% for post in posts %}
-            <li class="orbit-slide{% if i == 0 %} is-active{% endif %}">
-                <div>
-                    <a href="{{post.guid}}.html" title="{{post.title}}">
-                        <img  class="orbit-image" src="{{post.image.urlify('featured')}}" alt="{{post.title}}" /> 
-                        <figcaption class="orbit-caption"><h2>{{post.title}}</h2></figcaption>
-                    </a>
-                </div>
-            </li>
-            {% set i = i +1 %}
+            {% if post.image.id %}
+                <li class="orbit-slide{% if i == 0 %} is-active{% endif %}">
+                    <div>
+                        <a href="{{post.guid}}.html" title="{{post.title}}">
+                            <img  class="orbit-image" src="{{post.image.urlify('featured')}}" alt="{{post.title}}" /> 
+                            <figcaption class="orbit-caption"><h2>{{post.title}}</h2></figcaption>
+                        </a>
+                    </div>
+                </li>
+                {% set i = i +1 %}
+            {% endif %}
         {% endfor %}
       </ul>
     </div>
 {% endblock %}
 {% block content %}
     <section>
-        <h2>FyPress</h2>
-        {% set posts = get_posts() %}
-    </section>
-    <hr />
-    <section>
-        <h2>Themes</h2>
+        {% if index %}
+            <article class="post">
+                {{index.content|safe}}
+            </article>
+        {% endif %}
     </section>
 {% endblock %}
 

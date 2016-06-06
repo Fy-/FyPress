@@ -1,0 +1,38 @@
+{% extends "themes/Nyx/_base.html" %}
+
+
+{% block featured %}
+    {% if page.image_id != 0 %}
+        <div class="featured">
+            <img  class="orbit-image" src="{{page.image.urlify('featured')}}" alt="{{page.title}}" /> 
+            <h1>{{page.title}}</h1>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    {% if page.image_id == 0 %}
+        <h1>{{page.title}}</h1>
+    {% endif %}
+    <article class="post">
+        {{page.content|safe}}
+    </article>
+{% endblock %}
+
+{% block sidebar %}
+    <h3><a href="/{{page.folder.guid}}/">{{page.folder.name}}</a></h3>
+    <ul class="menu vertical">
+        {% for p in pages %}
+            {% if p.slug != 'index' %}
+                <li {% if page.id == p.id %}class="active"{% endif %}><a href="/{{p.guid}}.html">{{p.title}}</a></li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+
+    <br /><br />
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="/public/js/prism.js"></script>
+{% endblock %}
