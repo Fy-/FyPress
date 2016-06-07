@@ -94,13 +94,18 @@ class Folder(mysql.Base):
             {1}folder AS node,
             {1}folder AS parent
           WHERE
-            node.folder_left BETWEEN parent.folder_left AND parent.folder_right AND node.folder_id={0}
+            node.folder_left BETWEEN parent.folder_left AND parent.folder_right AND node.folder_id={0} AND node.folder_id!=1
           ORDER BY
             parent.folder_left""".format(self.id, config.MYSQL_PREFIX)
 
         self.guid = url_unique(Folder.query.raw(query).one()[0]['path'], Folder, self.id)
 
         Folder.query.update(self)
+
+    @staticmethod
+    def add():
+        # todo!
+        pass
 
     @staticmethod
     def get_path(self):
@@ -111,7 +116,7 @@ class Folder(mysql.Base):
             {1}folder AS node,
             {1}folder AS parent
           WHERE
-            node.folder_left BETWEEN parent.folder_left AND parent.folder_right AND node.folder_id={0}
+            node.folder_left BETWEEN parent.folder_left AND parent.folder_right AND node.folder_id={0} AND node.folder_id!=1
           ORDER BY
             parent.folder_left
 

@@ -72,6 +72,9 @@ def template():
             return item.title+' • '+g.options['name']
         return g.options['name']
 
+    def seo(item=False):
+        pass
+
     return dict(
         nav=nav, 
         get_posts=get_posts, 
@@ -98,7 +101,7 @@ def is_post(slug):
         post.views += 1
         Post.query.update(post)
         if post.type == 'post':
-            return render_template(get_template('post.html'), post=post, sidebar=False)
+            return render_template(get_template('post.html', config), post=post, sidebar=False)
         else:
             pages = Post.query.filter(folder_id=post.folder_id, status='published', type='page').order_by('created').all(array=True)
             return render_template(get_template('page.html', config), page=post, pages=pages)

@@ -58,7 +58,8 @@ def init_fypress(login='', email='', passwd=''):
 
     user = User.add(login, email, passwd)
     if user:
-        user.status = 4
+        user.status   = 4
+        user.nicename = user.login
         User.query.update(user)
         print '*** Added user: '+str(user)
     else:

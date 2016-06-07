@@ -18,6 +18,9 @@
     {% endblock %}
     <title>{{title(post or folder)}}</title>
     <!--<link rel="canonical" href="{{options.url}}"/>-->
+    <link rel="alternate" type="application/rss+xml" title="{{options.name}}" href="{{options.url}}feed/"/>
+    <meta name="generator" content="FyPress {{version}}"/>
+
     {% block microdata %}{% endblock %}
     {% include "themes/Nyx/_schema/breadcrumb.html" %}
 </head>
@@ -47,12 +50,14 @@
                         {{nav|safe}}
                         </ul>
                     </div >
+                    <!--
                     <div class="top-bar-right">
                         <ul class="menu">
                             <li><input type="search" placeholder="Search"></li>
                             <li><button type="button" class="button">Search</button></li>
                         </ul>
                     </div>
+                    -->
                 </nav>
                 {% endblock %}
             </div>
@@ -101,6 +106,8 @@
                 {% block sidebar %}
                 {% endblock %}
                 {% include 'themes/Nyx/widgets/popular-post.html' %}
+                <hr />
+                {% include 'themes/Nyx/widgets/social-follow.html' %}
             </aside>
         {% endif %}
     </main>
@@ -115,16 +122,7 @@
                 {% include 'themes/Nyx/widgets/popular-post.html' %}
             </section>
             <section class="large-4 columns">
-                <h3>Follow {{options.name}}</h3>
-                <div class="large-4 columns fat">
-                    <a  href="/feed/"><i class="fa fa-facebook-square" ></i></a>
-                </div>
-                <div class="large-4 columns fat">
-                    <a  href="/feed/"><i class="fa fa-twitter-square" ></i></a>
-                </div>
-                <div class="large-4 columns fat">
-                    <a  href="/feed/"><i class="fa fa-rss-square" ></i></a>
-                </div>
+                {% include 'themes/Nyx/widgets/social-follow.html' %}
             </section>        
 
         </div>

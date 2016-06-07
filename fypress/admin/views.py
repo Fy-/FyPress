@@ -2,12 +2,12 @@
 from flask import Blueprint, session, request, redirect, url_for, render_template, flash, jsonify, make_response, g
 from flask.views import MethodView
 from flask.ext.babel import lazy_gettext as gettext
-from fypress.user import level_required, login_required, User, UserEditForm, UserAddForm
+from fypress.user import level_required, login_required, User, UserEditForm, UserAddForm, UserEditFormAdmin
 from fypress.folder import FolderForm, Folder
 from fypress.media import Media
 from fypress.post import Post
 from fypress.admin.static import messages
-from fypress.admin.forms import GeneralSettingsForm
+from fypress.admin.forms import GeneralSettingsForm, SocialSettingsForm
 from fypress.admin.models import Option
 from fypress.utils import get_redirect_target, Paginator
 from fypress.local import _fypress_
@@ -17,8 +17,6 @@ import json
 
 admin  = Blueprint('admin', __name__,  url_prefix='/admin')
 config = _fypress_.config
-
-
 
 @admin.context_processor
 def inject_options():
@@ -71,9 +69,38 @@ def settings_general():
     if form.validate_on_submit():
         for data in form.data:
             Option.update(data, form.data[data])
+            from fypress.public.views import options
+            options = Option.auto_load()
         return redirect(url_for('admin.settings_general'))
         
     return render_template('admin/settings_general.html', form=form, title=gettext('General - Settings'))
+
+@admin.route('/settings/social', methods=['POST', 'GET'])
+@level_required(4)
+def settings_social():
+    form = SocialSettingsForm(obj=Option.get_settings('social'))
+
+    if form.validate_on_submit():
+        for data in form.data:
+            Option.update(data, form.data[data])
+            from fypress.public.views import options
+            options = Option.auto_load()
+        return redirect(url_for('admin.settings_social'))
+
+    return render_template('admin/settings_social.html', form=form, title=gettext('Social - Settings'))
+
+@admin.route('/settings/reading')
+def settings_reading():
+    return render_template('admin/blank.html')
+
+'''
+    Comments
+'''
+@admin.route('/comments')
+@admin.route('/comments/all')
+@level_required(4)
+def comments():
+    return render_template('admin/blank.html')
 
 """
     Posts & Pages
@@ -244,19 +271,33 @@ def users():
     return render_template('admin/users.html', title=gettext('Users'), users=paginator.items, pages=paginator.links)
 
 @admin.route('/users/edit', methods=['POST', 'GET'])
-@level_required(4)
+@level_required(0)
 def users_edit(id_user=None):
     if not id_user:
         id_user = request.args.get('id')
 
     user = User.query.get(id_user)
-    form = UserEditForm(obj=user)
+    if g.user.status == 4:
+        form = UserEditFormAdmin(obj=user)
+    else:
+        form = UserEditForm(obj=user)
 
     if form.validate_on_submit():
+        status = user.status
         form.populate_obj(user)
-        User.query.update(user)
-        flash(messages['updated']+' ('+str(user)+')')
-        return redirect(url_for('admin.users'))
+        
+        # don't allow to change status unless admin.
+        if g.user.status != 4:
+            user.status = status
+
+        if g.user.status == 4 or g.user.id == user.id:
+            User.query.update(user)
+            flash(messages['updated']+' ('+str(user)+')')
+
+        if g.user.status == 4:
+            return redirect(url_for('admin.users'))
+        else:
+            return redirect(url_for('admin.users_me'))
 
     return render_template('admin/users_edit.html', title=gettext('Edit - User'), user=user, form=form)
 

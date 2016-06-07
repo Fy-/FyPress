@@ -15,7 +15,9 @@ body, html {
 .grey {
     color: #505050;
 }
-
+p {
+    word-wrap: break-word;
+}
 a, .breadcrumbs a {
     color: #544277;
 }
@@ -131,6 +133,9 @@ footer .grey {
     width: 100%;
     color: #fff;
     text-align: center;
+}
+.orbit-previous, .orbit-next {
+    cursor: pointer;
 }
 
 /* Posts */

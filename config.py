@@ -34,7 +34,7 @@ class Config(object):
 
     ### DEBUG ###
     DEBUG = True
-    CACHE = True
+    CACHE = False
 
     ### CACHE ###
     CACHE_TYPE = 'memcached' # redis, memcached, file

@@ -8,7 +8,7 @@
     <meta name="author" content="FyPress">
 
     <title>{% block title %}{{title}} - {{options.name}}{% endblock %}</title>
-     <link rel=icon href=/static/admin/images/fypress_icon_64.png sizes="any" type="image/png">
+    <link rel=icon href=/static/admin/images/fypress_icon_64.png sizes="any" type="image/png">
     {% block css %}
         <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/metisMenu/2.5.2/metisMenu.css" rel="stylesheet">
@@ -47,8 +47,8 @@
             </div>
 
             <ul class="nav navbar-top-links navbar-right">
+                <!--
                 <li class="dropdown">
-
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                         <span class="badge alert-danger ">1</span> <i class="fa fa-envelope fa-fw"></i>  <i class="fa fa-caret-down"></i>
                     </a>
@@ -155,6 +155,7 @@
                         </li>
                     </ul>
                 </li>
+                -->
                 <li class="dropdown">
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                         <i class="fa fa-user fa-fw"></i> {{g.user.nicename}} <i class="fa fa-caret-down"></i>
@@ -233,7 +234,7 @@
 
                         {% if g.user.has_level(3) %}
                             <li>
-                                <a href="/admin/comments"><i class="fa fa-comment-o fa-fw"></i> Comments <span class="badge alert-danger pull-right">1</span></a>
+                                <a href="{{ url_for('admin.comments') }}"><i class="fa fa-comment-o fa-fw"></i> {{_('Comments')}} <span class="badge alert-danger pull-right">1</span></a>
                             </li>
                         {% endif %}
 
@@ -256,22 +257,16 @@
 
                         {% if g.user.has_level(4) %}
                             <li>
-                                <a href="#"><i class="fa fa-cogs fa-fw"></i> Settings<span class="fa arrow"></span></a>
+                                <a href="#"><i class="fa fa-cogs fa-fw"></i> {{_('Settings')}}<span class="fa arrow"></span></a>
                                 <ul class="nav nav-second-level">
                                     <li>
-                                        <a href="{{ url_for('admin.settings_general') }}">General</a>
+                                        <a href="{{ url_for('admin.settings_general') }}">{{_('General')}}</a>
                                     </li>
                                     <li>
-                                        <a href="/admin/settings/social">Social</a>
+                                        <a href="{{ url_for('admin.settings_social') }}">{{_('Social')}}</a>
                                     </li>
                                     <li>
-                                        <a href="/admin/settings/seo">SEO</a>
-                                    </li>
-                                    <li>
-                                        <a href="/admin/settings/writing">Writing</a>
-                                    </li>
-                                    <li>
-                                        <a href="/admin/settings/reading">Reading</a>
+                                        <a href="{{ url_for('admin.settings_reading') }}">{{_('Reading')}}</a>
                                     </li>
                                 </ul>
                             </li>

@@ -1,5 +1,5 @@
-<h3>Popular Posts</h3>
 {% set posts = get_posts(type="post", limit="5", order='views') %}
+{% if posts %}<h3>Popular Posts</h3>{% endif %}
 {% for post in posts %}
     <div class="row widget">
         {% if post.image.id %}
