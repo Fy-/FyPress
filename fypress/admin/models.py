@@ -20,16 +20,19 @@ class Option(mysql.Base):
         return final
 
     @staticmethod
-    def update(name, value):
+    def update(name, value, auto_load=1):
         option = Option.query.filter(name=name).one()
         if option:
             option.value = value
             Option.query.update(option)
         else:
             option = Option()
-            option.name     = name
-            option.value    = value 
+            option.name      = name
+            option.value     = value 
+            option.auto_load = auto_load
             Option.query.add(option)
+
+        return option
 
     @staticmethod
     def get(name):

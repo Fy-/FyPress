@@ -8,7 +8,11 @@ from fypress.folder import Folder
 from fypress.user import User
 from fypress.media import Media
 from fypress.utils import mysql
+from fypress.local import _fypress_
+
 from akismet import Akismet
+
+config = _fypress_.config
 
 class Comment(mysql.Base):
     comment_id               = mysql.Column(etype='int', primary_key=True)
@@ -114,11 +118,11 @@ class Post(mysql.Base):
             add = 'AND post_type="post"'
 
         query = """SELECT 
-            (SELECT COUNT(*) FROM fypress_post WHERE post_status != 'revision' {0}) AS total ,
-            (SELECT COUNT(*) FROM fypress_post WHERE post_status = 'published' {0}) AS published,
-            (SELECT COUNT(*) FROM fypress_post WHERE post_status = 'draft' {0}) AS draft,
-            (SELECT COUNT(*) FROM fypress_post WHERE post_status = 'trash' {0}) AS trash
-        """.format(add)
+            (SELECT COUNT(*) FROM {1}post WHERE post_status != 'revision' {0}) AS total ,
+            (SELECT COUNT(*) FROM {1}post WHERE post_status = 'published' {0}) AS published,
+            (SELECT COUNT(*) FROM {1}post WHERE post_status = 'draft' {0}) AS draft,
+            (SELECT COUNT(*) FROM {1}post WHERE post_status = 'trash' {0}) AS trash
+        """.format(add, config.MYSQL_PREFIX)
 
         return Post.query.raw(query).result()[0]
 
@@ -227,13 +231,13 @@ class Post(mysql.Base):
     def get_excerpt(self, size=255):
         # https://github.com/dziegler/excerpt_extractor/tree/master
 
-        soup = Post.except_utils_rm_headers(BeautifulSoup(self.content))
+        soup = Post.excerpt_utils_rm_headers(BeautifulSoup(self.content))
         text = ''.join(soup.findAll(text=True)).split('\n')
         description = max((len(i.strip()),i) for i in text)[1].strip()[0:size]
         return description   
     
     @staticmethod
-    def except_utils_rm_headers(soup):
+    def excerpt_utils_rm_headers(soup):
         [[tree.extract() for tree in soup(elem)] for elem in ('h1','h2','h3','h4','h5','h6')]
         return soup
 

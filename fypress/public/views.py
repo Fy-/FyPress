@@ -1,16 +1,18 @@
 # -*- coding: UTF-8 -*-
 from flask import Blueprint, url_for, render_template, request, make_response, g, send_from_directory, redirect, session
 from werkzeug.contrib.atom import AtomFeed
+from fypress.local import _fypress_
 from fypress.folder import Folder
 from fypress.post import Post, get_posts
 from fypress.admin import Option
 from fypress.utils import get_template, get_template_static, Paginator
 from fypress.folder import Folder
-from decorators import cached
+from .decorators import cached
 
 public  = Blueprint('public', __name__)
 options = []
 user    = None
+config  = _fypress_.config
 
 def is_404():
     return '404', 404
@@ -19,8 +21,9 @@ def is_404():
 def inject_options():
     if '/public/' not in request.path:
         from fypress.utils.mysql.sql import FyMySQL
-        from fypress import __version__, fypress
-        return dict(options=g.options, queries=FyMySQL._instance.queries, version=__version__, debug=fypress.config.DEBUG)
+        from fypress import __version__
+
+        return dict(options=g.options, queries=FyMySQL._instance.queries, version=__version__, debug=config.DEBUG)
 
 @public.before_request
 def before_request():
@@ -82,7 +85,7 @@ def template():
 @cached(pretty=True)
 def root():
     index = Post.query.filter(folder_id=1, slug='index', status='published', type='page').one()
-    return render_template(get_template('index.html'), index=index)
+    return render_template(get_template('index.html', config), index=index)
 
 @public.route('/<path:slug>.html')
 @cached(pretty=True)
@@ -98,7 +101,7 @@ def is_post(slug):
             return render_template(get_template('post.html'), post=post, sidebar=False)
         else:
             pages = Post.query.filter(folder_id=post.folder_id, status='published', type='page').order_by('created').all(array=True)
-            return render_template(get_template('page.html'), page=post, pages=pages)
+            return render_template(get_template('page.html', config), page=post, pages=pages)
     else:
         return is_404()
     
@@ -116,7 +119,7 @@ def posts():
             theme    = 'foundation',
             per_page = 6
     )
-    return render_template(get_template('articles.html'), articles=articles, folder=folder)
+    return render_template(get_template('articles.html', config), articles=articles, folder=folder)
 
 @public.route('/<path:slug>/')
 @cached(pretty=True)
@@ -130,13 +133,13 @@ def is_folder(slug):
         pages = Post.query.filter(folder_id=folder.id, status='published', type='page').order_by('created').all(array=True)
         index = Post.query.filter(folder_id=folder.id, slug='index', status='published', type='page').one()
 
-        return render_template(get_template('folder.html'), folder=folder, articles=articles, pages=pages, index=index)
+        return render_template(get_template('folder.html', config), folder=folder, articles=articles, pages=pages, index=index)
     else:
         return is_404()
     
 @public.route('/public/<path:folder>/<file>')
 def static(folder, file):
-    folder, file = get_template_static(folder, file)
+    folder, file = get_template_static(folder, file, config)
     return send_from_directory(folder, file)
 
 @public.route('/feed/')
@@ -162,7 +165,12 @@ def feed():
             updated=post.modified,
             published=post.created
         )
-    return feed.get_response()
+
+
+    response = feed.get_response()
+    response.headers["Content-Type"] = 'application/xml'
+
+    return response
 
 @public.route('/sitemap.xls')
 @cached()

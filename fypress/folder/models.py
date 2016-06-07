@@ -1,6 +1,9 @@
 # -*- coding: UTF-8 -*-
 from fypress.utils import slugify, url_unique, TreeHTML
 from fypress.utils import mysql
+from fypress.local import _fypress_
+config = _fypress_.config
+
 
 class Folder(mysql.Base):
     folder_id               = mysql.Column(etype='int', primary_key=True)
@@ -29,17 +32,17 @@ class Folder(mysql.Base):
     def count_posts(self):
         query = """
             UPDATE
-              fypress_folder
+              {0}folder
             SET
-              fypress_folder.folder_posts =(
+              {0}folder.folder_posts =(
                   SELECT
                     COUNT(*)
                   FROM
-                    fypress_post
+                    {0}post
                   WHERE
-                    fypress_post.post_parent = 0 AND fypress_post.post_folder_id = fypress_folder.folder_id
+                    {0}post.post_parent = 0 AND {0}post.post_folder_id = {0}folder.folder_id
             )
-        """        
+        """.format(config.MYSQL_PREFIX)
         Folder.query.sql(query).execute()
 
     @staticmethod
@@ -88,12 +91,12 @@ class Folder(mysql.Base):
           SELECT
             GROUP_CONCAT(parent.folder_slug SEPARATOR '/') AS path
           FROM
-            fypress_folder AS node,
-            fypress_folder AS parent
+            {1}folder AS node,
+            {1}folder AS parent
           WHERE
             node.folder_left BETWEEN parent.folder_left AND parent.folder_right AND node.folder_id={0}
           ORDER BY
-            parent.folder_left""".format(self.id)
+            parent.folder_left""".format(self.id, config.MYSQL_PREFIX)
 
         self.guid = url_unique(Folder.query.raw(query).one()[0]['path'], Folder, self.id)
 
@@ -105,14 +108,14 @@ class Folder(mysql.Base):
           SELECT
             parent.folder_seo_content, parent.folder_created, parent.folder_modified, parent.folder_parent, parent.folder_content, parent.folder_name, parent.folder_left, parent.folder_id, parent.folder_guid, parent.folder_posts, parent.folder_slug, parent.folder_depth, parent.folder_right
           FROM
-            fypress_folder AS node,
-            fypress_folder AS parent
+            {1}folder AS node,
+            {1}folder AS parent
           WHERE
             node.folder_left BETWEEN parent.folder_left AND parent.folder_right AND node.folder_id={0}
           ORDER BY
             parent.folder_left
 
-           """.format(self.id)
+           """.format(self.id, config.MYSQL_PREFIX)
 
 
         return Folder.query.sql(query).all(array=True)
@@ -157,15 +160,15 @@ class Folder(mysql.Base):
                 node.folder_right,
                 node.folder_modified
             FROM
-                fypress_folder AS node,
-                fypress_folder AS parent
+                {0}folder AS node,
+                {0}folder AS parent
             WHERE
                 node.folder_left BETWEEN parent.folder_left AND parent.folder_right
             GROUP BY
                 node.folder_id
             ORDER BY
                 node.folder_left, node.folder_id
-        """
+        """.format(config.MYSQL_PREFIX)
 
 
         folders = Folder.query.sql(query).all(array=True)

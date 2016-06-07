@@ -21,9 +21,9 @@ class Config(object):
     BABEL_DEFAULT_TIMEZONE  = 'UTC'
 
     ### MYSQL ###
-    MYSQL_USER 		= 'fypress'
-    MYSQL_PASSWORD	= 'stay'
-    MYSQL_DB		= 'fypress'
+    MYSQL_USER 		= 'dev'
+    MYSQL_PASSWORD	= 'pwd'
+    MYSQL_DB		= 'dev'
     MYSQL_PREFIX	= 'fypress_'
 
     ### UPLOAD ###
@@ -34,17 +34,18 @@ class Config(object):
 
     ### DEBUG ###
     DEBUG = True
-    CACHE = False
+    CACHE = True
 
     ### CACHE ###
     CACHE_TYPE = 'memcached' # redis, memcached, file
     CACHE_SERV = '127.0.0.1' # 127.0.0.1, 127.0.0.1, cache/ 
 
+    ### URL ###
+    URL        = 'http://127.0.0.1:5000/'
 
 class ConfigProd(Config):
     DEBUG = True
     CACHE = True
 
-config = Config
 
 del os

@@ -1,11 +1,11 @@
 from werkzeug.contrib.cache import FileSystemCache, MemcachedCache, RedisCache
-from flask import g
 from functools import wraps
-from flask import request
-from config import config
+from flask import request, g
 from bs4 import BeautifulSoup 
-from config import config
+from fypress.local import _fypress_
 import time
+
+config  = _fypress_.config
 
 if config.CACHE_TYPE == 'redis':
     cache = RedisCache(host=config.CACHE_SERV)

@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 import sys; reload(sys); sys.setdefaultencoding("utf-8")
-from fypress import fypress
+from fypress import FyPress
+from config import Config
 
 def main():
+    fypress = FyPress(Config)
     fypress.run()
     return 0
 

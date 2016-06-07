@@ -10,16 +10,20 @@ from fypress.admin.static import messages
 from fypress.admin.forms import GeneralSettingsForm
 from fypress.admin.models import Option
 from fypress.utils import get_redirect_target, Paginator
+from fypress.local import _fypress_
+from fypress import __version__
 
 import json
 
-admin = Blueprint('admin', __name__,  url_prefix='/admin')
+admin  = Blueprint('admin', __name__,  url_prefix='/admin')
+config = _fypress_.config
+
+
 
 @admin.context_processor
 def inject_options():
     from fypress.utils.mysql.sql import FyMySQL
-    from fypress import __version__, fypress
-    return dict(options=g.options, queries=FyMySQL._instance.queries, version=__version__, debug=fypress.config.DEBUG, flask_config=fypress.config)
+    return dict(options=g.options, queries=FyMySQL._instance.queries, version=__version__, debug=config.DEBUG, flask_config=config)
 
 @admin.before_request
 def before_request():
@@ -35,7 +39,7 @@ def before_request():
 @admin.after_request
 def clear_cache(response):
     from fypress.public.decorators import cache
-    print cache.clear()
+    cache.clear()
     return response
 
 @admin.route('/')

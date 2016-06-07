@@ -10,8 +10,7 @@ user = Blueprint('user', __name__,  url_prefix='/user')
 @user.context_processor
 def inject_options():
     from fypress.utils.mysql.sql import FyMySQL
-    from fypress import __version__, fypress
-    return dict(options=g.options, queries=FyMySQL._instance.queries, version=__version__, debug=fypress.config.DEBUG, flask_config=fypress.config)
+    return dict(options=g.options, queries=FyMySQL._instance.queries)
 
 @user.before_request
 def before_request():

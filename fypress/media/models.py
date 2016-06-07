@@ -5,9 +5,11 @@ import datetime, magic, os, hashlib, json
 from fypress.utils import FyImage, FyOembed, slugify, url_unique
 from fypress.admin.static import messages
 from fypress.utils import mysql
-from config import config
+from fypress.local import _fypress_
 
 import urllib2, shutil
+
+config  = _fypress_.config
 
 class Media(mysql.Base):
     # todo allowed {type, icon, }
