@@ -10,7 +10,7 @@ Edit your configuration file (config.py)
     python manager.py init_db
     python manager.py init_fypress --login=yourLoogin --email=your@email.tld --passwd=yourPassword
 
-    python run.py```
+    python run.py
 
 Build your website http://127.0.0.1:5000 & http://127.0.0.1:5000/admin/
 
