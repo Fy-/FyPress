@@ -245,12 +245,7 @@ def folders():
     else:
         form = FolderForm()
         if form.validate_on_submit():
-            folder = Folder()
-            form.populate_obj(folder)
-            folder.created = 'NOW()'
-            folder.parent  = 1
-            Folder.query.add(folder)
-            Folder.build_guid()
+            Folder.add(form)
             flash(messages['added']+' ('+str(folder)+')')
             return redirect(url_for('admin.folders'))
 

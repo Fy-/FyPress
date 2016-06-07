@@ -5,6 +5,12 @@ from flask.ext.babel import lazy_gettext as gettext
 from fypress.utils import mysql
 import urllib, hashlib
 
+class UserMeta(mysql.Base):
+    usermeta_id        = mysql.Column(etype='int', primary_key=True)
+    usermeta_id_user   = mysql.Column(etype='int')
+    usermeta_key       = mysql.Column(etype='string')
+    usermeta_value     = mysql.Column(etype='string')
+
 class User(mysql.Base):
     user_id                 = mysql.Column(etype='int', primary_key=True)
     user_login              = mysql.Column(etype='string', unique=True)
@@ -17,7 +23,7 @@ class User(mysql.Base):
     user_registered         = mysql.Column(etype='datetime')
     user_activation_key     = mysql.Column(etype='string')
     user_status             = mysql.Column(etype='int')
-    user_meta               = mysql.Column(meta=True)
+    user_meta               = mysql.Column(object=UserMeta, multiple='meta', link='usermeta_id_user')
 
     roles                   = {
         0: gettext('Member'),
@@ -27,9 +33,18 @@ class User(mysql.Base):
         4: gettext('Administrator')
     }
 
+    roles_admin             = {
+        0: gettext('<span class="badge alert-default">Member</span>'),
+        1: gettext('<span class="badge alert-info">Contributor</span>'),
+        2: gettext('<span class="badge alert-warning">Author</span>'),
+        3: gettext('<span class="badge alert-danger">Editor</span>'),
+        4: gettext('<span class="badge alert-success">Administrator</span>')   
+    }
+
     def init(self):
         self.role = self.roles[self.status]
-        
+        self.role_admin = self.roles_admin[self.status]
+
     def has_level(self, level):
         if self.status >= level:
             return True

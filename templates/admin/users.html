@@ -32,10 +32,14 @@
                                     <small class="text-muted">
                                         <a href="{{url_for('admin.users_edit')}}?id={{user.id}}">Edit</a> | <a class="ldanger" href="">Delete</a></small>
                                 </td>
-                                <td class="col-md-2">{{user.firstname}} {{user.lastname}}</td>
+                                <td class="col-md-2">
+                                    {{user.firstname}} {{user.lastname}}<br />
+                                    <small><abbr title="{{user.registered }}">{{user.registered }}</abbr></small><br />
+                                    meta: {{user.meta}}
+                                </td>
                                 <td class="col-md-2">{{user.nicename}}</td>
                                 <td class="col-md-2"><a href="mailto:{{user.email}}">{{user.email}}</a></td>
-                                <td class="col-md-1">{{user.role}}</td>
+                                <td class="col-md-1">{{user.role_admin}}</td>
                             </tr>
                         {% endfor %}
                 </tbody>

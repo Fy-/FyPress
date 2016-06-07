@@ -103,9 +103,24 @@ class Folder(mysql.Base):
         Folder.query.update(self)
 
     @staticmethod
-    def add():
-        # todo!
-        pass
+    def add(form):
+        query = """
+            SELECT MAX(folder_left) as l, MAX(folder_right) as r
+            FROM {0}folder
+        """.format(config.MYSQL_PREFIX)
+        
+        rv = Folder.query.raw(query).one()[0]
+        if rv['r'] == 0 and rv['l'] == 0:
+            rv['r'] = 1
+
+        folder = Folder()
+        form.populate_obj(folder)
+        folder.created = 'NOW()'
+        folder.parent  = 1
+        folder.left    = rv['r']+1
+        folder.right   = rv['r']+2
+        Folder.query.add(folder)
+        Folder.build_guid()
 
     @staticmethod
     def get_path(self):

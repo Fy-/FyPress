@@ -133,6 +133,8 @@ def is_folder(slug):
                 query    = Post.query.filter(folder_id=folder.id, status='published', type='post').order_by('created'),
                 page     = request.args.get('page')
         )
+        for article in articles.items:
+            article.dump()
         pages = Post.query.filter(folder_id=folder.id, status='published', type='page').order_by('created').all(array=True)
         index = Post.query.filter(folder_id=folder.id, slug='index', status='published', type='page').one()
 
