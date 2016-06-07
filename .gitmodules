@@ -1,0 +1,3 @@
+[submodule "fypress/utils/mysql"]
+	path = fypress/utils/mysql
+	url = https://github.com/Fy-/Fy_MySQL.git
