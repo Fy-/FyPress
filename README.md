@@ -4,6 +4,8 @@ FlaskPress is a mini CMS based on Flask and Jinja2, aimed to easily deploy conte
 
 ### Install FyPress
     git clone --recursive https://github.com/Fy-/FyPress.git
+    cd FyPress
+    pip install -r requirements.txt
 
 Edit your configuration file (config.py)
 
