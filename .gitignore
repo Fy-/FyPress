@@ -38,3 +38,4 @@ pip-delete-this-directory.txt
 media/*
 cache/*
 templates/themes/_current/*
+todo.txt
