@@ -35,6 +35,8 @@ pip-log.txt
 pip-delete-this-directory.txt
 
 # FyPress
+gunicorn.py
+gunicorn.sh
 media/*
 cache/*
 templates/themes/_current/*
