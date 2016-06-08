@@ -15,8 +15,12 @@ else:
     cache = FileSystemCache(config.CACHE_SERV)
 
 def clean_html(buf):
-    bs = BeautifulSoup(buf, 'html5lib')
-    return bs.prettify(formatter="minimal")
+    if isinstance(buf, tuple):
+        bs = BeautifulSoup(buf[0], 'html5lib')
+        return (bs.prettify(formatter="minimal"), buf[1])
+    else:
+        bs = BeautifulSoup(buf, 'html5lib')
+        return bs.prettify(formatter="minimal")
 
 def cached(timeout=5*60, key='public%s', pretty=False):
     def decorator(f):
@@ -30,7 +34,10 @@ def cached(timeout=5*60, key='public%s', pretty=False):
             cache_key = key % request.path
             rv = cache.get(cache_key)
             if rv is not None:
-                return rv+'\n\n<!-- FyPress Cache, served in {}s -->'.format(time.time() - g.start)
+                try:
+                    return rv+'\n\n<!-- FyPress Cache, served in {}s -->'.format(time.time() - g.start)
+                except:
+                    return rv
 
             if pretty == True:
                 rv = clean_html(f(*args, **kwargs))

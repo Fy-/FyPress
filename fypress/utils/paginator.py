@@ -47,6 +47,19 @@ class Paginator(object):
     
     # HTML
     @property
+    def prev_page_url(self):
+        if self.has_prev:
+            page = self.page - 1 if self.page > 2 else None
+            return self.page_href(page)
+        return False
+
+    @property
+    def next_page_url(self):
+        if self.has_next:
+            return self.page_href(self.page + 1)
+        return False
+
+    @property
     def prev_page(self):
         if self.has_prev:
             page = self.page - 1 if self.page > 2 else None

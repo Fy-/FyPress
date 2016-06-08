@@ -69,8 +69,8 @@ def settings_general():
     if form.validate_on_submit():
         for data in form.data:
             Option.update(data, form.data[data])
-            from fypress.public.views import options
-            options = Option.auto_load()
+        from fypress.public.views import reset_options
+        reset_options()
         return redirect(url_for('admin.settings_general'))
         
     return render_template('admin/settings_general.html', form=form, title=gettext('General - Settings'))
@@ -83,11 +83,25 @@ def settings_social():
     if form.validate_on_submit():
         for data in form.data:
             Option.update(data, form.data[data])
-            from fypress.public.views import options
-            options = Option.auto_load()
+        from fypress.public.views import reset_options
+        reset_options()
         return redirect(url_for('admin.settings_social'))
 
     return render_template('admin/settings_social.html', form=form, title=gettext('Social - Settings'))
+
+
+@admin.route('/settings/design', methods=['POST', 'GET'])
+def settings_design():
+    options = Option.get_settings('design')
+    if request.form:
+        for data in request.form:
+            Option.update(data, request.form[data])
+        from fypress.public.views import reset_options
+        reset_options()
+
+        return redirect(url_for('admin.settings_design'))
+
+    return render_template('admin/settings_design.html', design=options, title=gettext('Design - Settings'))
 
 @admin.route('/settings/reading')
 def settings_reading():
@@ -133,6 +147,11 @@ def posts(page=False):
         else:
             query   = Post.query.filter(status=request.args.get('filter'), type='post').order_by('created')
 
+    if page:
+        title = gettext('Page')
+    else:
+        title = gettext('Posts')
+
     paginator = Paginator(
         query    = query,
         page     = request.args.get('page')
@@ -141,7 +160,7 @@ def posts(page=False):
     if page: urls = 'admin.pages'
     else: urls = 'admin.posts'
 
-    return render_template('admin/posts.html', pages=paginator.links, title=gettext('Posts'), posts=paginator.items, numbers=numbers, filter=request.args.get('filter'), page=page, urls=urls)
+    return render_template('admin/posts.html', pages=paginator.links, title=title, posts=paginator.items, numbers=numbers, filter=request.args.get('filter'), page=page, urls=urls)
 
 @admin.route('/posts/delete')
 @level_required(4)
@@ -193,9 +212,13 @@ def posts_add(page=False):
 
     folders = Folder.get_all()
 
+    if page:
+        title = gettext('New - Page')
+    else:
+        title = gettext('New - Post')
 
 
-    return render_template('admin/posts_new.html', folders=folders, post=post, title=gettext('New - Post'), page=page, urls=urls)
+    return render_template('admin/posts_new.html', folders=folders, post=post, title=title, page=page, urls=urls)
 
 """
     Medias
@@ -204,12 +227,16 @@ def posts_add(page=False):
 @admin.route('/medias/all')
 @level_required(1)
 def medias():
+    if not request.args.get('filter'):
+        query = Media.query.select_all(array=True).order_by('modified')
+    else:
+        query = Media.query.filter(type=request.args.get('filter')).order_by('modified')
+
     paginator = Paginator(
-        query    = Media.query.select_all(array=True).order_by('modified'),
+        query    = query,
         page     = request.args.get('page'),
         per_page = 12
     )
-
     return render_template('admin/medias.html',  medias=paginator.items, pages=paginator.links, title=gettext('Library - Medias'))
 
 @admin.route('/medias/add/web')
@@ -304,6 +331,7 @@ def users_new():
     if form.validate_on_submit():
         user = User()
         form.populate_obj(user)
+        user.registered = 'NOW()'
         User.query.add(user)
         flash(messages['added']+' ('+str(user)+')')
         return redirect(url_for('admin.users'))

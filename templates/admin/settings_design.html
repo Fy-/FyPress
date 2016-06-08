@@ -1,0 +1,75 @@
+{% extends "admin/_base.html" %}
+{% block content %}
+    {% from 'macros/form.html' import render_form %}
+    <div class="col-lg-12">
+        <h1 class="page-header">{{ _('') }}</h1>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+               <strong>{{ _('Design Settings') }}</strong>
+            </div>
+            <div class="panel-body">
+                <form method="POST" action="" role="form" class="">
+                    <div class="form-group  ">
+                        <label for="fp_logo" class="control-label">{{_('Site Logo')}}</label>
+                        <div class="input-group" > 
+                            <input class="form-control" id="fp_logo" name="logo" type="text" value="{{design.logo}}"> 
+                            <a href="#" data-insert-target="fp_logo" data-toggle="modal" data-target="#fp_medias_modal" class="btn btn-primary input-group-addon">+ {{ _('Image') }}</a>
+                            
+                        </div>
+                        <div style="padding: 5px; margin-top: 5px; border: 1px solid #cecece" id="fp_logo_preview">
+                            {% if design.logo %}
+                                <img src="{{design.logo}}" alt="Logo" style="background: #000" />
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="form-group  ">
+                        <label for="fp_favico" class="control-label">{{_('Site Icon (favicon)')}}</label>
+                        <div class="input-group" > 
+                            <input class="form-control" id="fp_favico" name="ico" type="text" value="{{design.ico}}"> 
+                            <a href="#" data-insert-target="fp_favico" data-toggle="modal" data-target="#fp_medias_modal" class="btn btn-primary input-group-addon">+ {{ _('Image') }}</a>
+                            
+                        </div>
+                        <div style="padding: 5px; margin-top: 5px; border: 1px solid #cecece" id="fp_favico_preview">
+                            {% if design.ico %}
+                                <img src="{{design.ico}}" alt="Logo" style="background: #000" />
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <br />
+                    <button type="submit" class="btn btn-lg btn-success ">Submit </button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block footer %}
+    <div class="modal fade" id="fp_medias_modal" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-9">
+                            <div id="fp_media_loader"></div>
+                            <iframe id="fp_media_frame" src="" style="width: 100%; height: 0;"  width="100%" height="0" frameborder="0" ></iframe>
+                        </div>
+                        <div class="col-lg-3">
+                            <div id="fp_media_selected" class="pull-left alert alert-success" style="margin: 0; width: 100%;">{{_('No media selected')}}</div>
+                            <div class="clearfix"></div>
+                            <div id="fp_insert_btn" style="margin-top: 10px;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div id="fp_insert_btn"><button type="button" class="btn btn-default" data-dismiss="modal">Close</button> </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        {% include 'admin/js/media_field.js' %}
+    </script>    
+{% endblock %}

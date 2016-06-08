@@ -54,10 +54,24 @@ a:focus, a:hover {
 header {
     background: #2c223f;
 }
-    header h1 a, header h1 a:hover {
+    header h1 a, header h1 a:hover, header .h1 a, header .h1 a:hover {
         color: #fff;   
     }
-
+    header .h1 {
+        color: #fff;
+        font-size: 2rem;
+        font-family: Roboto;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 1.4;
+        margin-bottom: 0.5rem;
+        margin-top: 0;
+        display: block;
+    }
+    header .h1 small {
+        color: #cacaca;
+        line-height: 0;
+    }
 /* Main */
 #sidebar, #content {
     margin-top: 20px;
@@ -121,6 +135,25 @@ footer .grey {
 /* Featured */
 .orbit-slide h2 {
     margin: 0;
+}
+.orbit-text p {
+    text-align: center;
+}
+.orbit-text-summary {
+    width: 80%;
+    margin: 0 auto;
+    padding-top: 40px;
+}
+.orbit-text {
+    position: absolute;
+    text-align:center;
+    font-size: 1.4rem;
+    padding-top: 30px;
+    color: #fff;
+    width: 100%;
+}
+.featured {
+    position: relative;
 }
 .featured h1, .featured h2 {
     background: rgba(0,0,0, 0.9);

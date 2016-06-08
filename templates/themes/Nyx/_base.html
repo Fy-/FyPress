@@ -17,28 +17,62 @@
         <link rel="stylesheet" href="/public/css/nyx.css" />
     {% endblock %}
     <title>{{title(post or folder)}}</title>
-    <!--<link rel="canonical" href="{{options.url}}"/>-->
+    
     <link rel="alternate" type="application/rss+xml" title="{{options.name}}" href="{{options.url}}feed/"/>
     <meta name="generator" content="FyPress {{version}}"/>
-
+    {% if options.ico %}<link rel=icon href="{{options.ico}}" sizes="any">{% endif %}
     {% block microdata %}{% endblock %}
     {% include "themes/Nyx/_schema/breadcrumb.html" %}
+
+    {% block seo %}
+        <link rel="canonical" href="{{request.base_url}}">
+        {% if paginator and paginator.next_page_url %}
+            <link rel="next" href="{{options.url}}{{paginator.next_page_url[1:]}}"/>
+        {% endif %}
+        {% if paginator and paginator.prev_page_url %}
+            <link rel="prev" href="{{options.url}}{{paginator.prev_page_url[1:]}}"/>
+        {% endif %}
+        <meta property="og:type" content="website"/>
+        <meta property="og:title" content="{{title(post or folder)}}" />
+        <meta property="og:url" content="{{request.url}}"/>
+        <meta property="og:site_name" content="{{options.name}}"/>
+        {% if is_home %}
+            <meta property="og:description" content="{{options.slogan}}"/>
+            <meta name="twitter:description" content="{{options.slogan}}"/>
+        {% endif %}
+        {% if options.logo and is_home %}
+            <meta property="og:image" content="{{options.url}}{{options.logo[1:]}}"/>
+            <meta name="twitter:image" content="{{options.url}}{{options.logo[1:]}}"/>
+        {% endif %}
+        <meta name="twitter:card" content="summary"/>
+        <meta name="twitter:title" content="{{title(post or folder)}}" />
+        {% if options.twitter %}
+            <meta name="twitter:site" content="@{{options.twitter.rsplit('/', 1)[1]}}"/>
+            <meta name="twitter:creator" content="@{{options.twitter.rsplit('/', 1)[1]}}"/>
+        {% endif %}
+    {% endblock %}
 </head>
 <body>
     <header>
         <div class="row">
             <div class="large-12 columns">
                 {% block header %}
-                    <h1><a href="/">{{options.name}}</a> <small>{{options.slogan}}</small></h1>
-                    <!--<div id="logo">
-                    {% if is_home %}
-                        <h1>
+                    {% if options.logo %}
+                        {% if is_home %}
+                            <h1>
+                        {% endif %}
+                            <a href="/" title="{{options.name}}"><img alt="{{options.name}}" src="{{options.logo}}" /></a>
+                        {% if is_home %}
+                            </h1>
+                        {% endif %}
+                    {% else %}
+                        {% if is_home %}
+                            <h1><a href="/">{{options.name}}</a> <small>{{options.slogan}}</small></h1>
+                        {% else %}
+                            <span class="h1"><a href="/">{{options.name}}</a> <small>{{options.slogan}}</small></span>
+                        {% endif %}
                     {% endif %}
-                        <a href="/" title="{{options.name}}"><img alt="{{options.name}}" src="http://127.0.0.1:5000/files/2016/6/fynetwork.png" /></a>
-                    {% if is_home %}
-                        </h1>
-                    {% endif %}
-                    </div>-->
+
                 {% endblock %}
                 {% block nav %}
 
@@ -67,12 +101,12 @@
         <div class="large-12 columns">
             {%block featured %}{% endblock %}
         </div>
-        {% if sidebar %}
+        {% if show_sidebar %}
             <div class="large-9 columns" id="content">
         {% else %}
             <div class="large-12 columns" id="content">
         {% endif %}
-            {% if not is_home %}
+            {% if not is_home and show_breadcrumb %}
                 {% set bcitems = breadcrumb(post or page or folder) %}
                 <nav aria-label="You are here:">
                   <ul class="breadcrumbs">
@@ -101,7 +135,7 @@
             {% endif %}
             {% block content %}{% endblock %}
         </div>
-        {% if sidebar %}
+        {% if show_sidebar %}
             <aside class="large-3 columns" id="sidebar">
                 {% block sidebar %}
                 {% endblock %}
@@ -111,22 +145,24 @@
             </aside>
         {% endif %}
     </main>
-    <footer id="footer">
-        {% set footer = 1 %}
-        <div class="row">
-            <section class="large-4 columns">
-                <h3>About {{options.name}}</h3>
-                <p>Powered by FyPress v{{version}}</p>
-            </section>
-            <section class="large-4 columns">
-                {% include 'themes/Nyx/widgets/popular-post.html' %}
-            </section>
-            <section class="large-4 columns">
-                {% include 'themes/Nyx/widgets/social-follow.html' %}
-            </section>        
+    {% if show_footer %}
+        <footer id="footer">
+            {% set footer = 1 %}
+            <div class="row">
+                <section class="large-4 columns">
+                    <h3>About {{options.name}}</h3>
+                    <small>Powered by <a href="http://press.fy.to" title="FyPress, CMS, Flask">FyPress</a> v{{version}}, theme: {{options.theme}}</small>
+                </section>
+                <section class="large-4 columns">
+                    {% include 'themes/Nyx/widgets/popular-post.html' %}
+                </section>
+                <section class="large-4 columns">
+                    {% include 'themes/Nyx/widgets/social-follow.html' %}
+                </section>        
 
-        </div>
-    </footer>
+            </div>
+        </footer>
+    {% endif %}
     {% block scripts %}
         <script src="/public/js/jquery.js"></script>
         <script src="/public/js/foundation.min.js"></script>

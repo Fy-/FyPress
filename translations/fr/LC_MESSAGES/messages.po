@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-05-24 18:03+0200\n"
+"POT-Creation-Date: 2016-06-08 14:02+0200\n"
 "PO-Revision-Date: 2016-05-24 18:04+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -18,92 +18,69 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.3.4\n"
 
-#: ../templates/admin/_base.html:191 ../templates/admin/users_edit.html:5
-msgid "User Profile"
-msgstr ""
+#~ msgid "User Profile"
+#~ msgstr ""
 
-#: ../templates/admin/_base.html:194
-msgid "Logout"
-msgstr ""
+#~ msgid "Logout"
+#~ msgstr ""
 
-#: ../templates/admin/_base.html:268
-msgid "All Users"
-msgstr ""
+#~ msgid "All Users"
+#~ msgstr ""
 
-#: ../templates/admin/_base.html:271
-msgid "Add New"
-msgstr ""
+#~ msgid "Add New"
+#~ msgstr ""
 
-#: ../templates/admin/_base.html:274
-msgid "Your profile"
-msgstr ""
+#~ msgid "Your profile"
+#~ msgstr ""
 
-#: ../templates/admin/users.html:4 ../templates/admin/users.html:7
-msgid "Users"
-msgstr ""
+#~ msgid "Users"
+#~ msgstr ""
 
-#: ../templates/admin/users.html:15
-msgid "ID"
-msgstr ""
+#~ msgid "ID"
+#~ msgstr ""
 
-#: ../templates/admin/users.html:16 ../user/forms.py:7 ../user/forms.py:13
-#: ../user/forms.py:21
-msgid "Login"
-msgstr ""
+#~ msgid "Login"
+#~ msgstr ""
 
-#: ../templates/admin/users.html:17
-msgid "Name"
-msgstr ""
+#~ msgid "Name"
+#~ msgstr ""
 
-#: ../templates/admin/users.html:18 ../user/forms.py:15 ../user/forms.py:31
-msgid "Nicename"
-msgstr ""
+#~ msgid "Nicename"
+#~ msgstr ""
 
-#: ../templates/admin/users.html:19
-msgid "Contact"
-msgstr ""
+#~ msgid "Contact"
+#~ msgstr ""
 
-#: ../templates/admin/users.html:20
-msgid "Role"
-msgstr ""
+#~ msgid "Role"
+#~ msgstr ""
 
-#: ../templates/admin/users_edit.html:17
-msgid "User not found"
-msgstr ""
+#~ msgid "User not found"
+#~ msgstr ""
 
-#: ../templates/admin/users_edit.html:24
-msgid "Back to All Users"
-msgstr ""
+#~ msgid "Back to All Users"
+#~ msgstr ""
 
-#: ../user/forms.py:8 ../user/forms.py:23
-msgid "Password"
-msgstr ""
+#~ msgid "Password"
+#~ msgstr ""
 
-#: ../user/forms.py:9
-msgid "Remember Me"
-msgstr ""
+#~ msgid "Remember Me"
+#~ msgstr ""
 
-#: ../user/forms.py:14 ../user/forms.py:30
-msgid "E-Mail"
-msgstr ""
+#~ msgid "E-Mail"
+#~ msgstr ""
 
-#: ../user/forms.py:16 ../user/forms.py:32
-msgid "Firstname"
-msgstr ""
+#~ msgid "Firstname"
+#~ msgstr ""
 
-#: ../user/forms.py:17 ../user/forms.py:33
-msgid "Lastname"
-msgstr ""
+#~ msgid "Lastname"
+#~ msgstr ""
 
-#: ../user/forms.py:18 ../user/forms.py:34
-msgid "URL"
-msgstr ""
+#~ msgid "URL"
+#~ msgstr ""
 
-#: ../user/forms.py:24
-msgid "Repeat Password"
-msgstr ""
+#~ msgid "Repeat Password"
+#~ msgstr ""
 
-#: ../user/forms.py:27
-msgid "Passwords must match"
-msgstr ""
+#~ msgid "Passwords must match"
+#~ msgstr ""
 

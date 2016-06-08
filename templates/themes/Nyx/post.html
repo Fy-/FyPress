@@ -1,9 +1,57 @@
 {% extends "themes/Nyx/_base.html" %}
-{% block microdata %}
-    <script type='application/ld+json'>
 
+{% block microdata %}
+    {{ super() }}
+    <script type='application/ld+json'>
+        {
+            "@context": "http://schema.org",
+            "@type": "WebPage",
+            "mainEntity": {
+                "@context": "http://schema.org",
+                "@type": "NewsArticle",
+                "mainEntityOfPage":{
+                    "@type":"WebPage",
+                    "@id":"{{request.url}}"
+                },
+                "headline": "{{post.get_excerpt(100)}}",
+                {% if post.image_id != 0 %}
+                    "image": {
+                        "@type": "ImageObject",
+                        "url": "{{options.url}}{{post.image.urlify('thumbnail-lg')}}",
+                        "height": "270",
+                        "width": "175"                            
+                    },
+                }
+                {% else %}
+                    "image": {
+                        "@type": "ImageObject",
+                        "url": "{{options.url}}public/images/empty.png",
+                        "height": "270",
+                        "width": "175"                            
+                    },
+                {% endif %}
+                "publisher": {
+                    "@type": "Organization",
+                    "name": "{{options.name}}"
+                    {% if options.logo %}
+                    ,"logo": {
+                      "@type": "ImageObject",
+                      "url": "{{options.url}}{{options.logo[1:]}}"
+                    }
+                    {% endif %}
+                },
+                "datePublished": "{{post.created.isoformat()}}",
+                "dateModified": "{{post.modified.isoformat()}}",
+                "author": {
+                    "@type": "Person",
+                    "name": "{{post.user.nicename}}"
+                },
+                "description": "{{post.excerpt}}"
+            }   
+        }
     </script>
 {% endblock %}
+
 {% block featured %}
     {% if post.image_id != 0 %}
         <div class="featured">

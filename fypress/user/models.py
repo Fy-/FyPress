@@ -1,14 +1,13 @@
 # -*- coding: UTF-8 -*-
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask import session
+from flask import session, request
 from flask.ext.babel import lazy_gettext as gettext
 from fypress.utils import mysql
 import urllib, hashlib
 
 class UserMeta(mysql.Base):
-    usermeta_id        = mysql.Column(etype='int', primary_key=True)
-    usermeta_id_user   = mysql.Column(etype='int')
-    usermeta_key       = mysql.Column(etype='string')
+    usermeta_id_user   = mysql.Column(etype='int', primary_key=True)
+    usermeta_key       = mysql.Column(etype='string', primary_key=True)
     usermeta_value     = mysql.Column(etype='string')
 
 class User(mysql.Base):
@@ -23,7 +22,7 @@ class User(mysql.Base):
     user_registered         = mysql.Column(etype='datetime')
     user_activation_key     = mysql.Column(etype='string')
     user_status             = mysql.Column(etype='int')
-    user_meta               = mysql.Column(object=UserMeta, multiple='meta', link='usermeta_id_user')
+    user_meta               = mysql.Column(obj=UserMeta, multiple='meta', link='usermeta_id_user')
 
     roles                   = {
         0: gettext('Member'),
@@ -79,6 +78,10 @@ class User(mysql.Base):
         user = User.query.filter(login=login).one()
         if user.check_password(password):
             session['user_id'] = user.id
+            user.meta['last_login'] = 'NOW()'
+            user.meta['last_ip']    = request.remote_addr
+            User.query.update(user)
+
             return True
         else:
             return False

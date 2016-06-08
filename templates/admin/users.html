@@ -15,6 +15,7 @@
                         <tr>
                             <th>{{ _('ID') }}</th>
                             <th>{{ _('Login') }}</th>
+                            <th>{{ _('Infos') }}</th>
                             <th>{{ _('Name') }}</th>
                             <th>{{ _('Nicename') }}</th>
                             <th>{{ _('Contact') }}</th>
@@ -25,17 +26,24 @@
                         {% for user in users %}
                             <tr class="odd">
                                 <td class="col-md-1"> {{user.id}}</td>
-                                <td class="col-md-4">
+                                <td class="col-md-2">
                                     <a href="{{url_for('admin.users_edit')}}?id={{user.id}}"><img class="thumbnail-table pull-left" src="{{user.gravatar(40)}}" alt="{{user.login}}" /></a>
                                     <a href="{{url_for('admin.users_edit')}}?id={{user.id}}"><strong>{{user.login}}</strong></a>
                                     <br />
                                     <small class="text-muted">
-                                        <a href="{{url_for('admin.users_edit')}}?id={{user.id}}">Edit</a> | <a class="ldanger" href="">Delete</a></small>
+                                        <a href="{{url_for('admin.users_edit')}}?id={{user.id}}">{{ _('Edit') }}</a> | <a class="ldanger" href="">Delete (todo)</a></small>
+                                </td>
+                                <td class="col-md-2">
+                                    {% if user.meta.last_login %}
+                                        <small><em>{{_('Last login')}}: <abbr title="{{user.meta.last_login }}">{{user.meta.last_login }}</abbr></small><br />
+                                        <small><em>{{_('Last IP')}}: <strong>{{user.meta.last_ip }}</strong></small>
+                                    {% else %}
+                                        <small><em>{{_('Never logged in')}}.</em>
+                                    {% endif %}
                                 </td>
                                 <td class="col-md-2">
                                     {{user.firstname}} {{user.lastname}}<br />
-                                    <small><abbr title="{{user.registered }}">{{user.registered }}</abbr></small><br />
-                                    meta: {{user.meta}}
+                                    <small><em>{{_('Registered')}}: <abbr title="{{user.registered }}">{{user.registered }}</abbr></small><br />
                                 </td>
                                 <td class="col-md-2">{{user.nicename}}</td>
                                 <td class="col-md-2"><a href="mailto:{{user.email}}">{{user.email}}</a></td>

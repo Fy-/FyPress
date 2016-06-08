@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS `fypress_folder` (
   `folder_left` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
   `folder_right` bigint(20) NOT NULL DEFAULT '0',
   `folder_slug` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `folder_guid` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `folder_guid` varchar(150) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `folder_posts` int(11) NOT NULL DEFAULT '0',
   `folder_name` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `folder_content` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
@@ -102,15 +102,6 @@ CREATE TABLE IF NOT EXISTS `fypress_post` (
   KEY `post_nav` (`post_nav`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `fypress_post_meta` (
-  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `post_meta_id_post` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
-  `post_meta_key` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `post_meta_value` longtext COLLATE utf8mb4_unicode_ci,
-  PRIMARY KEY (`post_meta_id_post`,`post_meta_key`),
-  UNIQUE KEY `id` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 CREATE TABLE IF NOT EXISTS `fypress_user` (
   `user_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_login` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
@@ -130,12 +121,10 @@ CREATE TABLE IF NOT EXISTS `fypress_user` (
   KEY `user_login_2` (`user_login`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `fypress_user_meta` (
-  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `user_meta_id_user` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
-  `user_meta_key` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `user_meta_value` longtext COLLATE utf8mb4_unicode_ci,
-  PRIMARY KEY (`user_meta_id_user`,`user_meta_key`),
-  UNIQUE KEY `id` (`id`)
+CREATE TABLE IF NOT EXISTS `fypress_usermeta` (
+  `usermeta_id_user` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
+  `usermeta_key` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `usermeta_value` longtext COLLATE utf8mb4_unicode_ci,
+  PRIMARY KEY (`usermeta_id_user`,`usermeta_key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 COMMIT;

@@ -37,12 +37,25 @@
                 <div class="orbit-slide{% if i == 0 %} is-active{% endif %}">
                     <div class="featured">
                         <a href="{{post.guid}}.html" title="{{post.title}}">
+
                             <img  class="orbit-image" src="{{post.image.urlify('featured')}}" alt="{{post.title}}" /> 
                             <h2>{{post.title}}</h2>
                         </a>
                     </div>
                 </div>
                 {% set i = i +1 %}
+            {% else %}
+                <div class="orbit-slide{% if i == 0 %} is-active{% endif %}">
+                    <div class="featured">
+                        <a href="{{post.guid}}.html" title="{{post.title}}">
+                            <div class="orbit-text">
+                                <p class="orbit-text-summary">{{post.excerpt}}...</p>
+                            </div>
+                            <img  class="orbit-image" src="/public/images/empty-f.png"  alt="{{post.title}}" /> 
+                            <h2>{{post.title}}</h2>
+                        </a>
+                    </div>
+                </div>            
             {% endif %}
         {% endfor %}
       </div>

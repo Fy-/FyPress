@@ -7,6 +7,7 @@ from fypress.post import Post, get_posts
 from fypress.admin import Option
 from fypress.utils import get_template, get_template_static, Paginator
 from fypress.folder import Folder
+from fypress.admin.views import handle_404 as is_admin_404
 from .decorators import cached
 
 public  = Blueprint('public', __name__)
@@ -15,7 +16,11 @@ user    = None
 config  = _fypress_.config
 
 def is_404():
-    return '404', 404
+    return render_template(get_template('404.html', config)), 404
+
+def reset_options():
+    global options
+    options = []
 
 @public.context_processor
 def inject_options():
@@ -78,7 +83,9 @@ def template():
     return dict(
         nav=nav, 
         get_posts=get_posts, 
-        sidebar=True, 
+        show_sidebar=True,
+        show_breadcrumb=True, 
+        show_footer=True,
         breadcrumb=breadcrumb,
         is_home=is_home,
         title=title
@@ -101,7 +108,7 @@ def is_post(slug):
         post.views += 1
         Post.query.update(post)
         if post.type == 'post':
-            return render_template(get_template('post.html', config), post=post, sidebar=False)
+            return render_template(get_template('post.html', config), post=post, show_sidebar=False)
         else:
             pages = Post.query.filter(folder_id=post.folder_id, status='published', type='page').order_by('created').all(array=True)
             return render_template(get_template('page.html', config), page=post, pages=pages)
@@ -120,28 +127,30 @@ def posts():
             query    = Post.query.filter(status='published', type='post').order_by('created', 'DESC'),
             page     = request.args.get('page'),
             theme    = 'foundation',
-            per_page = 6
+            per_page = 2
     )
-    return render_template(get_template('articles.html', config), articles=articles, folder=folder)
+    return render_template(get_template('articles.html', config), paginator=articles, articles=articles, folder=folder)
 
 @public.route('/<path:slug>/')
 @cached(pretty=True)
 def is_folder(slug):
-    folder = Folder.query.filter(guid=slug).one()
-    if folder:
-        articles = Paginator(
-                query    = Post.query.filter(folder_id=folder.id, status='published', type='post').order_by('created'),
-                page     = request.args.get('page')
-        )
-        for article in articles.items:
-            article.dump()
-        pages = Post.query.filter(folder_id=folder.id, status='published', type='page').order_by('created').all(array=True)
-        index = Post.query.filter(folder_id=folder.id, slug='index', status='published', type='page').one()
+    if slug.split('/')[0] != 'admin':
+        folder = Folder.query.filter(guid=slug).one()
+        if folder:
+            articles = Paginator(
+                    query    = Post.query.filter(folder_id=folder.id, status='published', type='post').order_by('created'),
+                    page     = request.args.get('page')
+            )
 
-        return render_template(get_template('folder.html', config), folder=folder, articles=articles, pages=pages, index=index)
+            pages = Post.query.filter(folder_id=folder.id, status='published', type='page').order_by('created').all(array=True)
+            index = Post.query.filter(folder_id=folder.id, slug='index', status='published', type='page').one()
+
+            return render_template(get_template('folder.html', config), folder=folder, paginator=articles, articles=articles, pages=pages, index=index)
+        else:
+            return is_404()
     else:
-        return is_404()
-    
+        return is_admin_404()
+
 @public.route('/public/<path:folder>/<file>')
 def static(folder, file):
     folder, file = get_template_static(folder, file, config)

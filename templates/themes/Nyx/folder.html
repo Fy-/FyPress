@@ -48,7 +48,7 @@
 {% endblock %}
 
 {% block sidebar %}
-    {% if pages|length != 1 %}
+    {% if pages|length > 1 %}
         <h3>{{folder.name}}</h3>
         <ul class="menu vertical">
             {% for page in pages %}

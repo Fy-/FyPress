@@ -1,4 +1,4 @@
-{% if not is_home %}
+{% if show_breadcrumb and not is_home %}
   {% set bcitems = breadcrumb(post or page or folder) %}
   <script type='application/ld+json'>
     {

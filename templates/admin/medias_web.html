@@ -10,9 +10,11 @@
         <h1 class="page-header"><i class="fa fa fa-picture-o fa-fw"></i> {{ _('Medias') }}</h1>
 
         <ul class="nav nav-tabs">
-          <li role="presentation"><a href="{{url_for('admin.medias_upload', parent=request.args.get('parent'))}}">{{ _('Add New (Upload)') }}</a></li>
-          <li role="presentation" class="active"><a href="{{url_for('admin.medias_web', parent=request.args.get('parent'))}}">{{ _('Add New (Web)') }}</a></li>
-          <li role="presentation"><a href="{{url_for('admin.medias', parent=request.args.get('parent'))}}">{{ _('Library') }}</a></li>
+          <li role="presentation"><a href="{{url_for('admin.medias_upload', filter=request.args.get('filter'),  parent=request.args.get('parent'))}}">{{ _('Add New (Upload)') }}</a></li>
+          {% if request.args.get('filter') != 'image' %}
+            <li role="presentation" class="active"><a href="{{url_for('admin.medias_web', filter=request.args.get('filter'),  parent=request.args.get('parent'))}}">{{ _('Add New (Web)') }}</a></li>
+          {% endif %}
+          <li role="presentation"><a href="{{url_for('admin.medias', filter=request.args.get('filter'),  parent=request.args.get('parent'))}}">{{ _('Library') }}</a></li>
         </ul>
 
         <div class="medias-box">

@@ -26,7 +26,7 @@ class Comment(mysql.Base):
     comment_user_uri         = mysql.Column(etype='string') 
     comment_user_email       = mysql.Column(etype='string') 
     comment_user_ip          = mysql.Column(etype='string') 
-    comment_user             = mysql.Column(object=User, link='user_id')
+    comment_user             = mysql.Column(obj=User, link='user_id')
 
     @property
     def uri(self):
@@ -88,10 +88,9 @@ class Post(mysql.Base):
     post_comment_count    = mysql.Column(etype='int')
     post_slug             = mysql.Column(etype='string', unique=True)
     post_type             = mysql.Column(etype='string')
-    post_meta             = mysql.Column(meta=True)
-    post_folder           = mysql.Column(object=Folder, link='folder_id')
-    post_image            = mysql.Column(object=Media, link='image_id')
-    post_user             = mysql.Column(object=User, link='user_id')
+    post_folder           = mysql.Column(obj=Folder, link='folder_id')
+    post_image            = mysql.Column(obj=Media, link='image_id')
+    post_user             = mysql.Column(obj=User, link='user_id')
     post_views            = mysql.Column(etype='int')
 
     txt_to_status         = {
@@ -215,6 +214,7 @@ class Post(mysql.Base):
 
         path = Folder.query.get(self.folder_id)
         path = path.guid
+
         name = self.slug + count
         
         if self.id:
@@ -257,6 +257,14 @@ class Post(mysql.Base):
             Post.query.delete(post)
 
         Post.query.delete(post)
+
+    @staticmethod
+    def link_posts():
+        posts =  Post.query.where(' _table_.post_status IN ("draft", "published", "trash")').all()
+        for post in posts:
+            post.guid = post.guid_generate()
+            Post.query.update(post)
+            
 
 def get_posts(order='created', limit=5, type='post', folder=False):
     if not folder:

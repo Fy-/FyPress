@@ -50,7 +50,6 @@ class Folder(mysql.Base):
         if data:
             exist = []
             for item in data:
-                print item
                 if item.has_key('id') and item['id'] != '1':
                     exist.append(int(item['id']))
                     folder = Folder.query.get(item['id'])
@@ -60,7 +59,7 @@ class Folder(mysql.Base):
                     folder.parent   = item['parent_id']
 
                     folder.modified = 'NOW()'
-                    folder.update()
+                    Folder.query.update(folder)
 
             all_folders = []
             folders = Folder.query.get_all(array=True)
@@ -81,12 +80,12 @@ class Folder(mysql.Base):
                 folder.count_posts()
 
             Folder.build_guid()
-            Folder.link_posts()
+            from fypress.post import Post
+            
+            Post.link_posts()        
 
-    def update(self):
-        Folder.query.update(self)
-
-    def update_guid(self):
+    @staticmethod
+    def update_guid(folder):
         query = """
           SELECT
             GROUP_CONCAT(parent.folder_slug SEPARATOR '/') AS path
@@ -96,11 +95,17 @@ class Folder(mysql.Base):
           WHERE
             node.folder_left BETWEEN parent.folder_left AND parent.folder_right AND node.folder_id={0} AND node.folder_id!=1
           ORDER BY
-            parent.folder_left""".format(self.id, config.MYSQL_PREFIX)
+            parent.folder_left""".format(folder.id, config.MYSQL_PREFIX)
 
-        self.guid = url_unique(Folder.query.raw(query).one()[0]['path'], Folder, self.id)
+        folder.guid = url_unique(Folder.query.raw(query).one()[0]['path'], Folder, folder.id)
 
-        Folder.query.update(self)
+        Folder.query.update(folder)
+
+    @staticmethod
+    def build_guid():
+        folders = Folder.query.get_all(array=True)
+        for folder in folders:
+            Folder.update_guid(folder)
 
     @staticmethod
     def add(form):
@@ -123,7 +128,7 @@ class Folder(mysql.Base):
         Folder.build_guid()
 
     @staticmethod
-    def get_path(self):
+    def get_path(folder):
         query = """
           SELECT
             parent.folder_seo_content, parent.folder_created, parent.folder_modified, parent.folder_parent, parent.folder_content, parent.folder_name, parent.folder_left, parent.folder_id, parent.folder_guid, parent.folder_posts, parent.folder_slug, parent.folder_depth, parent.folder_right
@@ -135,24 +140,12 @@ class Folder(mysql.Base):
           ORDER BY
             parent.folder_left
 
-           """.format(self.id, config.MYSQL_PREFIX)
+           """.format(folder.id, config.MYSQL_PREFIX)
 
 
         return Folder.query.sql(query).all(array=True)
 
-    @staticmethod
-    def link_posts():
-        from fypress.post import Post 
-        posts =  Post.query.filter(status='draft').all(array=True)+Post.query.filter(status='published').all(array=True)+Post.query.filter(status='trash').all(array=True)
-        for post in posts:
-            post.guid = post.guid_generate()
-            Post.query.update(post)
 
-    @staticmethod
-    def build_guid():
-        folders = Folder.query.get_all(array=True)
-        for folder in folders:
-            folder.update_guid()
 
     @staticmethod
     def get_as_tree(mode='nav', current=''):
