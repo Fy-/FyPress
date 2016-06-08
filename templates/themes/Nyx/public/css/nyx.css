@@ -9,6 +9,24 @@ h4 { font-size: 1rem;}
 .post h2, .post h3,  .post h4 { margin-top: 2rem; margin-bottom: 1rem;}
 
 /* Global */
+code {
+    display: block;
+    background: #141414;
+    color: #fff;
+    padding: 5px;
+    padding-left: 10px;
+    border: 3px solid #545454 !important;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+}
+pre code {
+    border: none !important;
+    padding: 0;
+}
+code a, code a:hover {
+    color: #fefefe;
+    text-decoration: underline;
+}
 body, html {
     height: auto;
 }
