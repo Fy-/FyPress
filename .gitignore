@@ -35,6 +35,7 @@ pip-log.txt
 pip-delete-this-directory.txt
 
 # FyPress
+config.py
 gunicorn.py
 gunicorn.sh
 media/*
