@@ -142,7 +142,6 @@ class Media(mysql.Base):
         def is_unique(url):
             now = datetime.datetime.now()
             exist = Media.query.exist('guid', "{}/{}/".format(now.year, now.month)+url, False)
-            print exist
             if not exist:
                 return url
 

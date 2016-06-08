@@ -24,10 +24,11 @@ class TreeHTML(object):
                 return ''
                 
         for item in items:
-            active = ''
             if '/'+item['data'].guid+'/' in current:
-                active = 'class="active"'
-                
+                active = 'class="active"'                
+            else: 
+                active = ''
+
             if item.has_key('children'):
                 self.html += ("""
                     <li>
@@ -38,7 +39,7 @@ class TreeHTML(object):
 
                 """).format(item['data'].name, item['data'].guid, active)
 
-                self.generate_folders_nav(item['children'], 'dropdown')
+                self.generate_folders_nav(item['children'], 'dropdown', current)
 
                 self.html += ("""
                             </ul>

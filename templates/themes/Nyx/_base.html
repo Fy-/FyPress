@@ -81,25 +81,21 @@
 
                 {% endblock %}
                 {% block nav %}
-                <div data-sticky-container>
-                    <div class="sticky" id="example" data-sticky data-margin-top="0" style="width:100%;" data-margin-bottom="0">
-                        <nav  class="top-bar" data-magellan>
-                            <ul class="dropdown menu" data-dropdown-menu>
-                                <li><a href="/" {% if is_home %}class="active"{% endif %}>Home</a></li>
-                                <li><a href="/articles/" {% if folder and folder.guid == 'articles' %}class="active"{% endif %}>Articles</a></li>
+                    <nav  class="top-bar" >
+                        <ul class="dropdown menu" data-dropdown-menu>
+                            <li><a href="/" {% if is_home %}class="active"{% endif %}>Home</a></li>
+                            <li><a href="/articles/" {% if folder and folder.guid == 'articles' %}class="active"{% endif %}>Articles</a></li>
                             {{nav|safe}}
+                        </ul>
+                        <!--
+                        <div class="top-bar-right">
+                            <ul class="menu">
+                                <li><input type="search" placeholder="Search"></li>
+                                <li><button type="button" class="button">Search</button></li>
                             </ul>
-                            <!--
-                            <div class="top-bar-right">
-                                <ul class="menu">
-                                    <li><input type="search" placeholder="Search"></li>
-                                    <li><button type="button" class="button">Search</button></li>
-                                </ul>
-                            </div>
-                            -->
-                        </nav>
-                    </div>
-                </div>
+                        </div>
+                        -->
+                    </nav>
                 {% endblock %}
             </div>
         </div>

@@ -49,7 +49,7 @@ def before_request():
 
 @public.context_processor
 def template():
-    nav = Folder.get_as_tree(current=request.path)
+    nav = Folder.get_as_tree('nav', request.path)
     is_home = False
 
     if request.url == g.options['url']:
@@ -216,7 +216,7 @@ def sitemap():
     for post in posts:
             if post.slug != 'index':
                 url      = request.url_root+post.guid+'.html'
-                modified = post.modified.isoformat()
+                modified = post.modified.strftime('%Y-%m-%dT%H:%M:%S')
                 pages.append({'url': url, 'mod': modified, 'freq': 'monthly', 'prio': '0.9'})
 
     # posts
