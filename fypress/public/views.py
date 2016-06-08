@@ -208,7 +208,7 @@ def sitemap():
     for folder in folders:
         if folder.guid != '':
             url      = request.url_root+folder.guid+'/'
-            modified = folder.modified.isoformat()
+            modified = folder.modified.strftime('%Y-%m-%d')
             pages.append({'url': url, 'mod': modified, 'freq': 'weekly', 'prio': '0.6'})
 
     # pages
@@ -216,14 +216,14 @@ def sitemap():
     for post in posts:
             if post.slug != 'index':
                 url      = request.url_root+post.guid+'.html'
-                modified = post.modified.strftime('%Y-%m-%dT%H:%M:%S')
+                modified = post.modified.strftime('%Y-%m-%d')
                 pages.append({'url': url, 'mod': modified, 'freq': 'monthly', 'prio': '0.9'})
 
     # posts
     posts = Post.query.filter(status='published', type='post').order_by('created').limit(20, 0, array=True)
     for post in posts:
             url      = request.url_root+post.guid+'.html'
-            modified = post.modified.isoformat()
+            modified = post.modified.strftime('%Y-%m-%d')
             pages.append({'url': url, 'mod': modified, 'freq': 'monthly', 'prio': '0.8'})
 
     response = make_response(render_template('front/_sitemap.xml', pages=pages))
