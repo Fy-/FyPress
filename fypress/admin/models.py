@@ -42,9 +42,9 @@ class Option(mysql.Base):
     @staticmethod
     def get_settings(type='general'):
         settings = {
-            'general': ['name', 'url', 'slogan'],
+            'general': ['name', 'url', 'slogan', 'footer'],
             'social' : ['twitter', 'facebook', 'github'],
-            'design' : ['logo', 'ico']
+            'design' : ['logo', 'ico', 'css']
         }
 
         class Result(object):

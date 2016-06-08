@@ -120,7 +120,8 @@ class Folder(mysql.Base):
 
         folder = Folder()
         form.populate_obj(folder)
-        folder.created = 'NOW()'
+        folder.created  = 'NOW()'
+        folder.modified = 'NOW()'
         folder.parent  = 1
         folder.left    = rv['r']+1
         folder.right   = rv['r']+2

@@ -9,7 +9,7 @@
             </div>
             <div class="panel-body">
                 <form method="POST" action="" role="form" class="">
-                    <div class="form-group  ">
+                    <div class="form-group">
                         <label for="fp_logo" class="control-label">{{_('Site Logo')}}</label>
                         <div class="input-group" > 
                             <input class="form-control" id="fp_logo" name="logo" type="text" value="{{design.logo}}"> 
@@ -23,7 +23,7 @@
                         </div>
                     </div>
 
-                    <div class="form-group  ">
+                    <div class="form-group">
                         <label for="fp_favico" class="control-label">{{_('Site Icon (favicon)')}}</label>
                         <div class="input-group" > 
                             <input class="form-control" id="fp_favico" name="ico" type="text" value="{{design.ico}}"> 
@@ -35,6 +35,11 @@
                                 <img src="{{design.ico}}" alt="Logo" style="background: #000" />
                             {% endif %}
                         </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fp_css" class="control-label">{{_('Custom CSS')}}</label>
+                        <textarea class="form-control"  id="fp_css" name="css" rows="8">{{options.css}}</textarea>
                     </div>
 
                     <br />

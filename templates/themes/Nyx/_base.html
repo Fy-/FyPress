@@ -24,6 +24,13 @@
     {% block microdata %}{% endblock %}
     {% include "themes/Nyx/_schema/breadcrumb.html" %}
 
+    {% if options.css %}
+        <style>
+            {{options.css}}
+        </style>
+    {% endif %}
+
+
     {% block seo %}
         <link rel="canonical" href="{{request.base_url}}">
         {% if paginator and paginator.next_page_url %}
@@ -59,12 +66,11 @@
                 {% block header %}
                     {% if options.logo %}
                         {% if is_home %}
-                            <h1>
+                            <h1> <a href="/" title="{{options.name}}"><img alt="{{options.name}}" src="{{options.logo}}" /></a> </h1>
+                        {% else %}
+                             <span class="h1"><a href="/" title="{{options.name}}"><img alt="{{options.name}}" src="{{options.logo}}" /></a></span>
                         {% endif %}
-                            <a href="/" title="{{options.name}}"><img alt="{{options.name}}" src="{{options.logo}}" /></a>
-                        {% if is_home %}
-                            </h1>
-                        {% endif %}
+
                     {% else %}
                         {% if is_home %}
                             <h1><a href="/">{{options.name}}</a> <small>{{options.slogan}}</small></h1>
@@ -75,24 +81,25 @@
 
                 {% endblock %}
                 {% block nav %}
-
-                <nav  class="top-bar">
-                    <div class="top-bar-left">
-                        <ul class="dropdown menu" data-dropdown-menu>
-                            <li><a href="/" {% if is_home %}class="active"{% endif %}>Home</a></li>
-                            <li><a href="/articles/" {% if folder and folder.guid == 'articles' %}class="active"{% endif %}>Articles</a></li>
-                        {{nav|safe}}
-                        </ul>
-                    </div >
-                    <!--
-                    <div class="top-bar-right">
-                        <ul class="menu">
-                            <li><input type="search" placeholder="Search"></li>
-                            <li><button type="button" class="button">Search</button></li>
-                        </ul>
+                <div data-sticky-container>
+                    <div class="sticky" id="example" data-sticky data-margin-top="0" style="width:100%;" data-margin-bottom="0">
+                        <nav  class="top-bar" data-magellan>
+                            <ul class="dropdown menu" data-dropdown-menu>
+                                <li><a href="/" {% if is_home %}class="active"{% endif %}>Home</a></li>
+                                <li><a href="/articles/" {% if folder and folder.guid == 'articles' %}class="active"{% endif %}>Articles</a></li>
+                            {{nav|safe}}
+                            </ul>
+                            <!--
+                            <div class="top-bar-right">
+                                <ul class="menu">
+                                    <li><input type="search" placeholder="Search"></li>
+                                    <li><button type="button" class="button">Search</button></li>
+                                </ul>
+                            </div>
+                            -->
+                        </nav>
                     </div>
-                    -->
-                </nav>
+                </div>
                 {% endblock %}
             </div>
         </div>
@@ -146,12 +153,16 @@
         {% endif %}
     </main>
     {% if show_footer %}
-        <footer id="footer">
+        <footer id="footer" class="show-for-medium">
             {% set footer = 1 %}
             <div class="row">
                 <section class="large-4 columns">
                     <h3>About {{options.name}}</h3>
                     <small>Powered by <a href="http://press.fy.to" title="FyPress, CMS, Flask">FyPress</a> v{{version}}, theme: {{options.theme}}</small>
+                    {% if options.footer %}
+                        <hr />
+                        <small>{{options.footer|safe}}</small>
+                    {% endif %}
                 </section>
                 <section class="large-4 columns">
                     {% include 'themes/Nyx/widgets/popular-post.html' %}
