@@ -266,7 +266,7 @@ def folders():
         if form.validate_on_submit():
             form.populate_obj(folder)
             folder.modified = 'NOW()'
-            folder.update()
+            Folder.query.update(folder)
             flash(messages['updated']+' ('+str(folder)+')')
             return redirect(url_for('admin.folders'))
     else:

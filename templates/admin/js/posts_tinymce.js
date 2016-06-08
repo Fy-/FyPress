@@ -12,7 +12,7 @@ tinymce.init({
     forced_root_block: '',
     force_p_newlines: true,
     visualblocks_default_state: true,
-    document_base_url : "http://127.0.0.1:5000",
+    document_base_url : "{{options.url}}",
     plugins: [
         "autoresize advlist autolink link  lists charmap  hr anchor pagebreak spellchecker",
         "searchreplace wordcount visualblocks visualchars code nonbreaking",
