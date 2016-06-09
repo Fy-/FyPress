@@ -23,7 +23,6 @@ def clean_html(buf):
         return bs.prettify(formatter="minimal")
 
 def cached(timeout=5*60, key='public%s', pretty=False):
-    pretty = False
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):

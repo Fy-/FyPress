@@ -77,6 +77,19 @@ def template():
             return item.title+' • '+g.options['name']
         return g.options['name']
 
+    def description(item=False):
+        if request.path == '/articles/':
+            return ''
+        elif isinstance(item, Folder):
+            index = Post.query.filter(folder_id=item.id, slug='index', status='published', type='page').one()
+            if index:
+                return index.get_excerpt(155)
+            return item.seo_content
+        elif isinstance(item, Post):
+            return item.get_excerpt(155)
+        else:
+            return g.options['slogan']
+
     def seo(item=False):
         pass
 
@@ -88,7 +101,8 @@ def template():
         show_footer=True,
         breadcrumb=breadcrumb,
         is_home=is_home,
-        title=title
+        title=title,
+        description=description
     )
 
 @public.route('/')

@@ -229,12 +229,9 @@ class Post(mysql.Base):
 
 
     def get_excerpt(self, size=255):
-        # https://github.com/dziegler/excerpt_extractor/tree/master
-
         soup = Post.excerpt_utils_rm_headers(BeautifulSoup(self.content))
         text = ''.join(soup.findAll(text=True)).split('\n')
-        description = max((len(i.strip()),i) for i in text)[1].strip()[0:size]
-        return description   
+        return ' '.join(text).strip()[0:size]   
     
     @staticmethod
     def excerpt_utils_rm_headers(soup):
