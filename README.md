@@ -18,8 +18,5 @@ Edit your configuration file (config.py)
 
 Build your website http://127.0.0.1:5000 & http://127.0.0.1:5000/admin/
 
-### Dev 
-* Comments
-* Medias (Delete/Update)
-* Improved template system
-* Plugins
+## License
+This project is licensed under the [MIT license](http://opensource.org/licenses/MIT), see `LICENSE` for more details.
