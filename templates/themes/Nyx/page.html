@@ -71,14 +71,16 @@
 {% endblock %}
 
 {% block sidebar %}
-    <h3><a href="/{{page.folder.guid}}/">{{page.folder.name}}</a></h3>
-    <ul class="menu vertical">
-        {% for p in pages %}
-            {% if p.slug != 'index' %}
-                <li {% if page.id == p.id %}class="active"{% endif %}><a href="/{{p.guid}}.html">{{p.title}}</a></li>
-            {% endif %}
-        {% endfor %}
-    </ul>
+    <div class="row widget">
+        <h3><a href="/{{page.folder.guid}}/">{{page.folder.name}}</a></h3>
+        <ul class="menu vertical">
+            {% for p in pages %}
+                {% if p.slug != 'index' %}
+                    <li {% if page.id == p.id %}class="active"{% endif %}><a href="/{{p.guid}}.html">{{p.title}}</a></li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
 
     <br /><br />
 {% endblock %}

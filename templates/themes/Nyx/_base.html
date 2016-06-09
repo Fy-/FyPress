@@ -6,7 +6,8 @@
 <html lang="en-US">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
     <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge" /><![endif]-->
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     {% block head %}{% endblock %}
@@ -63,112 +64,135 @@
     <header>
         <div class="row">
             <div class="large-12 columns">
-                {% block header %}
-                    {% if options.logo %}
-                        {% if is_home %}
-                            <h1> <a href="/" title="{{options.name}}"><img alt="{{options.name}}" src="{{options.logo}}" /></a> </h1>
-                        {% else %}
-                             <span class="h1"><a href="/" title="{{options.name}}"><img alt="{{options.name}}" src="{{options.logo}}" /></a></span>
-                        {% endif %}
+                <div id="logo-container">
+                    {% block header %}
+                        {% if options.logo %}
+                            {% if is_home %}
+                                <h1> <a href="/" title="{{options.name}}"><img alt="{{options.name}}" src="{{options.logo}}" /></a> </h1>
+                            {% else %}
+                                 <span class="h1"><a href="/" title="{{options.name}}"><img alt="{{options.name}}" src="{{options.logo}}" /></a></span>
+                            {% endif %}
 
-                    {% else %}
-                        {% if is_home %}
-                            <h1><a href="/">{{options.name}}</a> <small>{{options.slogan}}</small></h1>
                         {% else %}
-                            <span class="h1"><a href="/">{{options.name}}</a> <small>{{options.slogan}}</small></span>
+                            {% if is_home %}
+                                <h1><a href="/">{{options.name}}</a> <small>{{options.slogan}}</small></h1>
+                            {% else %}
+                                <span class="h1"><a href="/">{{options.name}}</a> <small>{{options.slogan}}</small></span>
+                            {% endif %}
                         {% endif %}
-                    {% endif %}
+                    {% endblock %}
+                </div>
 
-                {% endblock %}
                 {% block nav %}
-                    <nav  class="top-bar" >
-                        <ul class="dropdown menu" data-dropdown-menu>
-                            <li><a href="/" {% if is_home %}class="active"{% endif %}>Home</a></li>
-                            <li><a href="/articles/" {% if folder and folder.guid == 'articles' %}class="active"{% endif %}>Articles</a></li>
-                            {{nav|safe}}
-                        </ul>
-                        <!--
-                        <div class="top-bar-right">
-                            <ul class="menu">
-                                <li><input type="search" placeholder="Search"></li>
-                                <li><button type="button" class="button">Search</button></li>
-                            </ul>
+
+                    <div  class="top-bar" data-topbar role="navigation">
+                        <div class="top-bar-title">
+                            <span data-responsive-toggle="responsive-menu" data-hide-for="medium">
+                                <button class="menu-icon " type="button" data-toggle></button>
+                            </span>
                         </div>
-                        -->
-                    </nav>
+                        <div id="responsive-menu">
+                            <nav class="top-bar-left show-for-medium">
+                                <ul class="dropdown menu" data-dropdown-menu>
+                                    <li><a href="/" {% if is_home %}class="active"{% endif %}>Home</a></li>
+                                    <li><a href="/articles/" {% if folder and folder.guid == 'articles' %}class="active"{% endif %}>Articles</a></li>
+                                    {{nav|safe}}
+                                </ul>
+                            </nav>
+                            <nav class="top-bar-left hide-for-medium">
+                                <ul class="dropdown menu vertical" data-dropdown-menu>
+                                    <li><a href="/" {% if is_home %}class="active"{% endif %}>Home</a></li>
+                                    <li><a href="/articles/" {% if folder and folder.guid == 'articles' %}class="active"{% endif %}>Articles</a></li>
+                                    {{nav|safe}}
+                                </ul>
+                            </nav>
+                            <!--
+                            <div class="top-bar-right">
+                                <ul class="menu">
+                                    <li><input type="search" placeholder="Search"></li>
+                                    <li><button type="button" class="button">Search</button></li>
+                                </ul>
+                            </div>
+                            -->
+                        </div>
+                    </div>
                 {% endblock %}
             </div>
         </div>
     </header>
-    <main class="row">
-        <div class="large-12 columns">
-            {%block featured %}{% endblock %}
-        </div>
-        {% if show_sidebar %}
-            <div class="large-9 columns" id="content">
-        {% else %}
-            <div class="large-12 columns" id="content">
-        {% endif %}
-            {% if not is_home and show_breadcrumb %}
-                {% set bcitems = breadcrumb(post or page or folder) %}
-                <nav aria-label="You are here:">
-                  <ul class="breadcrumbs">
-                    <li><a href="/">{{options.name}}</a></li>
-                        {% for item in bcitems %}
-                            {% if post or page %}
-                                <li><a href="/{{item.guid}}/"> {{item.name}}</a></li>
-                            {% elif folder %}
-                                {% if folder.guid == item.guid %}
-                                    <li>
-                                        <span class="show-for-sr">Current: </span> {{item.name}}
-                                    </li>    
-                                {% else %}
-                                    <li><a href="/{{item.guid}}/"> {{item.name}}</a></li>
-                                {% endif %}
-                            {% endif %}
-                        {% endfor %}
-                        {% if post or page %}
-                            {% if not post %} {% set post = page %} {% endif %}
-                            <li>
-                                <span class="show-for-sr">Current: </span> {{post.title}}
-                            </li>                                
-                        {% endif %}
-                  </ul>
-                </nav>
-            {% endif %}
-            {% block content %}{% endblock %}
-        </div>
-        {% if show_sidebar %}
-            <aside class="large-3 columns" id="sidebar">
-                {% block sidebar %}
-                {% endblock %}
-                {% include 'themes/Nyx/widgets/popular-post.html' %}
-                <hr />
-                {% include 'themes/Nyx/widgets/social-follow.html' %}
-            </aside>
-        {% endif %}
-    </main>
-    {% if show_footer %}
-        <footer id="footer" class="show-for-medium">
-            {% set footer = 1 %}
-            <div class="row">
-                <section class="large-4 columns">
-                    <h3>About {{options.name}}</h3>
-                    <small>Powered by <a href="http://press.fy.to" title="FyPress, CMS, Flask">FyPress</a> v{{version}}, theme: {{options.theme}}</small>
-                    {% if options.footer %}
-                        <hr />
-                        <small>{{options.footer|safe}}</small>
-                    {% endif %}
-                </section>
-                <section class="large-4 columns">
-                    {% include 'themes/Nyx/widgets/popular-post.html' %}
-                </section>
-                <section class="large-4 columns">
-                    {% include 'themes/Nyx/widgets/social-follow.html' %}
-                </section>        
-
+    <div class="wrapper callout large">
+        <main class="row">
+            <div class="large-12 columns">
+                {%block featured %}{% endblock %}
             </div>
-        </footer>
+            {% if show_sidebar %}
+                <div class="medium-9 columns" id="content">
+            {% else %}
+                <div class="medium-12 columns" id="content">
+            {% endif %}
+                {% if not is_home and show_breadcrumb %}
+                    {% set bcitems = breadcrumb(post or page or folder) %}
+                    <nav aria-label="You are here:">
+                      <ul class="breadcrumbs">
+                        <li><a href="/">{{options.name}}</a></li>
+                            {% for item in bcitems %}
+                                {% if post or page %}
+                                    <li><a href="/{{item.guid}}/"> {{item.name}}</a></li>
+                                {% elif folder %}
+                                    {% if folder.guid == item.guid %}
+                                        <li>
+                                            <span class="show-for-sr">Current: </span> {{item.name}}
+                                        </li>    
+                                    {% else %}
+                                        <li><a href="/{{item.guid}}/"> {{item.name}}</a></li>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                            {% if post or page %}
+                                {% if not post %} {% set post = page %} {% endif %}
+                                <li>
+                                    <span class="show-for-sr">Current: </span> {{post.title}}
+                                </li>                                
+                            {% endif %}
+                      </ul>
+                    </nav>
+                {% endif %}
+                {% block content %}{% endblock %}
+            </div>
+            {% if show_sidebar %}
+                <aside class="medium-3 columns" id="sidebar" >
+                    {% block sidebar %}
+                    {% endblock %}
+                    {% include 'themes/Nyx/widgets/popular-post.html' %}
+                    <hr />
+                    {% include 'themes/Nyx/widgets/social-follow.html' %}
+                </aside>
+            {% endif %}
+        </main>
+    </div>
+    {% if show_footer %}
+        <div id="footer">
+            <footer class="show-for-medium">
+                {% set footer = 1 %}
+                <div class="row">
+                    <section class="large-4 columns">
+                        <h3>About {{options.name}}</h3>
+                        <small>Powered by <a href="http://press.fy.to" title="FyPress, CMS, Flask">FyPress</a> v{{version}}, theme: {{options.theme}}</small>
+                        {% if options.footer %}
+                            <hr />
+                            <small>{{options.footer|safe}}</small>
+                        {% endif %}
+                    </section>
+                    <section class="large-4 columns">
+                        {% include 'themes/Nyx/widgets/popular-post.html' %}
+                    </section>
+                    <section class="large-4 columns">
+                        {% include 'themes/Nyx/widgets/social-follow.html' %}
+                    </section>        
+
+                </div>
+            </footer>
+        </div>
     {% endif %}
     {% block scripts %}
         <script src="/public/js/jquery.js"></script>

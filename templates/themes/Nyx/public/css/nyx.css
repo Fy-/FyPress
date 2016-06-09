@@ -9,6 +9,13 @@ h4 { font-size: 1rem;}
 .post h2, .post h3,  .post h4 { margin-top: 2rem; margin-bottom: 1rem;}
 
 /* Global */
+body {
+    background: #2c223f;
+}
+.wrapper {
+    background: #fff;
+    padding-bottom: 4rem;
+}
 .hidden {
     display: none;
 }
@@ -131,13 +138,11 @@ header {
 }
 
 /* Footer */
-footer {
+#footer {
     background: #2c223f;
     color: #fff;
-    margin-top: 4rem;
     padding-top: 1rem;
     padding-bottom: 1rem;
-    width: 100%;
 }
 footer a {
     color: #fff;
@@ -172,6 +177,9 @@ footer .grey {
     padding-top: 30px;
     color: #fff;
     width: 100%;
+}
+.featured-small {
+    color: #000;
 }
 .featured {
     position: relative;
@@ -247,4 +255,7 @@ blockquote p {
 #logo {
     padding-top: 1rem;
     padding-bottom: 1rem;
+}
+#logo-container {
+    padding-top: 0.5rem;
 }

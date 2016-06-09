@@ -7,12 +7,12 @@
     {% for item in articles.items %}
         <section class="row">
             {% if item.image.id %}
-                <div class="large-4 columns">
+                <div class="medium-4 columns">
                     <a title="{{item.title}}" href="/{{item.guid}}.html"><img  class="thumbnail" src="{{item.image.urlify('thumbnail-lg')}}" alt="{{item.title}}" /></a>
                 </div>
-                <div class="large-8 columns">
+                <div class="medium-8 columns">
             {% else %}
-                <div class="large-12 columns">
+                <div class="medium-12 columns">
             {% endif %}
                 <h2><a href="/{{item.guid}}.html" rel="bookmark">{{item.title}}</a></h2>
                 <p>
@@ -29,6 +29,7 @@
                 <a class="small button float-right" title="{{item.title}}" href="/{{item.guid}}.html">Read more</a>
             </div>
         </section>
+        <div class="clearfix"></div>
         <hr />
     {% endfor %}
     {{articles.links}}

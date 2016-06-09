@@ -1,17 +1,18 @@
 {% set posts = get_posts(type="post", limit="5", order='views') %}
-{% if posts %}<h3>Popular Posts</h3>{% endif %}
-{% for post in posts %}
-    <div class="row widget">
+<div class="row widget">
+    {% if posts %}<h3>Popular Posts</h3>{% endif %}
+
+    {% for post in posts %}
         {% if post.image.id %}
-            <div class="large-{% if footer %}4{% else %}5{% endif %} columns">
+            <div class="medium-{% if footer %}4{% else %}5{% endif %} show-for-medium columns">
                 <a title="{{post.title}}" href="/{{post.guid}}.html"><img  class="thumbnail" src="{{post.image.urlify('thumbnail-lg')}}" alt="{{post.title}}" /></a>
             </div>
         {% else %}
-            <div class="large-{% if footer %}4{% else %}5{% endif %} columns">
+            <div class="medium-{% if footer %}4{% else %}5{% endif %} show-for-medium columns">
                 <a title="{{post.title}}" href="/{{post.guid}}.html"><img  class="thumbnail" src="/public/images/empty.png" alt="{{post.title}}" /></a>
             </div>
         {% endif %}
-        <div class="large-{% if footer %}8{% else %}7{% endif %} columns widget-body">
+        <div class="medium-{% if footer %}8{% else %}7{% endif %} columns widget-body">
             <h4><a href="/{{post.guid}}.html">{{post.title}}</a></h4>
             <small class="grey">
                 <span><i class="fa fa-clock-o"></i> <time class="timeago" datetime="{{post.created.isoformat()}}">{{post.created.isoformat()}}</time> </span>
@@ -19,5 +20,6 @@
                 <span><i class="fa fa-eye" aria-hidden="true"></i> {{post.views}} &nbsp;&nbsp;<i class="fa fa-comments"></i> {{post.comment_count}}</span>
             </small> 
         </div>
-    </div>
-{% endfor %}
+        <div class="clearfix"></div>
+    {% endfor %}
+</div>
