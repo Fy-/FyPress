@@ -60,6 +60,11 @@
             <meta name="twitter:creator" content="@{{options.twitter.rsplit('/', 1)[1]}}"/>
         {% endif %}
     {% endblock %}
+
+    {% block css %}
+        <link rel="stylesheet" href="/public/css/foundation.min.css">
+        <link rel="stylesheet" href="/public/css/nyx.css" />
+    {% endblock %}
 </head>
 <body>
     <header>
@@ -195,12 +200,12 @@
             </footer>
         </div>
     {% endif %}
-    {% block css %}
-        <link rel="stylesheet" href="/public/css/foundation.min.css">
+
+    {% block css_add %}
         <link rel="stylesheet" href="/public/css/prism.css" >
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-        <link rel="stylesheet" href="/public/css/nyx.css" />
     {% endblock %}
+
     {% block scripts %}
         <script src="/public/js/jquery.js"></script>
         <script src="/public/js/foundation.min.js"></script>
