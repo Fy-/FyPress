@@ -12,6 +12,9 @@ h4 { font-size: 1rem;}
 body {
     background: #2c223f;
 }
+.callout {
+    border: 0;
+}
 .wrapper {
     background: #fff;
     padding-bottom: 4rem;
