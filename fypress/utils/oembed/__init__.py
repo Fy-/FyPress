@@ -1,7 +1,5 @@
 # -*- coding: UTF-8 -*-
 from __future__ import unicode_literals
-
-__import__('pkg_resources').declare_namespace(__name__)
 import re, requests
 
 class Sites(object):

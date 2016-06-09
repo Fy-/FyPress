@@ -6,6 +6,9 @@ Flask==0.10.1
 Flask-Babel==0.11.0
 Flask-Script==2.0.5
 Flask-WTF==0.12
+gevent==1.1.1
+greenlet==0.4.9
+gunicorn==19.6.0
 html5lib==0.9999999
 itsdangerous==0.24
 Jinja2==2.8
