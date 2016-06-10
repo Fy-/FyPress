@@ -74,7 +74,9 @@ def template():
         elif isinstance(item, Folder):
             return item.name+' • '+g.options['name']
         elif isinstance(item, Post):
-            return item.title+' • '+g.options['name']
+            if item.folder_id == 1:
+                return item.title+' • '+g.options['name']
+            return item.title+' • '+item.folder.name+' • '+g.options['name']
         return g.options['name']
 
     def description(item=False):
