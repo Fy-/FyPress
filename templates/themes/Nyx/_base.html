@@ -139,7 +139,7 @@
             {% else %}
                 <div class="medium-12 columns" id="content">
             {% endif %}
-                {% if not is_home and show_breadcrumb %}
+                {% if this and not is_home and show_breadcrumb %}
                     {% set bcitems = breadcrumb(this) %}
                     <nav aria-label="You are here:">
                       <ul class="breadcrumbs">
