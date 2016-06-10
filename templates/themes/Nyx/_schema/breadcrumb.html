@@ -1,4 +1,4 @@
-{% if show_breadcrumb and not is_home %}
+{% if this and show_breadcrumb and not is_home %}
   {% set bcitems = breadcrumb(this) %}
   <script type='application/ld+json'>
     {
