@@ -107,14 +107,14 @@
                             <nav class="top-bar-left show-for-medium">
                                 <ul class="dropdown menu" data-dropdown-menu>
                                     <li><a href="/" {% if is_home %}class="active"{% endif %}>Home</a></li>
-                                    <li><a href="/articles/" {% if folder and folder.guid == 'articles' %}class="active"{% endif %}>Articles</a></li>
+                                    <li><a href="/articles/" {% if this and this.guid == 'articles' %}class="active"{% endif %}>Articles</a></li>
                                     {{nav|safe}}
                                 </ul>
                             </nav>
                             <nav class="top-bar-left hide-for-medium">
                                 <ul class="dropdown menu vertical" data-dropdown-menu>
                                     <li><a href="/" {% if is_home %}class="active"{% endif %}>Home</a></li>
-                                    <li><a href="/articles/" {% if folder and folder.guid == 'articles' %}class="active"{% endif %}>Articles</a></li>
+                                    <li><a href="/articles/" {% if this and this.guid == 'articles' %}class="active"{% endif %}>Articles</a></li>
                                     {{nav|safe}}
                                 </ul>
                             </nav>

@@ -22,7 +22,7 @@ def clean_html(buf):
         bs = BeautifulSoup(buf, 'html5lib')
         return bs.prettify(formatter="minimal")
 
-def cached(timeout=5*60, key='public%s', pretty=False):
+def cached(timeout=5*60, key='public-%s', pretty=False):
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
@@ -31,7 +31,7 @@ def cached(timeout=5*60, key='public%s', pretty=False):
                     return clean_html(f(*args, **kwargs))
                 return f(*args, **kwargs)
 
-            cache_key = key % request.path
+            cache_key = key % request.url
             rv = cache.get(cache_key)
             if rv is not None:
                 try:

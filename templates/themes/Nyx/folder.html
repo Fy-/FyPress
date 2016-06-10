@@ -5,18 +5,20 @@
         {% if not this.index %}
             <h1>{{this.name}}</h1>
             <p>{{this.content}}</p>
+            <div class="clearfix"></div>
+            <hr />
         {% else %}
             <article class="post">
                 <h1>{{this.name}}</h1>
                 {{this.index.content|safe}}
             </article>
             <div class="clearfix"></div>
-            </hr />
+            <hr />
         {% endif %}
     {% endif %}
     {% if this.posts.items %}
-        {% if index %}
-            <h2>Latest posts</h2>
+        {% if this.index %}
+            <h2>Latest {{this.name}} posts</h2>
         {% endif %}
     {% endif %}
     {% for item in this.posts.items %}

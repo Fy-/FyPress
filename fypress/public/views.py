@@ -143,7 +143,7 @@ def posts():
             query    = Post.query.filter(status='published', type='post').order_by('created', 'DESC'),
             page     = request.args.get('page'),
             theme    = 'foundation',
-            per_page = 2
+            per_page = 5
     )
     return render_template(get_template('articles.html', config), this=folder)
 
@@ -179,7 +179,8 @@ def is_folder(slug):
             folder.index        = Post.query.filter(folder_id=folder.id, slug='index', status='published', type='page').one()
             folder.posts        = Paginator(
                 query    = Post.query.filter(folder_id=folder.id, status='published', type='post').order_by('created'),
-                page     = request.args.get('page')
+                page     = request.args.get('page'),
+                per_page = 5
             )
 
             return render_template(get_template('folder.html', config), this=folder)
