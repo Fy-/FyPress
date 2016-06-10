@@ -53,8 +53,8 @@
             <meta property="og:image" content="{{options.url}}{{options.logo[1:]}}"/>
             <meta name="twitter:image" content="{{options.url}}{{options.logo[1:]}}"/>
         {% elif image(this) %}
-            <meta property="og:image" content="{{options.url}}{{image(this).urlify('thumbnail-lg')}}"/>
-            <meta name="twitter:image" content="{{options.url}}{{image(this).urlify('thumbnail-lg')}}"/>       
+            <meta property="og:image" content="{{options.url}}{{image(this).urlify('thumbnail-lg')[1:]}}"/>
+            <meta name="twitter:image" content="{{options.url}}{{image(this).urlify('thumbnail-lg')[1:]}}"/>       
         {% endif %}
         <meta name="twitter:card" content="summary"/>
         <meta name="twitter:title" content="{{title(this)}}" />
