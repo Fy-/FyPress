@@ -55,6 +55,12 @@ def template():
     if request.url == g.options['url']:
         is_home = True
 
+    def jsonld(v):
+        return '{{option.name}}'
+
+    def theme(v):
+        return 'themes/' + g.options['theme'] + '/' + v
+
     def breadcrumb(item=False):
         if request.path == '/articles/':
             folder = Folder()
@@ -110,11 +116,10 @@ def template():
         
         return False    
 
-    def seo(item=False):
-        pass
-
     return dict(
         nav=nav, 
+        jsonld=jsonld,
+        theme=theme,
         get_posts=get_posts, 
         show_sidebar=True,
         show_breadcrumb=True, 

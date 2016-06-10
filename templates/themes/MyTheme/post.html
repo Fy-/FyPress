@@ -1,0 +1,17 @@
+{% extends theme('_base.html') %}
+
+{% block content %}
+    <article>
+        <h2>{{this.title}}</h2>
+        {% if this.image.id %}
+            <a title="{{this.title}}" href="/{{this.guid}}.html"><img  class="thumbnail" src="{{this.image.urlify('thumbnail-lg')}}" alt="{{this.title}}" /></a>
+        {% else %}
+        <small class="meta">
+            <span> By <a href="">{{this.user.nicename}}</a> &nbsp;&nbsp;</span>
+            <span> <time class="timeago" datetime="{{this.created.isoformat()}}">{{this.created.isoformat()}}</time> &nbsp;&nbsp;</span>
+            <span> {{this.comment_count}} comment &nbsp;&nbsp;</span>
+            <span><a href="/{{this.folder.guid}}/">/{{this.folder.guid}}</a></ppan>
+        </span>
+        <div>{{this.content|safe}}...</div>
+    </article>
+{% endblock %}

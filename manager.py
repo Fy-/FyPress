@@ -87,6 +87,7 @@ def init_fypress(login='', email='', passwd=''):
         opt = Option.update(option[0], option[1])
         print '*** Added Option: '+str(opt)
 
+
 if __name__ == '__main__':
     print logo
     manager.run()

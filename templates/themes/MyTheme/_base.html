@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <title>{{title(this)}}</title>
+</head>
+<body>
+    <header>
+        <div id="logo">
+            {% block header %}
+                {% if options.logo %}
+                    {% if is_home %}
+                        <h1> <a href="/" title="{{options.name}}"><img alt="{{options.name}}" src="{{options.logo}}" /></a> </h1>
+                    {% else %}
+                         <span class="h1"><a href="/" title="{{options.name}}"><img alt="{{options.name}}" src="{{options.logo}}" /></a></span>
+                    {% endif %}
+
+                {% else %}
+                    {% if is_home %}
+                        <h1><a href="/">{{options.name}}</a> <small>{{options.slogan}}</small></h1>
+                    {% else %}
+                        <span class="h1"><a href="/">{{options.name}}</a> <small>{{options.slogan}}</small></span>
+                    {% endif %}
+                {% endif %}
+            {% endblock %}
+        </div>
+        <nav>
+            <ul>
+                <li><a href="/" {% if is_home %}class="active"{% endif %}>Home</a></li>
+                <li><a href="/articles/" {% if this and this.guid == 'articles' %}class="active"{% endif %}>Articles</a></li>
+                {{nav|safe}}
+            </ul>
+        </nav>
+    </header>
+    <main>
+        {% if this and not is_home and show_breadcrumb %}
+            {% set bcitems = breadcrumb(this) %}
+            <nav>
+              <ul class="breadcrumbs">
+                <li><a href="/">{{options.name}}</a></li>
+                    {% for item in bcitems %}
+                        {% if this.is_folder %}
+                            <li>{{item.name}}</li>
+                        {% else %}
+                            {% if this.guid == item.guid %}
+                                <li>{{item.name}}</li>    
+                            {% else %}
+                                <li><a href="/{{item.guid}}/"> {{item.name}}</a></li>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                    {% if this.is_page or this.is_post %}
+                        <li>{{this.title}}</li>                                
+                    {% endif %}
+              </ul>
+            </nav>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+    <footer>
+        <h3>About {{options.name}}</h3>
+        <small>Powered by <a href="http://press.fy.to" title="FyPress, CMS, Flask">FyPress</a> v{{version}}, theme: {{options.theme}}</small>
+        {% if options.footer %}
+            <hr />
+            <small>{{options.footer|safe}}</small>
+        {% endif %}
+    </footer>
+</body>
+</html>

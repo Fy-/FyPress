@@ -1,0 +1,22 @@
+{% extends theme('_base.html') %}
+
+{% block content %}
+    {% for item in this.posts.items %}
+        <article>
+            <h2>{{item.title}}</h2>
+            {% if item.image.id %}
+                <a title="{{item.title}}" href="/{{item.guid}}.html"><img  class="thumbnail" src="{{item.image.urlify('thumbnail-lg')}}" alt="{{item.title}}" /></a>
+            {% endif %}
+            <small class="meta">
+                <span> By {{item.user.nicename}} &nbsp;&nbsp;</span>
+                <span> <time class="timeago" datetime="{{item.created.isoformat()}}">{{item.created.isoformat()}}</time> &nbsp;&nbsp;</span>
+                <span> {{item.comment_count}} comment &nbsp;&nbsp;</span>
+                <span><a href="/{{item.folder.guid}}/">/{{item.folder.guid}}</a></ppan>
+            </span>
+            <div>{{item.excerpt}}...</div>
+            <a title="{{item.title}}" href="/{{item.guid}}.html">Read more</a>
+        </article>
+    {% endfor %}
+
+    {{this.posts.links}} <!-- Pagination -->
+{% endblock %}

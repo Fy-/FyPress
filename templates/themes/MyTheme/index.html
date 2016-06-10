@@ -1,0 +1,9 @@
+{% extends theme('_base.html') %}
+{% block content %}
+    <h1>Welcome to MyTheme</h1>
+    {% if index %}
+        <article class="post">
+            {{index.content|safe}}
+        </article>
+    {% endif %}
+{% endblock %}

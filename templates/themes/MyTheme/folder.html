@@ -1,0 +1,44 @@
+{% extends theme('_base.html') %}
+
+{% block content %}
+    {% if this.id != 1 %}
+        {% if not this.index %}
+            <h1>{{this.name}}</h1>
+            <p>{{this.content}}</p>
+            <hr />
+        {% else %}
+            <article>
+                {% if this.is_page %}
+                    {% set page = this %}
+                    <h1>{{this.title}}</h1>
+                {% else %}
+                    {% set page = this.index %}
+                    <h1>{{this.name}} - {{this.index.title}}</h1>
+                {% endif %}
+                {{page.content|safe}}
+            </article>
+        {% endif %}
+    {% endif %}
+
+    {% if this.posts.items %}
+        <h2>Latest {{this.name}} posts</h2>
+    {% endif %}
+
+    {% for item in this.posts.items %}
+        <article>
+            <h2>{{item.title}}</h2>
+            {% if item.image.id %}
+                <a title="{{item.title}}" href="/{{item.guid}}.html"><img  class="thumbnail" src="{{item.image.urlify('thumbnail-lg')}}" alt="{{item.title}}" /></a>
+            {% endif %}
+            <small class="meta">
+                <span> By <a href="">{{item.user.nicename}}</a> &nbsp;&nbsp;</span>
+                <span> <time class="timeago" datetime="{{item.created.isoformat()}}">{{item.created.isoformat()}}</time> &nbsp;&nbsp;</span>
+                <span> {{item.comment_count}} comment &nbsp;&nbsp;</span>
+                <span><a href="/{{item.folder.guid}}/">/{{item.folder.guid}}</a></ppan>
+            </span>
+            <div>{{item.excerpt}}...</div>
+            <a title="{{item.title}}" href="/{{item.guid}}.html">Read more</a>
+        </article>
+    {% endfor %}
+    {{this.posts.links}} <!-- Pagination -->
+{% endblock %}
