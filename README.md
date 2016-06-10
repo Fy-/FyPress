@@ -1,5 +1,7 @@
 FyPress (Still in development)
 --------
+[![irc #FyPress](https://img.shields.io/badge/IRC-%23FyPress-green.svg](http://webchat.freenode.net/?channels=%23FyPress)
+
 FyPress is a mini CMS in Python based on Flask and Jinja2, aimed to easily deploy content-managed websites through organized articles and pages, using simply HTML.
 
 [![FyPress](https://raw.githubusercontent.com/Fy-/FyPress/91858685ca95d5a884d6735a67e9aad343bfde8b/static/admin/images/fakeplayer.png)](https://www.youtube.com/watch?v=5ejW8wblJps)
