@@ -4,7 +4,7 @@
 
 {% endblock %}
 {% block content %}
-    {% for item in articles.items %}
+    {% for item in this.posts.items %}
         <section class="row">
             {% if item.image.id %}
                 <div class="medium-4 columns">
@@ -32,5 +32,5 @@
         <div class="clearfix"></div>
         <hr />
     {% endfor %}
-    {{articles.links}}
+    {{this.posts.links}}
 {% endblock %}

@@ -71,20 +71,25 @@
 {% endblock %}
 
 {% block sidebar %}
-    <div class="row widget">
-        <h3>{{this.folder.name}}</h3>
-        <p><small>{{this.folder.content|safe}}</small></p>
-        <ul class="menu vertical">
-            <li><a href="/{{this.folder.guid}}/">{{this.folder.name}}</a></li>
-            {% for p in pages %}
-                {% if p.slug != 'index' %}
-                    <li {% if this.id == p.id %}class="active"{% endif %}><a href="/{{p.guid}}.html">{{p.title}}</a></li>
-                {% endif %}
-            {% endfor %}
-        </ul>
-    </div>
+    {% if this.pages|length > 1 %}
+        <div class="row widget">
+            <h3>{{this.folder.name}}</h3>
+            <p><small>{{this.folder.content|safe}}</small></p>
+            <ul class="menu vertical">
+                <li><a href="/{{this.folder.guid}}/">{{this.folder.name}}</a></li>
+                {% for page in this.pages %}
+                    {% if page.slug != 'index' %}
+                        <li {% if page.guid == this.guid %}class="active"{% endif %}><a href="/{{page.guid}}.html">{{page.title}}</a></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+        <hr />
+    {% endif %}
 
-    <br /><br />
+    {% with folder = this.folder_id %}
+        {% include 'themes/Nyx/widgets/last-post-by-folder.html' %}
+    {% endwith %}
 {% endblock %}
 
 {% block scripts %}

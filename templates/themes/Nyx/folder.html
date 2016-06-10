@@ -2,25 +2,24 @@
 
 {% block content %}
     {% if this.id != 1 %}
-        {% if not index %}
+        {% if not this.index %}
             <h1>{{this.name}}</h1>
             <p>{{this.content}}</p>
         {% else %}
             <article class="post">
                 <h1>{{this.name}}</h1>
-                {{index.content|safe}}
+                {{this.index.content|safe}}
             </article>
-            <br />
-            <hr />
-            <br />
+            <div class="clearfix"></div>
+            </hr />
         {% endif %}
     {% endif %}
-    {% if articles.items %}
+    {% if this.posts.items %}
         {% if index %}
             <h2>Latest posts</h2>
         {% endif %}
     {% endif %}
-    {% for item in articles.items %}
+    {% for item in this.posts.items %}
         <section class="row">
             {% if item.image.id %}
                 <div class="medium-4 columns">
@@ -48,17 +47,17 @@
         <div class="clearfix"></div>
         <hr />
     {% endfor %}
-    {{articles.links}}
+    {{this.posts.links}}
 {% endblock %}
 
 {% block sidebar %}
-    {% if pages|length > 1 %}
+    {% if this.pages|length > 1 %}
         <div class="row widget">
             <h3>{{this.name}}</h3>
             <p><small>{{this.content|safe}}</small></p>
             <ul class="menu vertical">
                 <li class="active"><a href="/{{this.guid}}/">{{this.name}}</a></li>
-                {% for page in pages %}
+                {% for page in this.pages %}
                     {% if page.slug != 'index' %}
                         <li><a href="/{{page.guid}}.html">{{page.title}}</a></li>
                     {% endif %}
@@ -66,9 +65,11 @@
             </ul>
         </div>
         <hr />
-        {% include 'themes/Nyx/widgets/last-post-by-folder.html' %}
-         <hr />
     {% endif %}
+
+    {% with folder = this.id %}
+        {% include 'themes/Nyx/widgets/last-post-by-folder.html' %}
+    {% endwith %}
 {% endblock %}
 
 

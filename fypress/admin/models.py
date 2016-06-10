@@ -43,7 +43,7 @@ class Option(mysql.Base):
     def get_settings(type='general'):
         settings = {
             'general': ['name', 'url', 'slogan', 'footer'],
-            'social' : ['twitter', 'facebook', 'github'],
+            'social' : ['analytics', 'twitter', 'facebook', 'github'],
             'design' : ['logo', 'ico', 'css']
         }
 

@@ -14,6 +14,9 @@
     <title>{{title(this)}}</title>
     
     <link rel="alternate" type="application/rss+xml" title="{{options.name}}" href="{{options.url}}feed/"/>
+    {% if this and this.is_folder %}
+        <link rel="alternate" type="application/rss+xml" title="{{options.name}} • {{this.name}}" href="/feed/{{this.guid}}/"/>
+    {% endif %}
     <meta name="generator" content="FyPress {{version}}"/>
     {% if options.ico %}<link rel=icon href="{{options.ico}}" sizes="any">{% endif %}
     {% block microdata %}{% endblock %}
@@ -29,11 +32,11 @@
     {% block seo %}
         <meta name="robots" content="noodp">
         <link rel="canonical" href="{{request.base_url}}">
-        {% if paginator and paginator.next_page_url %}
-            <link rel="next" href="{{options.url}}{{paginator.next_page_url[1:]}}"/>
+        {% if this and this.posts and this.posts.next_page_url %}
+            <link rel="next" href="{{options.url}}{{this.posts.next_page_url[1:]}}"/>
         {% endif %}
-        {% if paginator and paginator.prev_page_url %}
-            <link rel="prev" href="{{options.url}}{{paginator.prev_page_url[1:]}}"/>
+        {% if this and this.posts and this.posts.prev_page_url %}
+            <link rel="prev" href="{{options.url}}{{this.posts.prev_page_url[1:]}}"/>
         {% endif %}
         <meta property="og:type" content="website"/>
         <meta property="og:title" content="{{title(this)}}" />
@@ -52,9 +55,9 @@
         {% if options.logo and is_home %}
             <meta property="og:image" content="{{options.url}}{{options.logo[1:]}}"/>
             <meta name="twitter:image" content="{{options.url}}{{options.logo[1:]}}"/>
-        {% elif image(this) %}
-            <meta property="og:image" content="{{options.url}}{{image(this).urlify('thumbnail-lg')[1:]}}"/>
-            <meta name="twitter:image" content="{{options.url}}{{image(this).urlify('thumbnail-lg')[1:]}}"/>       
+        {% elif this and image(this) %}
+            <meta property="og:image" content="{{options.url}}{{image(this).urlify('medium')[1:]}}"/>
+            <meta name="twitter:image" content="{{options.url}}{{image(this).urlify('medium')[1:]}}"/>       
         {% endif %}
         <meta name="twitter:card" content="summary"/>
         <meta name="twitter:title" content="{{title(this)}}" />
@@ -145,8 +148,8 @@
                       <ul class="breadcrumbs">
                         <li><a href="/">{{options.name}}</a></li>
                             {% for item in bcitems %}
-                                {% if this.type %}
-                                    <li><a href="/{{item.guid}}/"> {{item.name}}</a></li>
+                                {% if this.is_folder %}
+                                    <li> <span class="show-for-sr"> Current: </span>{{item.name}}</li>
                                 {% else %}
                                     {% if this.guid == item.guid %}
                                         <li>
@@ -157,7 +160,7 @@
                                     {% endif %}
                                 {% endif %}
                             {% endfor %}
-                            {% if this.type %}
+                            {% if this.is_page or this.is_post %}
                                 <li>
                                     <span class="show-for-sr">Current: </span> {{this.title}}
                                 </li>                                
@@ -215,5 +218,9 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-timeago/1.5.2/jquery.timeago.min.js"></script>
         <script src="/public/js/nyx.js"></script>
     {% endblock %}
+
+    {% if options.analytics %}
+        {% include 'themes/Nyx/widgets/analytics.html' %}
+    {% endif %}
 </body>
 </html>

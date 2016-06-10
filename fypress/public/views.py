@@ -130,7 +130,22 @@ def template():
 @cached(pretty=True)
 def root():
     index = Post.query.filter(folder_id=1, slug='index', status='published', type='page').one()
-    return render_template(get_template('index.html', config), index=index)
+    return render_template(get_template('index.html', config), index=index, this=False)
+
+@public.route('/articles/')
+@cached(pretty=True)
+def posts():
+    folder = Folder()
+    folder.name = 'Articles'
+    folder.guid = 'articles'
+    folder.is_folder = True
+    folder.posts     = Paginator(
+            query    = Post.query.filter(status='published', type='post').order_by('created', 'DESC'),
+            page     = request.args.get('page'),
+            theme    = 'foundation',
+            per_page = 2
+    )
+    return render_template(get_template('articles.html', config), this=folder)
 
 @public.route('/<path:slug>.html')
 @cached(pretty=True)
@@ -142,45 +157,32 @@ def is_post(slug):
 
         post.views += 1
         Post.query.update(post)
+        
         if post.type == 'post':
+            post.is_post = True
             return render_template(get_template('post.html', config), this=post, show_sidebar=False)
         else:
-            pages = Post.query.filter(folder_id=post.folder_id, status='published', type='page').order_by('created').all(array=True)
-            return render_template(get_template('page.html', config), this=post, pages=pages)
+            post.is_page = True
+            post.pages = Post.query.filter(folder_id=post.folder_id, status='published', type='page').order_by('created').all(array=True)
+            return render_template(get_template('page.html', config), this=post)
     else:
         return is_404()
     
-
-@public.route('/articles/')
-@cached(pretty=True)
-def posts():
-    folder = Folder()
-    folder.name = 'Articles'
-    folder.guid = 'articles'
-
-    articles = Paginator(
-            query    = Post.query.filter(status='published', type='post').order_by('created', 'DESC'),
-            page     = request.args.get('page'),
-            theme    = 'foundation',
-            per_page = 2
-    )
-    return render_template(get_template('articles.html', config), paginator=articles, articles=articles, this=folder)
-
 @public.route('/<path:slug>/')
 @cached(pretty=True)
 def is_folder(slug):
     if slug.split('/')[0] != 'admin':
         folder = Folder.query.filter(guid=slug).one()
         if folder:
-            articles = Paginator(
-                    query    = Post.query.filter(folder_id=folder.id, status='published', type='post').order_by('created'),
-                    page     = request.args.get('page')
+            folder.is_folder    = True
+            folder.pages        = Post.query.filter(folder_id=folder.id, status='published', type='page').order_by('created').all(array=True)
+            folder.index        = Post.query.filter(folder_id=folder.id, slug='index', status='published', type='page').one()
+            folder.posts        = Paginator(
+                query    = Post.query.filter(folder_id=folder.id, status='published', type='post').order_by('created'),
+                page     = request.args.get('page')
             )
 
-            pages = Post.query.filter(folder_id=folder.id, status='published', type='page').order_by('created').all(array=True)
-            index = Post.query.filter(folder_id=folder.id, slug='index', status='published', type='page').one()
-
-            return render_template(get_template('folder.html', config), this=folder, paginator=articles, articles=articles, pages=pages, index=index)
+            return render_template(get_template('folder.html', config), this=folder)
         else:
             return is_404()
     else:
@@ -190,6 +192,43 @@ def is_folder(slug):
 def static(folder, file):
     folder, file = get_template_static(folder, file, config)
     return send_from_directory(folder, file)
+
+@public.route('/feed/<path:folder>/')
+@cached()
+def feed_folder(folder):
+    if folder.split('/')[0] != 'admin':
+        folder = Folder.query.filter(guid=folder).one()
+        if folder:
+            posts = Post.query.filter(folder_id=folder.id, status='published', type='post').order_by('created').limit(20, 0, array=True)
+
+            feed = AtomFeed(
+                g.options['name']+' • ' + folder.name,
+                subtitle=folder.seo_content,
+                feed_url=request.url_root+'feed/',
+                url=request.url_root,
+                generator=None
+            )
+
+            for post in posts:
+                feed.add(
+                    post.title, 
+                    post.content,
+                    content_type='html',
+                    author=post.user.nicename,
+                    url=request.url_root+post.guid,
+                    updated=post.modified,
+                    published=post.created
+                )
+
+
+            response = feed.get_response()
+            response.headers["Content-Type"] = 'application/xml'
+
+            return response
+        else:
+            return is_404()
+    else:
+        return is_admin_404()
 
 @public.route('/feed/')
 @cached()
