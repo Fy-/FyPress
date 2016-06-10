@@ -11,7 +11,7 @@
     <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge" /><![endif]-->
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     {% block head %}{% endblock %}
-    <title>{{title(post or page or folder)}}</title>
+    <title>{{title(this)}}</title>
     
     <link rel="alternate" type="application/rss+xml" title="{{options.name}}" href="{{options.url}}feed/"/>
     <meta name="generator" content="FyPress {{version}}"/>
@@ -36,25 +36,28 @@
             <link rel="prev" href="{{options.url}}{{paginator.prev_page_url[1:]}}"/>
         {% endif %}
         <meta property="og:type" content="website"/>
-        <meta property="og:title" content="{{title(post or page or folder)}}" />
+        <meta property="og:title" content="{{title(this)}}" />
         <meta property="og:url" content="{{request.url}}"/>
         <meta property="og:site_name" content="{{options.name}}"/>
         {% if is_home %}
             <meta property="og:description" content="{{options.slogan}}"/>
             <meta name="twitter:description" content="{{options.slogan}}"/>
         {% else %}
-            {% if description(post or page or folder) %}
-                <meta name="description" content="{{description(post or page or folder)}}"/>
-                <meta property="og:description" content="{{description(post or page or folder)}}"/>
-                <meta name="twitter:description" content="{{description(post or page or folder)}}"/>
+            {% if description(this) %}
+                <meta name="description" content="{{description(this)}}"/>
+                <meta property="og:description" content="{{description(this)}}"/>
+                <meta name="twitter:description" content="{{description(this)}}"/>
             {% endif %}  
         {% endif %}
         {% if options.logo and is_home %}
             <meta property="og:image" content="{{options.url}}{{options.logo[1:]}}"/>
             <meta name="twitter:image" content="{{options.url}}{{options.logo[1:]}}"/>
+        {% elif image(this) %}
+            <meta property="og:image" content="{{options.url}}{{image(this).urlify('thumbnail-lg')}}"/>
+            <meta name="twitter:image" content="{{options.url}}{{image(this).urlify('thumbnail-lg')}}"/>       
         {% endif %}
         <meta name="twitter:card" content="summary"/>
-        <meta name="twitter:title" content="{{title(post or page or folder)}}" />
+        <meta name="twitter:title" content="{{title(this)}}" />
         {% if options.twitter %}
             <meta name="twitter:site" content="@{{options.twitter.rsplit('/', 1)[1]}}"/>
             <meta name="twitter:creator" content="@{{options.twitter.rsplit('/', 1)[1]}}"/>
@@ -126,7 +129,7 @@
             </div>
         </div>
     </header>
-    <div class="wrapper callout large">
+    <div class="wrapper ">
         <main class="row">
             <div class="large-12 columns">
                 {%block featured %}{% endblock %}
@@ -137,15 +140,15 @@
                 <div class="medium-12 columns" id="content">
             {% endif %}
                 {% if not is_home and show_breadcrumb %}
-                    {% set bcitems = breadcrumb(post or page or folder) %}
+                    {% set bcitems = breadcrumb(this) %}
                     <nav aria-label="You are here:">
                       <ul class="breadcrumbs">
                         <li><a href="/">{{options.name}}</a></li>
                             {% for item in bcitems %}
-                                {% if post or page %}
+                                {% if this.type %}
                                     <li><a href="/{{item.guid}}/"> {{item.name}}</a></li>
-                                {% elif folder %}
-                                    {% if folder.guid == item.guid %}
+                                {% else %}
+                                    {% if this.guid == item.guid %}
                                         <li>
                                             <span class="show-for-sr">Current: </span> {{item.name}}
                                         </li>    
@@ -154,10 +157,9 @@
                                     {% endif %}
                                 {% endif %}
                             {% endfor %}
-                            {% if post or page %}
-                                {% if not post %} {% set post = page %} {% endif %}
+                            {% if this.type %}
                                 <li>
-                                    <span class="show-for-sr">Current: </span> {{post.title}}
+                                    <span class="show-for-sr">Current: </span> {{this.title}}
                                 </li>                                
                             {% endif %}
                       </ul>

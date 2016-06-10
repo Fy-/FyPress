@@ -15,6 +15,10 @@ body {
 .callout {
     border: 0;
 }
+.callout.large {
+    padding: 0;
+    margin: 0;
+}
 .wrapper {
     background: #fff;
     padding-bottom: 4rem;

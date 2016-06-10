@@ -1,5 +1,5 @@
 {% if show_breadcrumb and not is_home %}
-  {% set bcitems = breadcrumb(post or page or folder) %}
+  {% set bcitems = breadcrumb(this) %}
   <script type='application/ld+json'>
     {
       "@context": "http://schema.org",
@@ -16,7 +16,7 @@
         {% set i = [] %}
         {% for item in bcitems %}
           {% if i.append('1') %}{% endif %}
-          {% if post or page %}
+          {% if this.type %}
             {
               "@type": "ListItem",
               "position": {{i|length}},
@@ -25,7 +25,7 @@
                 "name": "{{item.name}}"
               }
             },
-          {% elif folder %}
+          {% else %}
             {
               "@type": "ListItem",
               "position": {{i|length}},
@@ -34,19 +34,18 @@
                 "name": "{{item.name}}"
               }
             }
-            {% if folder.guid != item.guid %},{% endif %}
+            {% if this.guid != item.guid %},{% endif %}
           {% endif %}
           
         {% endfor %}
         {% if i.append('1') %}{% endif %}
-        {% if post or page %}
-          {% if not post %} {% set post = page %} {% endif %}
+        {% if this.type %}
           {
             "@type": "ListItem",
             "position": {{i|length}},
             "item": {
-              "@id": "{{options.url}}{{post.guid}}.html",
-              "name": "{{post.title}}"
+              "@id": "{{options.url}}{{this.guid}}.html",
+              "name": "{{this.title}}"
             }
           }
         {% endif %}

@@ -13,11 +13,11 @@
                     "@type":"WebPage",
                     "@id":"{{request.url}}"
                 },
-                "headline": "{{post.get_excerpt(100)}}",
-                {% if post.image_id != 0 %}
+                "headline": "{{this.get_excerpt(100)}}",
+                {% if this.image_id != 0 %}
                     "image": {
                         "@type": "ImageObject",
-                        "url": "{{options.url}}{{post.image.urlify('thumbnail-lg')}}",
+                        "url": "{{options.url}}{{this.image.urlify('thumbnail-lg')}}",
                         "height": "270",
                         "width": "175"                            
                     },
@@ -40,36 +40,36 @@
                     }
                     {% endif %}
                 },
-                "datePublished": "{{post.created.isoformat()}}",
-                "dateModified": "{{post.modified.isoformat()}}",
+                "datePublished": "{{this.created.isoformat()}}",
+                "dateModified": "{{this.modified.isoformat()}}",
                 "author": {
                     "@type": "Person",
-                    "name": "{{post.user.nicename}}"
+                    "name": "{{this.user.nicename}}"
                 },
-                "description": "{{post.excerpt}}"
+                "description": "{{this.excerpt}}"
             }   
         }
     </script>
 {% endblock %}
 
 {% block featured %}
-    {% if post.image_id != 0 %}
+    {% if this.image_id != 0 %}
         <div class="featured show-for-medium">
-            <img  class="orbit-image" src="{{post.image.urlify('featured')}}" alt="{{post.title}}" /> 
-            <h1>{{post.title}} <small><time class="timeago" datetime="{{post.created.isoformat()}}">{{post.created.isoformat()}}</time></small></h1>
+            <img  class="orbit-image" src="{{this.image.urlify('featured')}}" alt="{{this.title}}" /> 
+            <h1>{{this.title}} <small><time class="timeago" datetime="{{this.created.isoformat()}}">{{this.created.isoformat()}}</time></small></h1>
         </div>
         <div class="hide-for-medium featured-small">
-            <h1>{{post.title}} <small><time class="timeago" datetime="{{post.created.isoformat()}}">{{post.created.isoformat()}}</time></small></h1>
+            <h1>{{this.title}} <small><time class="timeago" datetime="{{this.created.isoformat()}}">{{this.created.isoformat()}}</time></small></h1>
         </div>
     {% endif %}
 {% endblock %}
 
 {% block content %}
-    {% if post.image_id == 0 %}
-        <h1>{{post.title}} <small><time class="timeago" datetime="{{post.created.isoformat()}}">{{post.created.isoformat()}}</time></small></h1>
+    {% if this.image_id == 0 %}
+        <h1>{{this.title}} <small><time class="timeago" datetime="{{this.created.isoformat()}}">{{this.created.isoformat()}}</time></small></h1>
     {% endif %}
     <article class="post">
-        {{post.content|safe}}
+        {{this.content|safe}}
     </article>
 {% endblock %}
 

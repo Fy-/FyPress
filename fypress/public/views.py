@@ -79,7 +79,7 @@ def template():
 
     def description(item=False):
         if request.path == '/articles/':
-            return ''
+            return False
         elif isinstance(item, Folder):
             index = Post.query.filter(folder_id=item.id, slug='index', status='published', type='page').one()
             if index:
@@ -89,6 +89,24 @@ def template():
             return item.get_excerpt(155)
         else:
             return g.options['slogan']
+
+    def image(item=False):
+        if request.path == '/articles/':
+            return False
+        elif isinstance(item, Folder):
+            index = Post.query.filter(folder_id=item.id, slug='index', status='published', type='page').one()
+            if index and index.image_id != 0:
+                return index.image
+            return False
+        elif isinstance(item, Post):
+            if item.image_id != 0:
+                return item.image
+
+            index = Post.query.filter(folder_id=item.folder_id, slug='index', status='published', type='page').one()
+            if index and index.image_id != 0:
+                return index.image
+        
+        return False    
 
     def seo(item=False):
         pass
@@ -102,7 +120,8 @@ def template():
         breadcrumb=breadcrumb,
         is_home=is_home,
         title=title,
-        description=description
+        description=description,
+        image=image
     )
 
 @public.route('/')
@@ -122,10 +141,10 @@ def is_post(slug):
         post.views += 1
         Post.query.update(post)
         if post.type == 'post':
-            return render_template(get_template('post.html', config), post=post, show_sidebar=False)
+            return render_template(get_template('post.html', config), this=post, show_sidebar=False)
         else:
             pages = Post.query.filter(folder_id=post.folder_id, status='published', type='page').order_by('created').all(array=True)
-            return render_template(get_template('page.html', config), page=post, pages=pages)
+            return render_template(get_template('page.html', config), this=post, pages=pages)
     else:
         return is_404()
     
@@ -143,7 +162,7 @@ def posts():
             theme    = 'foundation',
             per_page = 2
     )
-    return render_template(get_template('articles.html', config), paginator=articles, articles=articles, folder=folder)
+    return render_template(get_template('articles.html', config), paginator=articles, articles=articles, this=folder)
 
 @public.route('/<path:slug>/')
 @cached(pretty=True)
@@ -159,7 +178,7 @@ def is_folder(slug):
             pages = Post.query.filter(folder_id=folder.id, status='published', type='page').order_by('created').all(array=True)
             index = Post.query.filter(folder_id=folder.id, slug='index', status='published', type='page').one()
 
-            return render_template(get_template('folder.html', config), folder=folder, paginator=articles, articles=articles, pages=pages, index=index)
+            return render_template(get_template('folder.html', config), this=folder, paginator=articles, articles=articles, pages=pages, index=index)
         else:
             return is_404()
     else:

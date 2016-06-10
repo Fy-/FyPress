@@ -13,11 +13,11 @@
                     "@type":"WebPage",
                     "@id":"{{request.url}}"
                 },
-                "headline": "{{page.get_excerpt(100)}}",
-                {% if page.image_id != 0 %}
+                "headline": "{{this.get_excerpt(100)}}",
+                {% if this.image_id != 0 %}
                     "image": {
                         "@type": "ImageObject",
-                        "url": "{{options.url}}{{page.image.urlify('thumbnail-lg')}}",
+                        "url": "{{options.url}}{{this.image.urlify('thumbnail-lg')}}",
                         "height": "270",
                         "width": "175"                            
                     },
@@ -40,43 +40,45 @@
                     }
                     {% endif %}
                 },
-                "datePublished": "{{page.created.isoformat()}}",
-                "dateModified": "{{page.modified.isoformat()}}",
+                "datePublished": "{{this.created.isoformat()}}",
+                "dateModified": "{{this.modified.isoformat()}}",
                 "author": {
                     "@type": "Person",
-                    "name": "{{page.user.nicename}}"
+                    "name": "{{this.user.nicename}}"
                 },
-                "description": "{{page.excerpt}}"
+                "description": "{{this.excerpt}}"
             }   
         }
     </script>
 {% endblock %}
 
 {% block featured %}
-    {% if page.image_id != 0 %}
+    {% if this.image_id != 0 %}
         <div class="featured">
-            <img  class="orbit-image" src="{{page.image.urlify('featured')}}" alt="{{page.title}}" /> 
-            <h1>{{page.title}}</h1>
+            <img  class="orbit-image" src="{{this.image.urlify('featured')}}" alt="{{this.title}}" /> 
+            <h1>{{this.title}}</h1>
         </div>
     {% endif %}
 {% endblock %}
 
 {% block content %}
-    {% if page.image_id == 0 %}
-        <h1>{{page.title}}</h1>
+    {% if this.image_id == 0 %}
+        <h1>{{this.title}}</h1>
     {% endif %}
     <article class="post">
-        {{page.content|safe}}
+        {{this.content|safe}}
     </article>
 {% endblock %}
 
 {% block sidebar %}
     <div class="row widget">
-        <h3><a href="/{{page.folder.guid}}/">{{page.folder.name}}</a></h3>
+        <h3>{{this.folder.name}}</h3>
+        <p><small>{{this.folder.content|safe}}</small></p>
         <ul class="menu vertical">
+            <li><a href="/{{this.folder.guid}}/">{{this.folder.name}}</a></li>
             {% for p in pages %}
                 {% if p.slug != 'index' %}
-                    <li {% if page.id == p.id %}class="active"{% endif %}><a href="/{{p.guid}}.html">{{p.title}}</a></li>
+                    <li {% if this.id == p.id %}class="active"{% endif %}><a href="/{{p.guid}}.html">{{p.title}}</a></li>
                 {% endif %}
             {% endfor %}
         </ul>
