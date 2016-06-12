@@ -55,9 +55,6 @@ def template():
     if request.url == g.options['url']:
         is_home = True
 
-    def jsonld(v):
-        return '{{option.name}}'
-
     def theme(v):
         return 'themes/' + g.options['theme'] + '/' + v
 
@@ -118,7 +115,6 @@ def template():
 
     return dict(
         nav=nav, 
-        jsonld=jsonld,
         theme=theme,
         get_posts=get_posts, 
         show_sidebar=True,
