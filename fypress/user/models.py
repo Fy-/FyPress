@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import session, request
-from flask.ext.babel import lazy_gettext as gettext
+from flask_babel import lazy_gettext as gettext
 from fypress.models import FyPressTables
 from fysql import CharColumn, DateTimeColumn, IntegerColumn, DictColumn
 import urllib, hashlib, datetime

@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-from flask.ext.babel import lazy_gettext as gettext
+from flask_babel import lazy_gettext as gettext
 from flask_wtf import Form
 from wtforms import validators, TextField, TextAreaField, HiddenField
 from wtforms.widgets import TextArea

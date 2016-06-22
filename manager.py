@@ -5,12 +5,11 @@ import re
 
 fypress = FyPress(Config, False)
 
-from flask.ext.script import Manager
+from flask_script import Manager
 from fypress.user import User
 from fypress.folder import Folder
 from fypress.post import Post
 from fypress.admin import Option
-from fypress.local import _fypress_
 
 app = fypress.app
 db  = fypress.database

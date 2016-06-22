@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-from flask.ext.babel import lazy_gettext as gettext
+from flask_babel import lazy_gettext as gettext
 
 messages = {
     'updated'   : gettext('Item updated'),

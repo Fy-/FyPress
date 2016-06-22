@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 from flask import g, request
-from flask.ext.babel import lazy_gettext as gettext
+from flask_babel import lazy_gettext as gettext
 from BeautifulSoup import *
 
 from fypress.utils import slugify, url_unique

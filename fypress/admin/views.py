@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 from flask import Blueprint, session, request, redirect, url_for, render_template, flash, jsonify, make_response, g
 from flask.views import MethodView
-from flask.ext.babel import lazy_gettext as gettext
+from flask_babel import lazy_gettext as gettext
 from fypress.user import level_required, login_required, User, UserEditForm, UserAddForm, UserEditFormAdmin
 from fypress.folder import FolderForm, Folder
 from fypress.media import Media

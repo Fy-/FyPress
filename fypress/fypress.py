@@ -2,7 +2,7 @@
 from werkzeug.contrib.fixers import ProxyFix
 from werkzeug import SharedDataMiddleware
 from flask import Flask, session, g
-from flask.ext.babel import Babel
+from flask_babel import Babel
 from fysql import FlaskFySQL
 
 from .local import local
