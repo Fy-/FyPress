@@ -28,7 +28,7 @@ p {
   text-align: justify;
 }
 a, .page-link, code a, code a:hover {
-  color: #412a6f;
+  color: #412a6f !important;
 }
 a:hover, a:active, .page-link:hover, .page-link:active {
   color: #9883c3;
