@@ -25,10 +25,9 @@ def reset_options():
 @public.context_processor
 def inject_options():
     if '/public/' not in request.path:
-        from fypress.utils.mysql.sql import FyMySQL
         from fypress import __version__
 
-        return dict(options=g.options, queries=FyMySQL._instance.queries, version=__version__, debug=config.DEBUG)
+        return dict(options=g.options, version=__version__, debug=config.DEBUG)
 
 @public.before_request
 def before_request():
@@ -38,7 +37,7 @@ def before_request():
         from fypress.user import User
         g.user = None
         if 'user_id' in session:
-            g.user = User.query.get(session['user_id'])
+            g.user = User.get(User.id==session['user_id'])
         
 
     if len(options) == 0:
@@ -77,7 +76,7 @@ def template():
         elif isinstance(item, Folder):
             return item.name+' • '+g.options['name']
         elif isinstance(item, Post):
-            if item.folder_id == 1:
+            if item.id_folder == 1:
                 return item.title+' • '+g.options['name']
             return item.title+' • '+item.folder.name+' • '+g.options['name']
         return g.options['name']
@@ -86,7 +85,7 @@ def template():
         if request.path == '/articles/':
             return False
         elif isinstance(item, Folder):
-            index = Post.query.filter(folder_id=item.id, slug='index', status='published', type='page').one()
+            index = Post.filter(Post.id_folder==item.id, Post.slug=='index', Post.status=='published', Post.type=='page').one()
             if index:
                 return index.get_excerpt(155)
             return item.seo_content
@@ -99,16 +98,16 @@ def template():
         if request.path == '/articles/':
             return False
         elif isinstance(item, Folder):
-            index = Post.query.filter(folder_id=item.id, slug='index', status='published', type='page').one()
-            if index and index.image_id != 0:
+            index = Post.filter(Post.id_folder==item.id, Post.slug=='index', Post.status=='published', Post.type=='page').one()
+            if index and index.id_image != 0:
                 return index.image
             return False
         elif isinstance(item, Post):
-            if item.image_id != 0:
+            if item.id_image != 0:
                 return item.image
 
-            index = Post.query.filter(folder_id=item.folder_id, slug='index', status='published', type='page').one()
-            if index and index.image_id != 0:
+            index = Post.filter(Post.id_folder==item.id_folder, Post.slug=='index', Post.status=='published', Post.type=='page').one()
+            if index and index.id_image != 0:
                 return index.image
         
         return False    
@@ -130,7 +129,7 @@ def template():
 @public.route('/')
 @cached(pretty=True)
 def root():
-    index = Post.query.filter(folder_id=1, slug='index', status='published', type='page').one()
+    index = Post.filter(Post.id_folder==1, Post.slug=='index', Post.status=='published', Post.type=='page').one()
     return render_template(get_template('index.html', config), index=index, this=False)
 
 @public.route('/articles/')
@@ -141,30 +140,30 @@ def posts():
     folder.guid = 'articles'
     folder.is_folder = True
     folder.posts     = Paginator(
-            query    = Post.query.filter(status='published', type='post').order_by('created', 'DESC'),
+            query    = Post.filter(Post.status=='published', Post.type=='post').order_by(Post.created, 'DESC'),
             page     = request.args.get('page'),
-            theme    = 'foundation',
-            per_page = 5
+            theme    = 'bootstrap',
+            per_page = 6
     )
     return render_template(get_template('articles.html', config), this=folder)
 
 @public.route('/<path:slug>.html')
 @cached(pretty=True)
 def is_post(slug):
-    post = Post.query.filter(guid=slug).one()
+    post = Post.get(Post.guid==slug)
     if post:
-        if post.slug == 'index' and post.folder_id != 0:
+        if post.slug == 'index' and post.id_folder != 0:
             return redirect('/'+post.folder.guid+'/')
 
         post.views += 1
-        Post.query.update(post)
+        post.save()
         
         if post.type == 'post':
             post.is_post = True
             return render_template(get_template('post.html', config), this=post, show_sidebar=False)
         else:
             post.is_page = True
-            post.pages = Post.query.filter(folder_id=post.folder_id, status='published', type='page').order_by('created').all(array=True)
+            post.pages = Post.filter(Post.id_folder==post.id_folder, Post.status=='published', Post.type=='page').order_by(Post.created).all()
             return render_template(get_template('page.html', config), this=post)
     else:
         return is_404()
@@ -173,14 +172,15 @@ def is_post(slug):
 @cached(pretty=True)
 def is_folder(slug):
     if slug.split('/')[0] != 'admin':
-        folder = Folder.query.filter(guid=slug).one()
+        folder = Folder.get(Folder.guid==slug)
         if folder:
             folder.is_folder    = True
-            folder.pages        = Post.query.filter(folder_id=folder.id, status='published', type='page').order_by('created').all(array=True)
-            folder.index        = Post.query.filter(folder_id=folder.id, slug='index', status='published', type='page').one()
+            folder.pages        = Post.filter(Post.id_folder==folder.id, Post.status=='published', Post.type=='page').order_by(Post.created).all()
+            folder.index        = Post.filter(Post.id_folder==folder.id, Post.slug=='index', Post.status=='published', Post.type=='page').one()
             folder.posts        = Paginator(
-                query    = Post.query.filter(folder_id=folder.id, status='published', type='post').order_by('created'),
+                query    = Post.filter(Post.id_folder==folder.id, Post.status=='published', Post.type=='post').order_by(Post.created),
                 page     = request.args.get('page'),
+                theme    = 'bootstrap',
                 per_page = 5
             )
 
@@ -199,9 +199,9 @@ def static(folder, file):
 @cached()
 def feed_folder(folder):
     if folder.split('/')[0] != 'admin':
-        folder = Folder.query.filter(guid=folder).one()
+        folder = Folder.get(Folder.guid==folder)
         if folder:
-            posts = Post.query.filter(folder_id=folder.id, status='published', type='post').order_by('created').limit(20, 0, array=True)
+            posts = Post.filter(Post.id_folder==folder.id, Post.status=='published', Post.type=='post').order_by(Post.created).limit(20)
 
             feed = AtomFeed(
                 g.options['name']+' • ' + folder.name,
@@ -244,7 +244,7 @@ def feed():
         generator=None
     )
 
-    posts = Post.query.filter(status='published', type='post').order_by('created').limit(20, 0, array=True)
+    posts = Post.filter(Post.status=='published', Post.type=='post').order_by(Post.created).limit(20)
     for post in posts:
         feed.add(
             post.title, 
@@ -272,7 +272,7 @@ def sitemap_xls():
 @public.route('/sitemap.xml')
 @cached()
 def sitemap():
-    posts   = Post.query.filter(status='published', type='post').order_by('created').all()
+    posts   = Post.filter(Post.status=='published', Post.type=='post').order_by(Post.created).all()
     folders = Folder.get_all()
 
     pages = []
@@ -288,7 +288,7 @@ def sitemap():
             pages.append({'url': url, 'mod': modified, 'freq': 'weekly', 'prio': '0.6'})
 
     # pages
-    posts = Post.query.filter(status='published', type='page').order_by('created').limit(20, 0, array=True)
+    posts = Post.filter(Post.status=='published', Post.type=='page').order_by(Post.created).limit(20)
     for post in posts:
             if post.slug != 'index':
                 url      = request.url_root+post.guid+'.html'
@@ -296,7 +296,7 @@ def sitemap():
                 pages.append({'url': url, 'mod': modified, 'freq': 'monthly', 'prio': '0.9'})
 
     # posts
-    posts = Post.query.filter(status='published', type='post').order_by('created').limit(20, 0, array=True)
+    posts = Post.filter(Post.status=='published', Post.type=='post').order_by(Post.created).limit(20,)
     for post in posts:
             url      = request.url_root+post.guid+'.html'
             modified = post.modified.strftime('%Y-%m-%d')

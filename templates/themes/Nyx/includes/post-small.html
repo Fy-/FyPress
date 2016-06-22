@@ -1,0 +1,19 @@
+<div class="row post-small">
+    <div class="col-xs-4">
+        {% if item.image.id %}
+            <a title="{{item.title}}" href="/{{item.guid}}.html">
+                <img  class="img-thumbnail pull-md-left blog-thumbnail" src="{{item.image.urlify('thumbnail-lg')}}" alt="{{item.title}}" />
+            </a>
+        {% else %}
+            <a title="{{item.title}}" href="/{{item.guid}}.html"><img  class="img-thumbnail pull-md-left blog-thumbnail" src="/public/images/empty.png" alt="{{item.title}}" /></a>
+        {% endif %}
+    </div>
+    <div class="col-xs-8">
+        <h5><a title="{{item.title}}" href="/{{item.guid}}.html">{{item.title}}</a></h5>
+        <small><i class="fa fa-clock-o"></i> <time class="timeago" datetime="{{item.created.isoformat()}}">{{item.created.isoformat()}}</time> 
+        <br />
+        <i class="fa fa-eye" aria-hidden="true"></i> {{item.views}} &nbsp;&nbsp;<i class="fa fa-comments"></i> {{item.comment_count}}</small>
+    </div>
+</div>
+<!-- /.blog-post -->
+

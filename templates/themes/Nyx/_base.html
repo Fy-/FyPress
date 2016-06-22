@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        {% if is_home %}
+            <meta name="description" content="{{description(this)}}"/>
+            <meta property="og:description" content="{{options.slogan}}"/>
+            <meta name="twitter:description" content="{{options.slogan}}"/>
+        {% else %}
+            {% if description(this) %}
+                <meta name="description" content="{{description(this)}}"/>
+                <meta property="og:description" content="{{description(this)}}"/>
+                <meta name="twitter:description" content="{{description(this)}}"/>
+            {% endif %}  
+        {% endif %}
+        {% if options.ico %}<link rel=icon href="{{options.ico}}" sizes="any">{% endif %}
+        <title>{{title(this)}}</title>
+
+        <meta name="generator" content="FyPress {{version}}"/>
+        <meta name="robots" content="noodp">
+        <link rel="canonical" href="{{request.base_url}}">
+        {% if this and this.posts and this.posts.next_page_url %}
+            <link rel="next" href="{{options.url}}{{this.posts.next_page_url[1:]}}"/>
+        {% endif %}
+        {% if this and this.posts and this.posts.prev_page_url %}
+            <link rel="prev" href="{{options.url}}{{this.posts.prev_page_url[1:]}}"/>
+        {% endif %}
+        <meta property="og:type" content="website"/>
+        <meta property="og:title" content="{{title(this)}}" />
+        <meta property="og:url" content="{{request.url}}"/>
+        <meta property="og:site_name" content="{{options.name}}"/>
+        {% if options.logo and is_home %}
+            <meta property="og:image" content="{{options.url}}{{options.logo[1:]}}"/>
+            <meta name="twitter:image" content="{{options.url}}{{options.logo[1:]}}"/>
+        {% elif this and image(this) %}
+            <meta property="og:image" content="{{options.url}}{{image(this).urlify('medium')[1:]}}"/>
+            <meta name="twitter:image" content="{{options.url}}{{image(this).urlify('medium')[1:]}}"/>       
+        {% endif %}
+        <meta name="twitter:card" content="summary"/>
+        <meta name="twitter:title" content="{{title(this)}}" />
+        {% if options.twitter %}
+            <meta name="twitter:site" content="@{{options.twitter.rsplit('/', 1)[1]}}"/>
+            <meta name="twitter:creator" content="@{{options.twitter.rsplit('/', 1)[1]}}"/>
+        {% endif %}
+
+        {% block css %}
+            <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/css/bootstrap.min.css">
+            <link rel="stylesheet" href="/public/css/style.css" />
+        {% endblock %}
+        {% if options.css %}
+            <style>
+                {{options.css}}
+            </style>
+        {% endif %}
+
+        <link rel="alternate" type="application/rss+xml" title="{{options.name}}" href="{{options.url}}feed/"/>
+        {% if this and this.is_folder %}
+            <link rel="alternate" type="application/rss+xml" title="{{options.name}} • {{this.name}}" href="/feed/{{this.guid}}/"/>
+        {% endif %}
+        {% block microdata %}{% include theme('jsonld/breadcrumb.html') %}{% endblock %}
+    </head>
+
+    <body>
+        <div class="blog-masthead">
+          <div class="container">
+            <nav class="main-nav">
+                <ul class="nav navbar-nav blog-nav">
+                    <li class="nav-item {% if is_home %} active{% endif %}"><a class="nav-link" href="/" >Home</a></li>
+                    <li class="nav-item {% if this and this.guid == 'articles' %} active{% endif %}"><a class="nav-link" href="/articles/">Articles</a></li>
+                    {{nav|safe}}
+                </ul>
+            </nav>
+          </div>
+        </div>
+        <div class="blog-header">
+          <div class="container">
+            {% block header %}
+                {% if options.logo %}
+                    {% if is_home %}
+                        <h1 class="blog-title"> <a href="/" title="{{options.name}}"><img alt="{{options.name}}" src="{{options.logo}}" /></a> </h1>
+                    {% else %}
+                         <span class="blog-title"><a href="/" title="{{options.name}}"><img alt="{{options.name}}" src="{{options.logo}}" /></a></span>
+                    {% endif %}
+
+                {% else %}
+                    {% if is_home %}
+                        <h1 class="blog-title"><a href="/">{{options.name}}</a> <small class="lead blog-description">{{options.slogan}}</small></h1>
+                    {% else %}
+                        <span class="blog-title"><a href="/">{{options.name}}</a> <small class="lead blog-description">{{options.slogan}}</small></span>
+                    {% endif %}
+                {% endif %}
+            {% endblock %}
+          </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-8 blog-main">
+                    {% block content %}{% endblock %}
+                </div> 
+                <div class="col-sm-4  blog-sidebar">
+                    {% block sidebar %}{% endblock %}
+                    <div class="sidebar-module sidebar-module-inset">
+                        <h4>Popular Posts</h4>
+                        {% include theme('widgets/popular-post.html') %}
+                    </div>
+                    <div class="sidebar-module sidebar-module-inset">
+                        <h4>About {{options.url}}</h4>
+                        <small>Powered by <a href="http://fy.to/fypress/" title="FyPress, CMS, Flask, Python">FyPress</a> v{{version}}, theme: {{options.theme}} <small>Nyx is inspired by "Blog template" by <a target="_blank" href="https://twitter.com/mdo">@mdo</a>.</small></small>
+                    </div>
+                </div> <!-- /.blog-sidebar -->
+            </div> <!-- /.row -->
+        </div> <!-- /.container -->
+
+        <footer class="blog-footer">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <h6>About {{options.url}}</h6>
+                        {% if options.footer %}
+                            <small>{{options.footer|safe}}</small>
+                        {% endif %}
+                    </div>
+                    <div class="col-sm-4">
+                        <h6>Popular Posts</h6>
+                        {% include theme('widgets/popular-post.html') %}
+                    </div>
+                    <div class="col-sm-4">
+                        <h6>Follow {{options.name}}</h6>
+                        {% include theme('widgets/social-follow.html') %}
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.3.2/js/tether.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/js/bootstrap.min.js" crossorigin="anonymous"></script>
+        {% block css_add %}
+            <link rel="stylesheet" href="/public/css/prism.css" >
+            <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+        {% endblock %}
+
+        {% block scripts %}
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-timeago/1.5.2/jquery.timeago.min.js"></script>
+        {% endblock %}
+
+        {% if options.analytics %}
+            {% include 'themes/Nyx/widgets/analytics.html' %}
+        {% endif %}
+        <div id="fb-root"></div>
+        <script>
+            jQuery(document).ready(function() {
+              jQuery("time.timeago").timeago();
+            });
+        </script>
+        <script>(function(d, s, id) {
+          var js, fjs = d.getElementsByTagName(s)[0];
+          if (d.getElementById(id)) return;
+          js = d.createElement(s); js.id = id;
+          js.src = "//connect.facebook.net/fr_FR/sdk.js#xfbml=1&version=v2.6";
+          fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));</script>
+    </body>
+</html>

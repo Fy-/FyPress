@@ -1,0 +1,9 @@
+{% set posts = get_posts(type="post", limit="5", folder=folder) %}
+{% if posts %}
+    <div class="sidebar-module">
+        <h4><a href="/feed/{{this.guid}}/" title="RSS {{this.name}}"><i class="fa fa-rss-square"></i></a> Latest {{this.name}} posts</h4>
+        {% for item in posts %}
+            {% include theme('includes/post-small.html') %}
+        {% endfor %}
+    </div>
+{% endif %}

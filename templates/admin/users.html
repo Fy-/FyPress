@@ -35,7 +35,7 @@
                                 </td>
                                 <td class="col-md-2">
                                     {% if user.meta.last_login %}
-                                        <small><em>{{_('Last login')}}: <abbr title="{{user.meta.last_login }}">{{user.meta.last_login }}</abbr></small><br />
+                                        <small><em>{{_('Last login')}}: <abbr title="{{user.meta.last_login }}">{{user.meta.last_login}}</abbr></small><br />
                                         <small><em>{{_('Last IP')}}: <strong>{{user.meta.last_ip }}</strong></small>
                                     {% else %}
                                         <small><em>{{_('Never logged in')}}.</em>
@@ -43,7 +43,7 @@
                                 </td>
                                 <td class="col-md-2">
                                     {{user.firstname}} {{user.lastname}}<br />
-                                    <small><em>{{_('Registered')}}: <abbr title="{{user.registered }}">{{user.registered }}</abbr></small><br />
+                                    <small><em>{{_('Registered')}}: <abbr title="{{user.registered }}">{{user.registered}}</abbr></small><br />
                                 </td>
                                 <td class="col-md-2">{{user.nicename}}</td>
                                 <td class="col-md-2"><a href="mailto:{{user.email}}">{{user.email}}</a></td>

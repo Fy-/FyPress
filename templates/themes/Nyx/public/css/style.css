@@ -1,0 +1,333 @@
+/*
+ * Globals
+ */
+@import url(https://fonts.googleapis.com/css?family=Roboto);
+
+@media (min-width: 48em) {
+  html {
+    font-size: 16px;
+  }
+}
+
+body {
+  font-family: Georgia, "Times New Roman", Times, serif;
+  color: #555;
+}
+h1,h2,h3,h4 {font-family: Roboto;}
+h1, .h1,
+h2, .h2,
+h3, .h3,
+h4, .h4,
+h5, .h5,
+h6, .h6 {
+  font-family: Roboto, Helvetica, Arial, sans-serif;
+  font-weight: normal;
+  color: #333;
+}
+p {
+  text-align: justify;
+}
+a, .page-link {
+  color: #412a6f;
+}
+a:hover, a:active, .page-link:hover, .page-link:active {
+  color: #9883c3;
+  text-decoration: none;
+}
+.page-item.active .page-link, .page-item.active .page-link:focus, .page-item.active .page-link:hover {
+    background: #2c223f;
+    border-color: #2c223f;
+}
+h1 { font-size: 2rem; }
+h2 { font-size: 1.6rem; }
+h3 { font-size: 1.3rem; }
+h4 { font-size: 1.2rem; }
+h5 { font-size: 0.9rem; }
+
+/*
+ * Override Bootstrap's default container.
+ */
+
+.container {
+  max-width: 70rem;
+}
+
+
+/*
+ * Masthead for nav
+ */
+.blog-masthead {
+  margin-bottom: 1rem;
+  background-color: #2c223f;
+  -webkit-box-shadow: inset 0 -.1rem .25rem rgba(0,0,0,.1);
+          box-shadow: inset 0 -.1rem .25rem rgba(0,0,0,.1);
+}
+.navbar {
+  padding-left: 0;
+}
+
+/* Nav links */
+.nav-link {
+  font-family: Roboto, Helvetica, Arial, sans-serif;
+  position: relative;
+  padding: 1rem;
+  font-weight: 500;
+  color: #ede7f8;
+  display: block;
+  text-align: center;
+  margin: 0;
+  padding-right: 0;
+  margin-right: 1rem;
+}
+.nav-link:hover,
+.nav-link:focus {
+  color: #fff;
+  background-color: transparent;
+}
+.nav-link:first-child {
+  padding-left: 0;
+}
+
+/* Active state gets a caret at the bottom */
+.nav-item.active a {
+  color: #fff;
+}
+.nav-item.active a:after {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 0;
+  margin-left: -.3rem;
+  vertical-align: middle;
+  content: "";
+  border-right: .3rem solid transparent;
+  border-bottom: .3rem solid;
+  border-left: .3rem solid transparent;
+}
+
+
+/*
+ * Blog name and description
+ */
+.blog-main {
+  position: inherit;
+}
+
+.blog-header {
+  padding-bottom: 1.25rem;
+  margin-bottom: 2rem;
+  border-bottom: .05rem solid #eee;
+}
+.blog-title {
+  margin-bottom: 0;
+  font-size: 2rem;
+  font-weight: normal;
+}
+.blog-description {
+  font-size: 1.1rem;
+  color: #999;
+}
+
+@media (min-width: 40em) {
+  .blog-title {
+    font-size: 2.5rem;
+  }
+}
+
+/*
+ * Main column and sidebar layout
+ */
+
+/* Sidebar modules for boxing content */
+.fat {
+    font-size: 3rem;
+}
+.nav-pills .nav-link {
+  color: #412a6f;
+}
+.nav-pills .nav-item.open .nav-link, .nav-pills .nav-item.open .nav-link:focus, .nav-pills .nav-item.open .nav-link:hover, .nav-pills .nav-link.active, .nav-pills .nav-link.active:focus, .nav-pills .nav-link.active:hover {
+  background: #9883c3;
+}
+.sidebar-module {
+  padding: 1rem;
+  /*margin: 0 -1rem 1rem;*/
+}
+.sidebar-module-inset {
+  padding: 1rem;
+  background-color: #f5f5f5;
+  border-radius: .25rem;
+}
+.sidebar-module-inset p:last-child,
+.sidebar-module-inset ul:last-child,
+.sidebar-module-inset ol:last-child {
+  margin-bottom: 0;
+}
+.sidebar-module .thumbnail {
+  max-width: 50px !important;
+}
+
+/* Pagination */
+.pager {
+  margin-bottom: 4rem;
+  text-align: left;
+}
+.pager > li > a {
+  width: 8rem;
+  padding: .75rem 1.25rem;
+  text-align: center;
+  border-radius: 2rem;
+}
+
+
+/*
+ * Blog posts
+ */
+
+.blog-post {
+  margin-bottom: 4rem;
+}
+.blog-post-title {
+  margin-bottom: .25rem;
+}
+.blog-post-meta {
+  margin-bottom: 1.25rem;
+  color: #999;
+  font-family: Roboto, Helvetica, Arial, sans-serif;
+}
+.blog-post-meta a {
+  color: #a79ab5;
+}
+.blog-post .blog-thumbnail {
+  max-width: 215px;
+  margin-right: 1rem;
+}
+.post-small .col-xs-4 {
+  padding-right: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.post-small {
+  margin-top: 0.5rem;
+}
+.post-small .col-xs-8 {
+  padding-left: 0.7rem;
+}
+.post-small h5 {
+  height: 1rem;
+  overflow: hidden;
+  margin: 0;
+}
+.post-small small {
+  display: block;
+  line-height: 1.2rem;
+}
+code {
+    display: block;
+    background: #f5f2f0;
+    color: #000;
+    padding-left: 10px;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+    font-family: Consolas,Monaco,"Andale Mono","Ubuntu Mono",monospace;
+    text-align: left;
+}
+pre code {
+    border: none !important;
+    padding: 0;
+}
+code a, code a:hover {
+    color: #fefefe;
+    text-decoration: underline;
+}
+
+
+/*
+ * Footer
+ */
+
+.blog-footer {
+  padding: 2.5rem 0;
+  color: #999;
+  background-color: #f9f9f9;
+  border-top: .05rem solid #e5e5e5;
+  margin-top: 2rem;
+}
+.blog-footer p:last-child {
+  margin-bottom: 0;
+}
+
+
+/* Social */
+.social-aside {
+    border-bottom: 1px solid #cecece;
+    margin-bottom: 1rem;
+}
+.social-aside .social {
+    float: right;
+    margin-left: 10px;
+}
+.social-aside .modified {
+    float: left;
+    font-size: 0.8rem;
+}
+.fb-like {
+    margin-top: -4px;
+}
+/* Widgets */
+.widget h4 {
+    height: 20px;
+    overflow: hidden;
+    font-size: 0.95rem;
+    margin-bottom: 0;
+}
+.widget .widget-body {
+    padding-left: 0;
+}
+
+/* Posts */
+.pull-left {
+    float: left;
+    margin-right: 10px;
+}
+.pull-right {
+    float: right;
+    margin-left: 10px;
+}
+.img-thumbnail {
+    border: 1px solid #cacaca;
+    padding: 5px;
+}
+.post, p  {
+    text-align: justify;
+}
+code {
+    border: none;
+}
+blockquote {
+  background: #f9f9f9;
+  border-left: 10px solid #ccc;
+  margin: 1.5em 10px;
+  padding: 0.5em 10px;
+  quotes: "\201C""\201D""\2018""\2019";
+}
+blockquote:before {
+  color: #ccc;
+  content: open-quote;
+  font-size: 4em;
+  line-height: 0.1em;
+  margin-right: 0.25em;
+  vertical-align: -0.4em;
+}
+blockquote p {
+  display: inline;
+}
+.centered {
+    display: block;
+    margin: 0 auto;
+}
+
+/* Thumbnail */
+.thumbnail {
+    background: #000
+}

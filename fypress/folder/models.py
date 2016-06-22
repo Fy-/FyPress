@@ -1,49 +1,47 @@
 # -*- coding: UTF-8 -*-
 from fypress.utils import slugify, url_unique, TreeHTML
-from fypress.utils import mysql
 from fypress.local import _fypress_
-config = _fypress_.config
+from fypress.models import FyPressTables
+from fysql import CharColumn, DateTimeColumn, IntegerColumn, TextColumn
 
+import datetime
 
-class Folder(mysql.Base):
-    folder_id               = mysql.Column(etype='int', primary_key=True)
-    folder_parent           = mysql.Column(etype='int')
-    folder_left             = mysql.Column(etype='int')
-    folder_right            = mysql.Column(etype='int')
-    folder_depth            = mysql.Column(etype='int')
-    folder_guid             = mysql.Column(etype='string', unique=True)
-    folder_slug             = mysql.Column(etype='string', unique=True)
-    folder_posts            = mysql.Column(etype='int')
-    folder_name             = mysql.Column(etype='string', unique=True)
-    folder_modified         = mysql.Column(etype='datetime')
-    folder_created          = mysql.Column(etype='datetime')
-    folder_content          = mysql.Column(etype='string')
-    folder_seo_content      = mysql.Column(etype='string')
+config      = _fypress_.config
+database    = _fypress_.database.db 
 
-    @property
-    def slug(self):
-        if self.__dict__.has_key('slug'):
-            return self.__dict__['slug']
+def slug_setter(value):
+    return slugify(value)
 
-    @slug.setter
-    def slug(self, value):
-        self.__dict__['slug'] = slugify(value)
+class Folder(FyPressTables):
+    parent           = IntegerColumn(index=True)
+    left             = IntegerColumn(index=True)
+    right            = IntegerColumn(index=True)
+    depth            = IntegerColumn(index=True)
+    guid             = CharColumn(index=True, max_length=255)
+    slug             = CharColumn(index=True, max_length=255, setter=slug_setter)
+    posts            = IntegerColumn()
+    name             = CharColumn(index=True, max_length=150)
+    modified         = DateTimeColumn(default=datetime.datetime.now)
+    created          = DateTimeColumn(default=datetime.datetime.now)
+    content          = TextColumn()
+    seo_content      = TextColumn()
 
     def count_posts(self):
         query = """
             UPDATE
-              {0}folder
+              folder
             SET
-              {0}folder.folder_posts =(
+              folder.posts =(
                   SELECT
                     COUNT(*)
                   FROM
-                    {0}post
+                    post
                   WHERE
-                    {0}post.post_parent = 0 AND {0}post.post_folder_id = {0}folder.folder_id
+                    post.parent = 0 AND post.id = folder.id
             )
-        """.format(config.MYSQL_PREFIX)
-        Folder.query.sql(query).execute()
+        """
+        database.raw(query)
+
 
     @staticmethod
     def update_all(data):
@@ -52,17 +50,17 @@ class Folder(mysql.Base):
             for item in data:
                 if item.has_key('id') and item['id'] != '1':
                     exist.append(int(item['id']))
-                    folder = Folder.query.get(item['id'])
+                    folder = Folder.get(Folder.id==item['id'])
                     folder.depth    = item['depth']
                     folder.left     = item['left']
                     folder.right    = item['right']
                     folder.parent   = item['parent_id']
 
-                    folder.modified = 'NOW()'
-                    Folder.query.update(folder)
+                    folder.modified = datetime.datetime.now()
+                    folder.save()
 
             all_folders = []
-            folders = Folder.query.get_all(array=True)
+            folders = Folder.all()
             for folder in folders:
                 all_folders.append(int(folder.id))
 
@@ -70,11 +68,11 @@ class Folder(mysql.Base):
             for item in diff:
                 if item != 1:
                     from fypress.post import Post 
-                    posts = Post.query.filter(folder_id=item).all(array=True)
+                    posts = Post.filter(Post.id_folder==item).all()
                     for post in posts:
-                        post.folder_id = 1
-                        Post.query.update(post)
-                    Folder.query.delete(Folder.query.get(item))
+                        post.id_folder = 1
+                        post.save()
+                    Folder.get(Folder.id==item).remove()
 
             for folder in folders:
                 folder.count_posts()
@@ -88,69 +86,68 @@ class Folder(mysql.Base):
     def update_guid(folder):
         query = """
           SELECT
-            GROUP_CONCAT(parent.folder_slug SEPARATOR '/') AS path
+            GROUP_CONCAT(parent.slug SEPARATOR '/') AS path
           FROM
-            {1}folder AS node,
-            {1}folder AS parent
+            folder,
+            folder AS parent
           WHERE
-            node.folder_left BETWEEN parent.folder_left AND parent.folder_right AND node.folder_id={0} AND node.folder_id!=1
+            folder.`left` BETWEEN parent.`left` AND parent.`right` AND folder.id={0} AND folder.id!=1
           ORDER BY
-            parent.folder_left""".format(folder.id, config.MYSQL_PREFIX)
+            parent.`left`""".format(folder.id)
 
-        folder.guid = url_unique(Folder.query.raw(query).one()[0]['path'], Folder, folder.id)
-
-        Folder.query.update(folder)
+        folder.guid = url_unique(database.raw(query).fetchone()[0], Folder, folder.id)
+        folder.save()
 
     @staticmethod
     def build_guid():
-        folders = Folder.query.get_all(array=True)
+        folders = Folder.all()
         for folder in folders:
-            Folder.update_guid(folder)
+            if folder.id != 1:
+                Folder.update_guid(folder)
 
     @staticmethod
     def add(form):
-        query = """
-            SELECT MAX(folder_left) as l, MAX(folder_right) as r
-            FROM {0}folder
-        """.format(config.MYSQL_PREFIX)
-        
-        rv = Folder.query.raw(query).one()[0]
-        if rv['r'] == 0 and rv['l'] == 0:
-            rv['r'] = 1
+        query = """SELECT MAX(`left`) as l, MAX(`right`) as r FROM folder"""
+        rv = database.raw(query).fetchall()[0]
 
-        folder = Folder()
+        if rv[0] == 0 and rv[1] == 0:
+            r  = 1
+            l  = 2
+        else: 
+            r = rv[0]
+            l = rv[1]
+
+        folder = Folder.create()
         form.populate_obj(folder)
-        folder.created  = 'NOW()'
-        folder.modified = 'NOW()'
         folder.parent  = 1
-        folder.left    = rv['r']+1
-        folder.right   = rv['r']+2
-        Folder.query.add(folder)
+        folder.left    = r+1
+        folder.right   = l+1
+        folder.save()
+
         Folder.build_guid()
 
     @staticmethod
     def get_path(folder):
-        query = """
-          SELECT
-            parent.folder_seo_content, parent.folder_created, parent.folder_modified, parent.folder_parent, parent.folder_content, parent.folder_name, parent.folder_left, parent.folder_id, parent.folder_guid, parent.folder_posts, parent.folder_slug, parent.folder_depth, parent.folder_right
-          FROM
-            {1}folder AS node,
-            {1}folder AS parent
-          WHERE
-            node.folder_left BETWEEN parent.folder_left AND parent.folder_right AND node.folder_id={0} AND node.folder_id!=1
-          ORDER BY
-            parent.folder_left
-
-           """.format(folder.id, config.MYSQL_PREFIX)
-
-
-        return Folder.query.sql(query).all(array=True)
-
-
+        return Folder.select(
+            add_from='folder AS parent'
+        ).where(
+            'folder.`left` BETWEEN parent.`left` AND parent.`right` AND folder.id={0} AND folder.id!=1'.format(folder.id)
+        ).order_by(
+            'parent.`left`'
+        ).all()
 
     @staticmethod
     def get_as_tree(mode='nav', current=''):
-        folders = Folder.get_all()
+        folders = Folder.select(
+            add_from='folder AS parent'
+        ).where(
+            'folder.`left` BETWEEN parent.`left` AND parent.`right`'
+        ).group_by(
+            'folder.id'
+        ).order_by(
+            'folder.`left`, folder.id'
+        ).all()
+
         tree = TreeHTML(folders)
 
         if mode == 'nav':
@@ -158,34 +155,15 @@ class Folder(mysql.Base):
 
     @staticmethod
     def get_all(html = False):
-        query = """
-            SELECT
-                node.folder_seo_content,
-                node.folder_created,
-                node.folder_parent,
-                node.folder_name,
-                node.folder_depth,
-                node.folder_posts,
-                node.folder_id,
-                node.folder_left,
-                node.folder_guid,
-                node.folder_content,
-                node.folder_slug,
-                node.folder_right,
-                node.folder_modified
-            FROM
-                {0}folder AS node,
-                {0}folder AS parent
-            WHERE
-                node.folder_left BETWEEN parent.folder_left AND parent.folder_right
-            GROUP BY
-                node.folder_id
-            ORDER BY
-                node.folder_left, node.folder_id
-        """.format(config.MYSQL_PREFIX)
-
-
-        folders = Folder.query.sql(query).all(array=True)
+        folders = Folder.select(
+            add_from='folder AS parent'
+        ).where(
+            'folder.left BETWEEN parent.left AND parent.right'
+        ).group_by(
+            'folder.id'
+        ).order_by(
+            'folder.left, folder.id'
+        ).all()
         
         if not html:
             return folders

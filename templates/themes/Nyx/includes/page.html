@@ -1,0 +1,13 @@
+<article class="post">
+    {% if this.is_page %}
+        {% set page = this %}
+        <h1>{{this.title}}</h1>
+    {% else %}
+        {% set page = this.index %}
+        <h1>{{this.name}} - {{this.index.title}}</h1>
+    {% endif %}
+    {% with item = page %}
+        {% include theme('includes/social.html') %}
+    {% endwith %}    
+    {{page.content|safe}}
+</article>

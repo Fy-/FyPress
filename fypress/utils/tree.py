@@ -25,17 +25,17 @@ class TreeHTML(object):
                 
         for item in items:
             if '/'+item['data'].guid+'/' in current:
-                active = 'class="active"'                
+                active = ' active'                
             else: 
                 active = ''
 
             if item.has_key('children'):
                 self.html += ("""
-                    <li>
-                        <a  href="/{1}/" {2}>
+                    <li class="nav-item{2}">
+                        <a class="nav-link" href="/{1}/">
                             {0}
                         </a>
-                        <ul class="menu vertical">
+                        <ul class="dropdown-menu">
 
                 """).format(item['data'].name, item['data'].guid, active)
 
@@ -47,8 +47,8 @@ class TreeHTML(object):
                 """)
             else:
                 self.html += ("""
-                    <li>
-                        <a {3} href="/{2}/">{1}</a>
+                    <li class="nav-item{3}">
+                        <a class="nav-link" href="/{2}/">{1}</a>
                     </li>
                 """).format(cls, item['data'].name, item['data'].guid, active)
     

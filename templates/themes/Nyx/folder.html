@@ -1,0 +1,51 @@
+{% extends theme('_base.html') %}
+
+{% block content %}
+    {% if this.id != 1 %}
+        {% if not this.index %}
+            <h1>{{this.name}}</h1>
+            <p>{{this.content}}</p>
+            <div class="clearfix"></div>
+            <hr />
+        {% else %}
+            {% include theme('includes/page.html') %}
+            <hr />
+        {% endif %}
+    {% endif %}
+
+
+    {% for item in this.posts.items %}
+        {% include theme('includes/post-excerpt.html') %}
+    {% endfor %}
+    {{this.posts.links}}
+{% endblock %}
+
+{% block sidebar %}
+    
+    {% if this.pages|length > 1 %}
+        <div class="sidebar-module sidebar-module-inset">
+            <h3>{{this.name}}</h3>
+            {{this.content|safe}}
+            <ul class="nav nav-pills nav-stacked">
+                <li class="nav-item"><a  class="nav-link active" href="/{{this.guid}}/">{{this.name}}</a></li>
+                {% for page in this.pages %}
+                    {% if page.slug != 'index' %}
+                        <li class="nav-item"><a class="nav-link" href="/{{page.guid}}.html">{{page.title}}</a></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+        <hr />
+    {% endif %}
+
+    {% with folder = this.id %}
+        {% include theme('widgets/last-post-by-folder.html') %}
+    {% endwith %}
+{% endblock %}
+
+
+
+{% block scripts %}
+    {{ super() }}
+    <script src="/public/js/prism.js"></script>
+{% endblock %}

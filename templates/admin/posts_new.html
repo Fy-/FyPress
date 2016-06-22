@@ -38,7 +38,7 @@
                 <div class="fp_rte">
                     <a title="{{_('Add media')}}" id="fp_add_media"  data-toggle="modal" data-target="#fp_medias_modal" class="btn btn-default"><i class="fa fa-picture-o" aria-hidden="true"></i> {{_('Media Library')}}</a>
                 </div>
-                <textarea id="tinymce" name="content">{{post.content}}</textarea>
+                <textarea id="tinymce" name="content">{%if post.content %}{{post.content}}{% endif %}</textarea>
               </div>
         </div>
         <div class="col-lg-3">
@@ -74,7 +74,7 @@
                 <div class="panel-body">
                         <select id="fp_folder" name="folder" class="form-control" autocomplete="off" >
                             {% for folder in folders %}
-                                <option {% if post.folder_id == folder.id %}selected="selected"{% endif %} value="{{folder.id}}">{% for n in range(0,folder.depth) %}&nbsp;&nbsp;&nbsp;{% endfor %}{{folder.name}}</option>
+                                <option {% if post.id_folder == folder.id %}selected="selected"{% endif %} value="{{folder.id}}">{% for n in range(0,folder.depth) %}&nbsp;&nbsp;&nbsp;{% endfor %}{{folder.name}}</option>
                             {% endfor %}
                         </select>
                 </div>  
@@ -88,7 +88,7 @@
  {{ _('Delete') }}</a>
                 </div>
                 <div class="panel-body" style="padding-bottom:0">
-                    {% if post.id and post.image.urlify('thumbnail-s') %}
+                    {% if post.id and post.image and post.image.urlify('thumbnail-s') %}
                         <img src="{{post.image.urlify('thumbnail-lg')}}" id="post_featured" style="width: 100%" class="thumbnail img-responsive"  alt="{{post.image.name}}" />
                     {% else %}
                         <img data-toggle="modal" data-target="#fp_medias_modal" src="/static/admin/images/empty-lg.png" id="post_featured" style="cursor: pointer; width: 100%" class="thumbnail img-responsive"  alt="{{_('Empty')}}" />

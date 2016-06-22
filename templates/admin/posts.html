@@ -16,10 +16,10 @@
     <div class="panel panel-default">
         <div class="panel-heading">
             {{ _('Filter') }}: 
-            <a {% if not filter %} class="active-filter"{% endif %} href="{{ url_for(urls)}}">All</a> ({{numbers['total']}}) | 
-            <a {% if filter == 'published' %} class="active-filter"{% endif %} href="{{ url_for(urls, filter='published')}}">Published</a> ({{numbers['published']}}) | 
-            <a {% if filter == 'draft' %} class="active-filter"{% endif %} href="{{ url_for(urls, filter='draft')}}">Drafts</a> ({{numbers['draft']}}) |
-            <a {% if filter == 'trash' %} class="active-filter"{% endif %} href="{{ url_for(urls, filter='trash')}}">Trash</a> ({{numbers['trash']}})
+            <a {% if not filter %} class="active-filter"{% endif %} href="{{ url_for(urls)}}">All</a> ({{numbers[0]}}) | 
+            <a {% if filter == 'published' %} class="active-filter"{% endif %} href="{{ url_for(urls, filter='published')}}">Published</a> ({{numbers[1]}}) | 
+            <a {% if filter == 'draft' %} class="active-filter"{% endif %} href="{{ url_for(urls, filter='draft')}}">Drafts</a> ({{numbers[2]}}) |
+            <a {% if filter == 'trash' %} class="active-filter"{% endif %} href="{{ url_for(urls, filter='trash')}}">Trash</a> ({{numbers[3]}})
         </div>
         <div class="panel-body">
             {{pages|safe}}

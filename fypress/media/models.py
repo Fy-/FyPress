@@ -4,27 +4,27 @@ from flask import flash, jsonify
 import datetime, magic, os, hashlib, json
 from fypress.utils import FyImage, FyOembed, slugify, url_unique
 from fypress.admin.static import messages
-from fypress.utils import mysql
 from fypress.local import _fypress_
+from fypress.models import FyPressTables
+from fysql import CharColumn, DateTimeColumn, IntegerColumn, TextColumn, DictColumn
 
 import urllib2, shutil
 
 config  = _fypress_.config
 
-class Media(mysql.Base):
+class Media(FyPressTables):
     # todo allowed {type, icon, }
     allowed_upload_types  = ('image/jpeg', 'image/png', 'image/gif')
     upload_types_images   = ('image/jpeg', 'image/png')
 
-    media_id              = mysql.Column(etype='int', primary_key=True)
-    media_hash            = mysql.Column(etype='string', unique=True)
-    media_modified        = mysql.Column(etype='datetime')
-    media_type            = mysql.Column(etype='string')
-    media_guid            = mysql.Column(etype='string', unique=True)
-    media_name            = mysql.Column(etype='string')
-    media_data            = mysql.Column(etype='json')
-    media_icon            = mysql.Column(etype='string')
-    media_html            = mysql.Column(etype='string')
+    uid             = CharColumn(unique=True, index=True, max_length=150)
+    modified        = DateTimeColumn(default=datetime.datetime.now)
+    type            = CharColumn(index=True, max_length=150)
+    guid            = CharColumn(unique=True, index=True, max_length=255)
+    name            = CharColumn(max_length=150)
+    data            = DictColumn()
+    icon            = CharColumn(max_length=75)
+    html            = TextColumn()
 
     def generate_html(self):
         pass
@@ -51,15 +51,14 @@ class Media(mysql.Base):
         now = datetime.datetime.now()
         media_hash          = Media.hash_string(data['url'])
 
-        if Media.query.exist('hash', media_hash):
-            media = Media.query.filter(hash=media_hash).one()
-            media.modified = 'NOW()'
-            Media.query.update(media)
+        if Media.get(Media.uid==media_hash):
+            media = Media.get(Media.uid==media_hash)
+            media.modified = datetime.datetime.now()
+            media.save()
             return jsonify(success=True), 200
         
-        media = Media()
-        media.hash          = media_hash
-        media.modified      = 'NOW()'
+        media = Media.create()
+        media.uid           = media_hash
         media.type          = 'oembed'
         media.name          = data['title']
         media.guid          = "{}/{}/".format(now.year, now.month)+media_hash
@@ -77,7 +76,7 @@ class Media(mysql.Base):
             media.data['author_name']  = ''
             media.data['author_url']   = ''
 
-        Media.query.add(media)
+        media.save()
 
         if data['oembed'].has_key('thumbnail_url'):
             response = urllib2.urlopen(data['oembed']['thumbnail_url'])
@@ -100,7 +99,7 @@ class Media(mysql.Base):
                 sizes[image[3]] = {'name': image[1], 'source': os.path.join(Media.upload_path(config.UPLOAD_DIRECTORY), image[0]), 'guid': "{}/{}/".format(now.year, now.month)+image[2]}
 
             media.data['var'] = sizes
-            Media.query.update(media)
+            media.save()
 
         flash(messages['added']+' ('+str(media)+')')
 
@@ -132,6 +131,7 @@ class Media(mysql.Base):
                 part = os.path.join(source_folder, str(i))
                 with open(part, 'rb') as source:
                     destination.write(source.read())
+
     @staticmethod
     def upload(file, attrs):        
         fhash   = attrs['qquuid']
@@ -141,13 +141,13 @@ class Media(mysql.Base):
 
         def is_unique(url):
             now = datetime.datetime.now()
-            exist = Media.query.exist('guid', "{}/{}/".format(now.year, now.month)+url, False)
+            exist = Media.get(Media.guid == "{}/{}/".format(now.year, now.month)+url)
             if not exist:
                 return url
 
             i = 1
             ext = url.split('.')
-            while Media.query.exist('guid',  "{}/{}/".format(now.year, now.month)+url, False):
+            while Media.get(Media.guid == "{}/{}/".format(now.year, now.month)+url):
                 add  = '{}{}'.format('-', i)
                 url = ext[0]+add+'.'+ext[1]
                 i += 1 
@@ -183,24 +183,23 @@ class Media(mysql.Base):
              upload_icon = ' fa-file-image-o'
 
         media_hash = Media.hash_file(fpath)
-        if Media.query.exist('hash', media_hash):
-            media = Media.query.filter(hash=media_hash).one()
-            media.modified = 'NOW()'
-            Media.query.update(media)
+        if Media.get(Media.uid == media_hash):
+            media = Media.get(Media.uid == media_hash)
+            media.modified = datatime.datetime.now()
+            media.save()
 
             return jsonify(success=True), 200
 
         now = datetime.datetime.now()
-        media = Media()
-        media.hash          = media_hash
-        media.modified      = 'NOW()'
+        media = Media.create()
+        media.uid           = media_hash
         media.type          = upload_type
         media.name          = filename
         media.guid          = "{}/{}/".format(now.year, now.month)+filename
         media.source        = fpath
         media.icon          = upload_icon
 
-        Media.query.add(media)
+        media.save()
 
         if upload_type == 'image':
             images = FyImage(fpath).generate()
@@ -210,7 +209,7 @@ class Media(mysql.Base):
                 sizes[image[3]] = {'name': image[1], 'source': os.path.join(Media.upload_path(config.UPLOAD_DIRECTORY), image[0]), 'guid': "{}/{}/".format(now.year, now.month)+image[2]}
 
             media.data = {'var':sizes}
-            Media.query.update(media)
+            media.save()
             
         flash(messages['added']+' ('+str(media)+')')
 

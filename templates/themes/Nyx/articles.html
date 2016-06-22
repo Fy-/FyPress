@@ -1,0 +1,9 @@
+{% extends theme('_base.html') %}
+
+
+{% block content %}
+    {% for item in this.posts.items %}
+        {% include theme('includes/post-excerpt.html') %}
+    {% endfor %}
+    {{this.posts.links}}
+{% endblock %}

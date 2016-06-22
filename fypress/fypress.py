@@ -2,15 +2,16 @@
 from werkzeug.contrib.fixers import ProxyFix
 from werkzeug import SharedDataMiddleware
 from flask import Flask, session, g
+from flask.ext.babel import Babel
+from fysql import FlaskFySQL
+
 from .local import local
 import time
 
 
+
 class FyPress():
     def __init__(self, config, manager=False):
-        from flask.ext.babel import Babel
-        from utils.mysql import FlaskFyMySQL
-
         self.prepared = False
         self.config = config
         self.app = Flask(
@@ -21,7 +22,7 @@ class FyPress():
         self.app.config.from_object(config)
         self.app.wsgi_app = ProxyFix(self.app.wsgi_app)
         self.babel = Babel(self.app)
-        self.db    = FlaskFyMySQL(self.app)
+        self.database = FlaskFySQL(self.app)
 
         if not manager:
             self.prepare()

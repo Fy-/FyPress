@@ -1,0 +1,48 @@
+<script type='application/ld+json'>
+    {
+        "@context": "http://schema.org",
+        "@type": "WebPage",
+        "mainEntity": {
+            "@context": "http://schema.org",
+            "@type": "Article",
+            "mainEntityOfPage":{
+                "@type":"WebPage",
+                "@id":"{{request.url}}"
+            },
+            "headline": "{{this.get_excerpt(100)}}",
+            {% if this.image_id != 0 %}
+                "image": {
+                    "@type": "ImageObject",
+                    "url": "{{options.url}}{{this.image.urlify('thumbnail-lg')}}",
+                    "height": "270",
+                    "width": "175"                            
+                },
+            }
+            {% else %}
+                "image": {
+                    "@type": "ImageObject",
+                    "url": "{{options.url}}public/images/empty.png",
+                    "height": "270",
+                    "width": "175"                            
+                },
+            {% endif %}
+            "publisher": {
+                "@type": "Organization",
+                "name": "{{options.name}}"
+                {% if options.logo %}
+                ,"logo": {
+                  "@type": "ImageObject",
+                  "url": "{{options.url}}{{options.logo[1:]}}"
+                }
+                {% endif %}
+            },
+            "datePublished": "{{this.created.isoformat()}}",
+            "dateModified": "{{this.modified.isoformat()}}",
+            "author": {
+                "@type": "Person",
+                "name": "{{this.user.nicename}}"
+            },
+            "description": "{{this.excerpt}}"
+        }   
+    }
+</script>

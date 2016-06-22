@@ -17,6 +17,19 @@ class Paginator(object):
             'container_start'   : '<nav><ul class="pagination{0}">',
             'container_end'     : '</ul></nav>'
         },
+        'bootstrap': {
+            'prev_page'         : '<li class="page-item"><a class="page-link" href="{0}" aria-label="Previous">{1} <span class="sr-only">Previous</span></a></li>',
+            'next_page'         : '<li class="page-item"><a class="page-link" href="{0}" aria-label="Next">{1} <span class="sr-only">Next</span></a></li>',
+            'next_page_disabled': '<li class="page-item disabled"><a class="page-link" href="#" aria-label="Next"> {0} <span class="sr-only">Next</span></a></li>',
+            'prev_page_disabled': '<li class="page-item disabled"><a class="page-link" href="#" aria-label="Previous"> {0} <span class="sr-only">Previous</span></a></li>',
+            'next_label'        : '&raquo;',
+            'prev_label'        : '&laquo;',
+            'current'           : '<li class="page-item active"><a class="page-link" href="#">{0} <span class="sr-only">(current)</span></a></li>',
+            'link'              : '<li class="page-item"><a class="page-link" href="{0}">{1}</a></li>',
+            'disabled_link'     : '<li class="page-item disabled"><a>{0}</a></li>',
+            'container_start'   : '<nav><ul class="pagination pagination-sm{0}">',
+            'container_end'     : '</ul></nav>'
+        },
         'foundation': {
             'prev_page'         : '<li class="pagination-previous"><a href="{0}">{1}</a></li>',
             'next_page'         : '<li class="pagination-next"><a href="{0}">{1}</a></li>',
@@ -27,8 +40,8 @@ class Paginator(object):
             'current'           : '<li class="current"><span class="show-for-sr">You\'re on page</span> {0}</a></li>',
             'link'              : '<li><a href="{0}">{1}</a></li>',
             'disabled_link'     : '<li class="ellipsis" aria-hidden="true"></li>',
-            'container_start'   : '<ul class="pagination{0}" role="navigation" aria-label="Pagination">',
-            'container_end'     : '</ul>'
+            'container_start'   : '<nav><ul class="pagination{0}" role="navigation" aria-label="Pagination">',
+            'container_end'     : '</ul></nav>'
         }
     }
 
@@ -36,14 +49,15 @@ class Paginator(object):
         self.page           = kwargs.pop('page') or 1
         self.page           = int(self.page)
         self.query          = kwargs.pop('query')
+        self.cquery         = self.query.clone()
 
         self.theme          = Paginator.themes[kwargs.pop('theme', 'bootstrap3')]
         self.per_page       = kwargs.pop('per_page', 10)
         self.inner_range    = kwargs.pop('inner_range', 2)
         self.outer_range    = kwargs.pop('outer_range', 1)
 
-        self.items          = self.query.limit(position=((self.page-1)*self.per_page), limit=self.per_page, array=True);
-        self.current_total  = self.query.count_lines()
+        self.items          = self.query.limit(position=((self.page-1)*self.per_page), limit=self.per_page)
+        self.current_total  = self.cquery.count()
     
     # HTML
     @property

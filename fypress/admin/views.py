@@ -13,22 +13,21 @@ from fypress.utils import get_redirect_target, Paginator
 from fypress.local import _fypress_
 from fypress import __version__
 
-import json
+import json, datetime
 
 admin  = Blueprint('admin', __name__,  url_prefix='/admin')
 config = _fypress_.config
 
 @admin.context_processor
 def inject_options():
-    from fypress.utils.mysql.sql import FyMySQL
-    return dict(options=g.options, queries=FyMySQL._instance.queries, version=__version__, debug=config.DEBUG, flask_config=config)
+    return dict(options=g.options, version=__version__, debug=config.DEBUG, flask_config=config)
 
 @admin.before_request
 def before_request():
     from fypress.user import User
     g.user = None
     if 'user_id' in session:
-        g.user = User.query.get(session['user_id'])
+        g.user = User.get(User.id==session['user_id'])
 
     from fypress.admin import Option
     g.options = Option.auto_load()
@@ -137,15 +136,9 @@ def pages_add():
 def posts(page=False):
     numbers = Post.count_by_status(page)
     if not request.args.get('filter'):
-        if page:
-            query = Post.query.where(' _table_.post_status IN ("draft", "published") AND _table_.post_type="page"').order_by('created')
-        else:
-            query = Post.query.where(' _table_.post_status IN ("draft", "published") AND _table_.post_type="post"').order_by('created')
+        query = Post.filter(Post.status << ['draft', 'published'], Post.type==('page' if page else 'post')).order_by(Post.created)
     else:
-        if page:
-            query   = Post.query.filter(status=request.args.get('filter'), type='page').order_by('created')
-        else:
-            query   = Post.query.filter(status=request.args.get('filter'), type='post').order_by('created')
+        query = Post.filter(Post.status==request.args.get('filter'), Post.type==('page' if page else 'post')).order_by(Post.created)
 
     if page:
         title = gettext('Page')
@@ -165,7 +158,7 @@ def posts(page=False):
 @admin.route('/posts/delete')
 @level_required(4)
 def posts_delete():
-    post = Post.query.get(request.args.get('id'))
+    post = Post.get(Post.id==request.args.get('id'))
     if post:
         Post.delete(post)
         flash(messages['deleted']+' ('+str(post)+')')
@@ -176,7 +169,7 @@ def posts_delete():
 @admin.route('/posts/move')
 @level_required(1)
 def posts_move():
-    post = Post.query.get(request.args.get('id'))
+    post = Post.get(Post.id==request.args.get('id'))
     if post:
         post.move(request.args.get('status'))
         flash(messages['moved']+' to '+request.args.get('status')+' ('+str(post)+')')
@@ -188,27 +181,27 @@ def posts_move():
 @admin.route('/posts/new', methods=['POST', 'GET'])
 @level_required(1)
 def posts_add(page=False):
-    post = Post()
+    post = False
 
     if page: urls = 'admin.pages'
     else: urls = 'admin.posts'
 
     if request.args.get('edit'):
-        post = Post.query.get(request.args.get('edit'))
+        post = Post.get(Post.id==request.args.get('edit'))
         if post:
             if post.parent:
                 return redirect(url_for(urls+'_add', edit=post.parent))
             if request.form:
-                post_id = Post.update(request.form, post)
+                post = Post.update(request.form, post)
                 flash(messages['updated']+' ('+str(post)+')')
-                return redirect(url_for(urls+'_add', edit=post_id))
+                return redirect(url_for(urls+'_add', edit=post.id))
         else:
             return handle_404()
     else:
         if request.form:
-            post_id = Post.create(request.form)
+            post = Post.new(request.form)
             flash(messages['added']+' ('+str(post)+')')
-            return redirect(url_for(urls+'_add', edit=post_id))
+            return redirect(url_for(urls+'_add', edit=post.id))
 
     folders = Folder.get_all()
 
@@ -217,7 +210,7 @@ def posts_add(page=False):
     else:
         title = gettext('New - Post')
 
-
+    
     return render_template('admin/posts_new.html', folders=folders, post=post, title=title, page=page, urls=urls)
 
 """
@@ -228,9 +221,9 @@ def posts_add(page=False):
 @level_required(1)
 def medias():
     if not request.args.get('filter'):
-        query = Media.query.select_all(array=True).order_by('modified')
+        query = Media.select().order_by(Media.modified)
     else:
-        query = Media.query.filter(type=request.args.get('filter')).order_by('modified')
+        query = Media.filter(Media.type==request.args.get('filter')).order_by(Media.modified)
 
     paginator = Paginator(
         query    = query,
@@ -261,12 +254,12 @@ def folders():
     folder  = None
 
     if request.args.get('edit') and request.args.get('edit') != 1:
-        folder = Folder.query.get(request.args.get('edit'))
+        folder = Folder.get(Folder.id==request.args.get('edit'))
         form = FolderForm(obj=folder)
         if form.validate_on_submit():
             form.populate_obj(folder)
-            folder.modified = 'NOW()'
-            Folder.query.update(folder)
+            folder.modified = datetime.datetime.now()
+            folder.save()
             flash(messages['updated']+' ('+str(folder)+')')
             return redirect(url_for('admin.folders'))
     else:
@@ -287,7 +280,7 @@ def folders():
 @level_required(4)
 def users():
     paginator = Paginator(
-        query    = User.query.select_all(array=True),
+        query    = User.select(),
         page     = request.args.get('page')
     )
     return render_template('admin/users.html', title=gettext('Users'), users=paginator.items, pages=paginator.links)
@@ -298,7 +291,7 @@ def users_edit(id_user=None):
     if not id_user:
         id_user = request.args.get('id')
 
-    user = User.query.get(id_user)
+    user = User.get(User.id==id_user)
     if g.user.status == 4:
         form = UserEditFormAdmin(obj=user)
     else:
@@ -313,7 +306,7 @@ def users_edit(id_user=None):
             user.status = status
 
         if g.user.status == 4 or g.user.id == user.id:
-            User.query.update(user)
+            user.save()
             flash(messages['updated']+' ('+str(user)+')')
 
         if g.user.status == 4:
@@ -329,10 +322,9 @@ def users_new():
     form = UserAddForm(request.form)
 
     if form.validate_on_submit():
-        user = User()
+        user = User.create()
         form.populate_obj(user)
-        user.registered = 'NOW()'
-        User.query.add(user)
+        user.save()
         flash(messages['added']+' ('+str(user)+')')
         return redirect(url_for('admin.users'))
 
@@ -368,7 +360,7 @@ def post_media_delete():
 @admin.route('/medias/get')
 @level_required(1)
 def ajax_get_media():
-    media = Media.query.get(request.args.get('id').replace('media_', ''))
+    media = Media.get(Media.id==request.args.get('id').replace('media_', ''))
     result = {}
     result['name'] = media.name
     result['icon'] = media.icon

@@ -1,0 +1,16 @@
+<article class="blog-post">
+    <h2 class="blog-post-title"><a title="{{item.title}}" href="/{{item.guid}}.html">{{item.title}}</a></h2>
+    <aside class="blog-post-meta">
+        <time class="timeago" datetime="{{item.created.isoformat()}}">{{item.created.isoformat()}}</time> - By <a href="">{{item.user.nicename}}</a> in <a href="/{{item.folder.guid}}/">{{item.folder.guid}}</a>
+        <span class="pull-xs-right"><i class="fa fa-comments"></i> {{item.comment_count}} comment </span>
+    </aside>
+    {% if item.image.id %}
+        <a title="{{item.title}}" href="/{{item.guid}}.html">
+            <img  class="img-thumbnail pull-xs-left blog-thumbnail" src="{{item.image.urlify('thumbnail-lg')}}" alt="{{item.title}}" />
+        </a>
+    {% endif %}
+    <p>
+        {{item.excerpt}}...
+    </p>
+</article> <!-- /.blog-post -->
+

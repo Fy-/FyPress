@@ -1,0 +1,18 @@
+{% extends theme('_base.html') %}
+{% block microdata %}
+    {% include theme('jsonld/index.html') %}
+{% endblock %}
+{% block content %}
+    {% if index %}
+        <article class="post">
+            {{index.content|safe}}
+        </article>
+    {% endif %}
+
+    {% set posts = get_posts() %}
+    {% for item in posts %}
+        {% include theme('includes/post-excerpt.html') %}
+    {% endfor %}
+    
+{% endblock %}
+

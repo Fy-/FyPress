@@ -1,0 +1,22 @@
+{% extends theme('_base.html') %}
+
+{% block microdata %}
+    {{ super() }}
+    {% include theme('jsonld/post.html') %}
+{% endblock %}
+
+{% block content %}
+    <article class="post">
+        <h1>{{this.title}} </h1>
+        
+        {% with item = this %}
+            {% include theme('includes/social.html') %}
+        {% endwith %}    
+        {{this.content|safe}}
+    </article>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="/public/js/prism.js"></script>
+{% endblock %}

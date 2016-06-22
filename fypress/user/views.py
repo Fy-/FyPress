@@ -9,15 +9,14 @@ user = Blueprint('user', __name__,  url_prefix='/user')
 
 @user.context_processor
 def inject_options():
-    from fypress.utils.mysql.sql import FyMySQL
-    return dict(options=g.options, queries=FyMySQL._instance.queries)
+    return dict(options=g.options)
 
 @user.before_request
 def before_request():
     from fypress.user import User
     g.user = None
     if 'user_id' in session:
-        g.user = User.query.get(session['user_id'])
+        g.user = User.get(User.id==session['user_id'])
 
     from fypress.admin import Option
     g.options = Option.auto_load()
@@ -31,7 +30,7 @@ def login():
     form = UserLoginForm(request.form, next=request.args.get('next'))
 
     if form.validate_on_submit():
-        login = User.login(form.data['login'], form.data['password'])
+        login = User.connect(form.data['login'], form.data['password'])
         if login:
             if form.data['next'] != '':
                 return redirect(form.data['next'])

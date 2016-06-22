@@ -10,6 +10,7 @@ from fypress.user import User
 from fypress.folder import Folder
 from fypress.post import Post
 from fypress.admin import Option
+from fypress.local import _fypress_
 
 app = fypress.app
 db  = fypress.db
@@ -26,27 +27,8 @@ logo = """
 
 @manager.command
 def init_db():
-    try:
-        con = db.connect().test()
-    except:
-        print '*** /!\ MySQL user or pass incorrect, please check config.py'
-        return False
-    
-    statement = ""
-    for line in open('./sql/all.sql'):
-        if re.match(r'--', line):  
-            continue
-        if not re.search(r'[^-;]+;', line): 
-            statement = statement + line
-        else:  
-            statement = statement + line
-            try:
-                statement = statement.replace('`fypress_', '`'+Config.MYSQL_PREFIX)
-                con.cursor().execute(statement)
-            except (OperationalError, ProgrammingError) as e:
-                print "\n[WARN] MySQLError during execute statement \n\tArgs: '%s'" % (str(e.args))
+    _fypress_.database.db.create_all()
 
-            statement = ""
     print '*** FyPress Database initialized.'
     return True
 
@@ -60,21 +42,19 @@ def init_fypress(login='', email='', passwd=''):
     if user:
         user.status   = 4
         user.nicename = user.login
-        User.query.update(user)
+        user.save()
         print '*** Added user: '+str(user)
     else:
         print '*** /!\ Invalid user (Duplicate entry)'
 
-    exist = Folder.query.get(1)
+    exist = Folder.get(Folder.id==1)
     if not exist:
         folder = Folder()
         folder.name     = 'Uncategorized'
-        folder.created  = 'NOW()'
-        folder.modified = 'NOW()'
         folder.id       = 1
         folder.guid     = ''
         
-        Folder.query.add(folder)
+        folder.insert()       
         print '*** Added Folder: '+str(folder)
 
     options = [
@@ -86,7 +66,6 @@ def init_fypress(login='', email='', passwd=''):
     for option in options:
         opt = Option.update(option[0], option[1])
         print '*** Added Option: '+str(opt)
-
 
 if __name__ == '__main__':
     print logo

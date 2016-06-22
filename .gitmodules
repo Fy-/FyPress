@@ -1,6 +1,0 @@
-[submodule "fypress/utils/mysql"]
-	path = fypress/utils/mysql
-	url = https://github.com/Fy-/Fy_MySQL.git
-[submodule "templates/themes/Nyx"]
-	path = templates/themes/Nyx
-	url = git@github.com:Fy-/Nyx.git

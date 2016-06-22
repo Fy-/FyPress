@@ -15,6 +15,7 @@ else:
     cache = FileSystemCache(config.CACHE_SERV)
 
 def clean_html(buf):
+    return buf
     if isinstance(buf, tuple):
         bs = BeautifulSoup(buf[0], 'html5lib')
         return (bs.prettify(formatter="minimal"), buf[1])

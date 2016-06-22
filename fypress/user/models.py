@@ -2,27 +2,27 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import session, request
 from flask.ext.babel import lazy_gettext as gettext
-from fypress.utils import mysql
-import urllib, hashlib
+from fypress.models import FyPressTables
+from fysql import CharColumn, DateTimeColumn, IntegerColumn, DictColumn
+import urllib, hashlib, datetime
 
-class UserMeta(mysql.Base):
-    usermeta_id_user   = mysql.Column(etype='int', primary_key=True)
-    usermeta_key       = mysql.Column(etype='string', primary_key=True)
-    usermeta_value     = mysql.Column(etype='string')
+def password_setter(value):
+    if 'pbkdf2:sha1:1000' in value:
+        return value
+    return generate_password_hash(value)
 
-class User(mysql.Base):
-    user_id                 = mysql.Column(etype='int', primary_key=True)
-    user_login              = mysql.Column(etype='string', unique=True)
-    user_email              = mysql.Column(etype='string', unique=True)
-    user_password           = mysql.Column(etype='string')
-    user_nicename           = mysql.Column(etype='string')
-    user_firstname          = mysql.Column(etype='string')
-    user_lastname           = mysql.Column(etype='string')
-    user_url                = mysql.Column(etype='string')
-    user_registered         = mysql.Column(etype='datetime')
-    user_activation_key     = mysql.Column(etype='string')
-    user_status             = mysql.Column(etype='int')
-    user_meta               = mysql.Column(obj=UserMeta, multiple='meta', link='usermeta_id_user')
+class User(FyPressTables):
+    login            = CharColumn(unique=True, index=True, max_length=75)
+    email            = CharColumn(unique=True, index=True, max_length=150)
+    password         = CharColumn(max_length=100, setter=password_setter)
+    nicename         = CharColumn(max_length=200)
+    firstname        = CharColumn(max_length=75)
+    lastname         = CharColumn(max_length=75)
+    url              = CharColumn(max_length=200)
+    registered       = DateTimeColumn(default=datetime.datetime.now)
+    activation_key   = CharColumn(max_length=200)
+    status           = IntegerColumn()
+    meta             = DictColumn()
 
     roles                   = {
         0: gettext('Member'),
@@ -40,7 +40,7 @@ class User(mysql.Base):
         4: gettext('<span class="badge alert-success">Administrator</span>')   
     }
 
-    def init(self):
+    def __load__(self):
         self.role = self.roles[self.status]
         self.role_admin = self.roles_admin[self.status]
 
@@ -54,33 +54,20 @@ class User(mysql.Base):
         gravatar_url = "http://www.gravatar.com/avatar/" + hashlib.md5(self.email.lower()).hexdigest() + "?"
         gravatar_url += urllib.urlencode({'d':default, 's':str(size)})
 
-        return gravatar_url
-
-    @property
-    def password(self):
-        if self.__dict__.has_key('password'):
-            return self.__dict__['password']
-
-    @password.setter
-    def password(self, value):
-        if 'pbkdf2:sha1:1000' in value:
-            self.__dict__['password'] = value
-        else:
-            self.__dict__['password'] = generate_password_hash(value)
-
+        return gravatar_url    
 
     def check_password(self, password):
+        a = generate_password_hash(password)
         return check_password_hash(self.password, password)
 
-
     @staticmethod
-    def login(login, password):
-        user = User.query.filter(login=login).one()
+    def connect(login, password):
+        user = User.filter(User.login==login).one()
         if user.check_password(password):
             session['user_id'] = user.id
-            user.meta['last_login'] = 'NOW()'
+            user.meta['last_login'] = datetime.datetime.now()
             user.meta['last_ip']    = request.remote_addr
-            User.query.update(user)
+            user.save()
 
             return True
         else:
@@ -89,16 +76,11 @@ class User(mysql.Base):
     @staticmethod
     def add(login, email, password, data=None):
         if User.validate_email(email) and User.validate_login(login) and User.validate_password(password):
-            user = User()
-
-            user.login          = login
-            user.email          = email
-            user.password       = generate_password_hash(password)
-            user.registered     = 'NOW()'
-        
-            User.query.add(user)
-
-            return user         
+            return User.create(
+                login=login, 
+                email=email, 
+                password=generate_password_hash(password)
+            )
         else:
             return False
 
@@ -111,11 +93,8 @@ class User(mysql.Base):
 
     @staticmethod
     def validate_login(login):
-        return not User.query.exist('login', login)
+        return not User.filter(User.login==login).one()
 
     @staticmethod
     def validate_email( email):
-        return not User.query.exist('email', email)
-
-    def __repr__(self):
-        return '[User: #%s %s (%s)]' % (self.id, self.nicename, self.email) 
+        return not User.filter(User.email==email).one()

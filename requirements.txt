@@ -6,6 +6,7 @@ Flask==0.10.1
 Flask-Babel==0.11.0
 Flask-Script==2.0.5
 Flask-WTF==0.12
+-e git+https://github.com/Fy-Network/fysql@c327448d6748d2bf72eaf16ac761e69649d041a7#egg=fysql
 gevent==1.1.1
 greenlet==0.4.9
 gunicorn==19.6.0

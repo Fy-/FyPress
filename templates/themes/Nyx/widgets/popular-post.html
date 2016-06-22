@@ -1,0 +1,6 @@
+{% set posts = get_posts(type="post", limit="5", order='post.views DESC') %}
+{% if posts %}
+    {% for item in posts %}
+        {% include theme('includes/post-small.html') %}
+    {% endfor %}
+{% endif %}

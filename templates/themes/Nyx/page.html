@@ -1,0 +1,39 @@
+{% extends theme('_base.html') %}
+
+{% block microdata %}
+    {{ super() }}
+    {% include theme('jsonld/page.html') %}
+{% endblock %}
+
+
+{% block content %}
+    {% include theme('includes/page.html') %}
+{% endblock %}
+
+{% block sidebar %}
+    {% if this.pages|length > 1 %}
+        <div class="sidebar-module sidebar-module-inset">
+            <h4>{{this.folder.name}}</h4>
+            {{this.folder.content|safe}}
+            <ul class="nav nav-pills nav-stacked">
+                <li class="nav-item" ><a class="nav-link" href="/{{this.folder.guid}}/">{{this.folder.name}}</a></li>
+                {% for page in this.pages %}
+                    {% if page.slug != 'index' %}
+                        <li class="nav-item" ><a class="nav-link {% if page.guid == this.guid %}active{% endif %}" href="/{{page.guid}}.html">{{page.title}}</a></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+        <hr />
+    {% endif %}
+
+    {% with folder = this.folder_id %}
+        {% include theme('widgets/last-post-by-folder.html') %}
+    {% endwith %}
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="/public/js/prism.js"></script>
+{% endblock %}
+

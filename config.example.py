@@ -20,12 +20,15 @@ class Config(object):
     BABEL_DEFAULT_LOCALE    = 'en'
     BABEL_DEFAULT_TIMEZONE  = 'UTC'
 
-    ### MYSQL ###
-    MYSQL_USER      = 'dev'
-    MYSQL_PASSWORD  = 'pwd'
-    MYSQL_DB        = 'dev'
-    MYSQL_PREFIX    = 'fypress_'
-
+    ### FYSQL ###
+    DATABASE = {
+        'engine'    : 'MySQL',
+        'host'      : 'localhost',
+        'db'        : 'dev',
+        'user'      : 'dev',
+        'passwd'    : 'pwd'
+    }
+    
     ### UPLOAD ###
     MEDIA_ROOT           = os.path.join(BASE_DIR, 'media')
     UPLOAD_DIRECTORY     = os.path.join(MEDIA_ROOT, 'uploads')
