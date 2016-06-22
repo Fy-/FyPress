@@ -6,7 +6,7 @@ Flask==0.11.1
 Flask-Babel==0.11.1
 Flask-Script==2.0.5
 Flask-WTF==0.12
--e git+https://github.com/Fy-Network/fysql@c327448d6748d2bf72eaf16ac761e69649d041a7#egg=fysql
+-e git+https://github.com/Fy-Network/fysql@d6f321745c76960586e38b45f103c8f4c396cbda#egg=fysql
 html5lib==0.9999999
 itsdangerous==0.24
 Jinja2==2.8
