@@ -27,7 +27,7 @@ h6, .h6 {
 p {
   text-align: justify;
 }
-a, .page-link {
+a, .page-link, code a, code a:hover {
   color: #412a6f;
 }
 a:hover, a:active, .page-link:hover, .page-link:active {

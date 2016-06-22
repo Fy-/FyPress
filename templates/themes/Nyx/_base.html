@@ -79,9 +79,9 @@
             {% block header %}
                 {% if options.logo %}
                     {% if is_home %}
-                        <h1 class="blog-title"> <a href="/" title="{{options.name}}"><img alt="{{options.name}}" src="{{options.logo}}" /></a> </h1>
+                        <h1 class="blog-title"> <a href="/" title="{{options.name}}"><img alt="{{options.name}}" src="{{options.logo}}" /></a> <small class="lead blog-description">{{options.slogan}}</small></h1>
                     {% else %}
-                         <span class="blog-title"><a href="/" title="{{options.name}}"><img alt="{{options.name}}" src="{{options.logo}}" /></a></span>
+                         <span class="blog-title"><a href="/" title="{{options.name}}"><img alt="{{options.name}}" src="{{options.logo}}" /> <small class="lead blog-description">{{options.slogan}}</small></a></span>
                     {% endif %}
 
                 {% else %}
@@ -107,7 +107,7 @@
                     </div>
                     <div class="sidebar-module sidebar-module-inset">
                         <h4>About {{options.url}}</h4>
-                        <small>Powered by <a href="http://fy.to/fypress/" title="FyPress, CMS, Flask, Python">FyPress</a> v{{version}}, theme: {{options.theme}} <small>Nyx is inspired by "Blog template" by <a target="_blank" href="https://twitter.com/mdo">@mdo</a>.</small></small>
+                        <small>Powered by <a href="http://fy.to/fypress/" title="FyPress, CMS, Flask, Python">FyPress</a> v{{version}}, theme: {{options.theme}} <br /><small>Nyx is inspired by "Blog template" by <a target="_blank" href="https://twitter.com/mdo">@mdo</a>.</small></small>
                     </div>
                 </div> <!-- /.blog-sidebar -->
             </div> <!-- /.row -->
