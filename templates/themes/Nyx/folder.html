@@ -22,18 +22,20 @@
 
 {% block sidebar %}
     
-    {% if this.pages|length > 1 %}
+    {% if this.index %}
         <div class="sidebar-module sidebar-module-inset">
             <h3>{{this.name}}</h3>
             {{this.content|safe}}
-            <ul class="nav nav-pills nav-stacked">
-                <li class="nav-item"><a  class="nav-link active" href="/{{this.guid}}/">{{this.name}}</a></li>
-                {% for page in this.pages %}
-                    {% if page.slug != 'index' %}
-                        <li class="nav-item"><a class="nav-link" href="/{{page.guid}}.html">{{page.title}}</a></li>
-                    {% endif %}
-                {% endfor %}
-            </ul>
+            {% if this.pages|length > 1 %}
+                <ul class="nav nav-pills nav-stacked">
+                    <li class="nav-item"><a  class="nav-link active" href="/{{this.guid}}/">{{this.name}}</a></li>
+                    {% for page in this.pages %}
+                        {% if page.slug != 'index' %}
+                            <li class="nav-item"><a class="nav-link" href="/{{page.guid}}.html">{{page.title}}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            {% endif %}
         </div>
         <hr />
     {% endif %}
