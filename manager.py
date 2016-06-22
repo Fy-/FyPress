@@ -13,7 +13,7 @@ from fypress.admin import Option
 from fypress.local import _fypress_
 
 app = fypress.app
-db  = fypress.db
+db  = fypress.database
 
 manager = Manager(app)
 
