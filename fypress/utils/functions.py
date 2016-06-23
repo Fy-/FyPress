@@ -1,22 +1,7 @@
 from flask import g
 from unidecode import unidecode
 import string, random, re, os
-from werkzeug.utils import secure_filename
 
-
-def get_template(key, config):
-    key  = os.path.normpath(key)
-    path = os.path.join('themes', g.options['theme'], key)
-    path_child = os.path.join('themes', '_current', key)
-    if os.path.isfile(os.path.join(config.TEMPLATE_FOLDER, path_child)):
-      return path_child
-    return path
-
-def get_template_static(key, file, config):
-    key  = os.path.normpath(key)
-    file = secure_filename(file)
-    path = get_template(os.path.join('public',key), config)
-    return [os.path.join(config.TEMPLATE_FOLDER, path), file]
 
 def slugify(text, delim=u'-'):
   _punct_re = re.compile(r'[\t !"#$%&\'()*\-/<=>?@\[\\\]^_`{|},.]+')

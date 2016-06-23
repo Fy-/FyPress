@@ -164,7 +164,7 @@
                             <a href="#"><i class="fa fa-user fa-fw"></i> {{ _('User Profile') }}</a>
                         </li>
                         <li class="divider"></li>
-                            <li><a href="/user/logout"><i class="fa fa-sign-out fa-fw"></i> {{ _('Logout') }}</a>
+                            <li><a href="{{url_for('admin.logout')}}"><i class="fa fa-sign-out fa-fw"></i> {{ _('Logout') }}</a>
                         </li>
                     </ul>
                 </li>
@@ -253,6 +253,12 @@
                                 </li>
                             </ul>
                         </li>
+
+                        {% if g.user.has_level(3) %}
+                            <li>
+                                <a href="{{ url_for('admin.themes') }}"><i class="fa fa-code fa-fw"></i> {{_('Theme')}} </a>
+                            </li>
+                        {% endif %}
 
                         {% if g.user.has_level(4) %}
                             <li>

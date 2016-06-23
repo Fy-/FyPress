@@ -1,48 +1,87 @@
 # -*- coding: UTF-8 -*-
-from flask import Blueprint, session, request, redirect, url_for, render_template, flash, jsonify, make_response, g
-from flask.views import MethodView
+from flask import Blueprint, session, request, redirect, url_for, flash, jsonify, make_response, g, get_flashed_messages
+from flask.templating import _default_template_ctx_processor
+from jinja2 import Environment, PackageLoader
 from flask_babel import lazy_gettext as gettext
-from fypress.user import level_required, login_required, User, UserEditForm, UserAddForm, UserEditFormAdmin
+from fypress.user import level_required, login_required, User, UserEditForm, UserAddForm, UserEditFormAdmin, UserLoginForm
 from fypress.folder import FolderForm, Folder
 from fypress.media import Media
 from fypress.post import Post
 from fypress.admin.static import messages
 from fypress.admin.forms import GeneralSettingsForm, SocialSettingsForm
-from fypress.admin.models import Option
+from fypress.admin.models import Option, Theme
 from fypress.utils import get_redirect_target, Paginator
 from fypress.local import _fypress_
-from fypress import __version__
+from fypress import __version__, __file__ as __fypress_file__
 
 import json, datetime
 
 admin  = Blueprint('admin', __name__,  url_prefix='/admin')
 config = _fypress_.config
+cache  = _fypress_.cache
 
-@admin.context_processor
-def inject_options():
-    return dict(options=g.options, version=__version__, debug=config.DEBUG, flask_config=config)
+env    = Environment(loader=PackageLoader('fypress', '_html/templates/'),  extensions=['jinja2.ext.autoescape', 'jinja2.ext.with_'], autoescape=True)
+
+def render_template(template, **kwargs):
+    kwargs.update(_default_template_ctx_processor())
+    kwargs.update({
+        'url_for': url_for,
+        'get_flashed_messages': get_flashed_messages,
+        '_': gettext
+    })
+    kwargs.update(dict(options=g.options, version=__version__, debug=config.DEBUG, flask_config=config))
+
+    template = env.get_template(template)
+    return template.render(**kwargs)
 
 @admin.before_request
 def before_request():
-    from fypress.user import User
     g.user = None
     if 'user_id' in session:
         g.user = User.get(User.id==session['user_id'])
 
-    from fypress.admin import Option
     g.options = Option.auto_load()
-
 
 @admin.after_request
 def clear_cache(response):
-    from fypress.public.decorators import cache
-    cache.clear()
+    # todo, button clear cache
+    if cache:
+        cache.clear()
     return response
 
 @admin.route('/')
 @login_required
 def root():
     return render_template('admin/index.html', title='Admin')
+
+"""
+    Login & Logout
+"""
+@admin.route('/login', methods=['GET', 'POST'])
+def login():
+    if 'user_id' in session:
+        return redirect('/admin/')
+
+    form = UserLoginForm(request.form, next=request.args.get('next'))
+
+    if form.validate_on_submit():
+        login = User.connect(form.data['login'], form.data['password'])
+        if login:
+            if form.data['next'] != '':
+                return redirect(form.data['next'])
+            else:
+                return redirect('/admin/')
+        else:
+            pass
+    
+    return render_template('admin/login.html', form=form, title=gettext('Please sign in'))
+
+@admin.route('/logout')
+@login_required
+def logout():
+    session.clear()
+    return redirect(url_for('admin.login'))
+
 
 """
     Errors & Utils
@@ -57,6 +96,24 @@ def handle_404():
 def handle_403():
     return render_template('admin/403.html', title=gettext('Error: 403')), 403
 
+
+
+"""
+    Themes
+"""
+@admin.route('/themes')
+@level_required(4)
+def themes():
+    themes = Theme.load_themes()
+    
+    return render_template('admin/themes.html', themes=themes, title=gettext('Theme'))
+
+@level_required(4)
+@admin.route('/themes/active')
+def theme_active():
+    Option.update('theme', request.args.get('theme'))
+    return redirect(url_for('admin.themes'))
+
 """
     Settings
 """
@@ -68,8 +125,6 @@ def settings_general():
     if form.validate_on_submit():
         for data in form.data:
             Option.update(data, form.data[data])
-        from fypress.public.views import reset_options
-        reset_options()
         return redirect(url_for('admin.settings_general'))
         
     return render_template('admin/settings_general.html', form=form, title=gettext('General - Settings'))
@@ -82,8 +137,7 @@ def settings_social():
     if form.validate_on_submit():
         for data in form.data:
             Option.update(data, form.data[data])
-        from fypress.public.views import reset_options
-        reset_options()
+
         return redirect(url_for('admin.settings_social'))
 
     return render_template('admin/settings_social.html', form=form, title=gettext('Social - Settings'))
@@ -92,11 +146,10 @@ def settings_social():
 @admin.route('/settings/design', methods=['POST', 'GET'])
 def settings_design():
     options = Option.get_settings('design')
+
     if request.form:
         for data in request.form:
             Option.update(data, request.form[data])
-        from fypress.public.views import reset_options
-        reset_options()
 
         return redirect(url_for('admin.settings_design'))
 

@@ -3,134 +3,44 @@ from flask import Blueprint, url_for, render_template, request, make_response, g
 from werkzeug.contrib.atom import AtomFeed
 from fypress.local import _fypress_
 from fypress.folder import Folder
-from fypress.post import Post, get_posts
-from fypress.admin import Option
-from fypress.utils import get_template, get_template_static, Paginator
+from fypress.post import Post
+from fypress.admin import Option, Theme
+from fypress.utils import Paginator
 from fypress.folder import Folder
+from fypress.user import User
 from fypress.admin.views import handle_404 as is_admin_404
+from fypress import __version__
+
 from .decorators import cached
 
 public  = Blueprint('public', __name__)
-options = []
-user    = None
 config  = _fypress_.config
 
 def is_404():
-    return render_template(get_template('404.html', config)), 404
-
-def reset_options():
-    global options
-    options = []
-
-@public.context_processor
-def inject_options():
-    if '/public/' not in request.path:
-        from fypress import __version__
-
-        return dict(options=g.options, version=__version__, debug=config.DEBUG)
+    return render_template(Theme.get_template('404.html')), 404
 
 @public.before_request
 def before_request():
-    global options
+    g.user = None
+    if 'user_id' in session:
+        g.user = User.get(User.id==session['user_id'])
 
-    if '/public/' not in request.path:
-        from fypress.user import User
-        g.user = None
-        if 'user_id' in session:
-            g.user = User.get(User.id==session['user_id'])
-        
-
-    if len(options) == 0:
-        from fypress.admin import Option
-        options = Option.auto_load()
-
-    g.options = options
+    g.options = Option.auto_load()
 
 @public.context_processor
 def template():
-    nav = Folder.get_as_tree('nav', request.path)
-    is_home = False
-
-    if request.url == g.options['url']:
-        is_home = True
-
-    def theme(v):
-        return 'themes/' + g.options['theme'] + '/' + v
-
-    def breadcrumb(item=False):
-        if request.path == '/articles/':
-            folder = Folder()
-            folder.name = 'Articles'
-            folder.guid = 'articles'
-            return [folder]
-        elif item:
-            if isinstance(item, Folder):
-                return item.get_path(item)
-            elif isinstance(item, Post):
-                return item.folder.get_path(item.folder)
-        return []
-
-    def title(item=False):
-        if request.path == '/articles/':
-            return 'Articles • '+g.options['name']
-        elif isinstance(item, Folder):
-            return item.name+' • '+g.options['name']
-        elif isinstance(item, Post):
-            if item.id_folder == 1:
-                return item.title+' • '+g.options['name']
-            return item.title+' • '+item.folder.name+' • '+g.options['name']
-        return g.options['name']
-
-    def description(item=False):
-        if request.path == '/articles/':
-            return False
-        elif isinstance(item, Folder):
-            index = Post.filter(Post.id_folder==item.id, Post.slug=='index', Post.status=='published', Post.type=='page').one()
-            if index:
-                return index.get_excerpt(155)
-            return item.seo_content
-        elif isinstance(item, Post):
-            return item.get_excerpt(155)
-        else:
-            return g.options['slogan']
-
-    def image(item=False):
-        if request.path == '/articles/':
-            return False
-        elif isinstance(item, Folder):
-            index = Post.filter(Post.id_folder==item.id, Post.slug=='index', Post.status=='published', Post.type=='page').one()
-            if index and index.id_image != 0:
-                return index.image
-            return False
-        elif isinstance(item, Post):
-            if item.id_image != 0:
-                return item.image
-
-            index = Post.filter(Post.id_folder==item.id_folder, Post.slug=='index', Post.status=='published', Post.type=='page').one()
-            if index and index.id_image != 0:
-                return index.image
-        
-        return False    
-
-    return dict(
-        nav=nav, 
-        theme=theme,
-        get_posts=get_posts, 
-        show_sidebar=True,
-        show_breadcrumb=True, 
-        show_footer=True,
-        breadcrumb=breadcrumb,
-        is_home=is_home,
-        title=title,
-        description=description,
-        image=image
-    )
+    return Theme.context()
 
 @public.route('/')
 @cached(pretty=True)
 def root():
     index = Post.filter(Post.id_folder==1, Post.slug=='index', Post.status=='published', Post.type=='page').one()
-    return render_template(get_template('index.html', config), index=index, this=False)
+    return render_template(Theme.get_template('index.html'), index=index, this=False)
+
+@public.route('/_preview/')
+def preview():
+    g.options['theme'] = request.args.get('theme')
+    return root()
 
 @public.route('/articles/')
 @cached(pretty=True)
@@ -145,7 +55,7 @@ def posts():
             theme    = 'bootstrap',
             per_page = 6
     )
-    return render_template(get_template('articles.html', config), this=folder)
+    return render_template(Theme.get_template('articles.html'), this=folder)
 
 @public.route('/<path:slug>.html')
 @cached(pretty=True)
@@ -160,11 +70,11 @@ def is_post(slug):
         
         if post.type == 'post':
             post.is_post = True
-            return render_template(get_template('post.html', config), this=post, show_sidebar=False)
+            return render_template(Theme.get_template('post.html'), this=post, show_sidebar=False)
         else:
             post.is_page = True
             post.pages = Post.filter(Post.id_folder==post.id_folder, Post.status=='published', Post.type=='page').order_by(Post.created).all()
-            return render_template(get_template('page.html', config), this=post)
+            return render_template(Theme.get_template('page.html'), this=post)
     else:
         return is_404()
     
@@ -184,7 +94,7 @@ def is_folder(slug):
                 per_page = 5
             )
 
-            return render_template(get_template('folder.html', config), this=folder)
+            return render_template(Theme.get_template('folder.html'), this=folder)
         else:
             return is_404()
     else:
@@ -192,7 +102,7 @@ def is_folder(slug):
 
 @public.route('/public/<path:folder>/<file>')
 def static(folder, file):
-    folder, file = get_template_static(folder, file, config)
+    folder, file = Theme.get_template_static(folder, file, config)
     return send_from_directory(folder, file)
 
 @public.route('/feed/<path:folder>/')
@@ -265,7 +175,7 @@ def feed():
 @public.route('/sitemap.xls')
 @cached()
 def sitemap_xls():
-    response = make_response(render_template('front/_sitemap.xls'))
+    response = make_response(render_template(Theme.get_template('_sitemap.xls')))
     response.headers["Content-Type"] = 'application/xml'
     return response 
 
@@ -302,6 +212,6 @@ def sitemap():
             modified = post.modified.strftime('%Y-%m-%d')
             pages.append({'url': url, 'mod': modified, 'freq': 'monthly', 'prio': '0.8'})
 
-    response = make_response(render_template('front/_sitemap.xml', pages=pages))
+    response = make_response(render_template(Theme.get_template('_sitemap.xml'), pages=pages))
     response.headers["Content-Type"] = 'application/xml'
     return response 

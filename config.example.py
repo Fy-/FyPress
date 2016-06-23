@@ -13,8 +13,7 @@ class Config(object):
     SECRET_KEY      = "secretkeygglol"
 
     ### Folders ###
-    STATIC_FOLDER     = os.path.join(BASE_DIR, 'static')
-    TEMPLATE_FOLDER   = os.path.join(BASE_DIR, 'templates')
+    THEME_FOLDER      = os.path.join(BASE_DIR, 'themes')
 
     ### Babel ###
     BABEL_DEFAULT_LOCALE    = 'en'
@@ -49,6 +48,5 @@ class Config(object):
 class ConfigProd(Config):
     DEBUG = True
     CACHE = True
-
 
 del os

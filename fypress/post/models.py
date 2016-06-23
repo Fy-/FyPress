@@ -202,13 +202,6 @@ class Post(FyPressTables):
         for post in posts:
             post.guid = post.guid_generate()
             post.save()
-            
-
-def get_posts(order='post.created DESC', limit=5, type='post', folder=False):
-    if not folder:
-        return Post.filter(Post.status=='published', Post.type==type).order_by(order).limit(limit, 0)
-    else:
-        return Post.filter(Post.status=='published', Post.type==type, Post.id_folder==folder).order_by(order).limit(limit, 0)
 
 class Comment(FyPressTables):
     id_user          = FKeyColumn(table=User, reference='user')

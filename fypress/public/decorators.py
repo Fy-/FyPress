@@ -1,18 +1,11 @@
-from werkzeug.contrib.cache import FileSystemCache, MemcachedCache, RedisCache
 from functools import wraps
-from flask import request, g
+from flask import request
 from bs4 import BeautifulSoup 
 from fypress.local import _fypress_
 import time
 
 config  = _fypress_.config
-
-if config.CACHE_TYPE == 'redis':
-    cache = RedisCache(host=config.CACHE_SERV)
-elif config.CACHE_TYPE == 'memcached':
-    cache = MemcachedCache(servers=[config.CACHE_SERV])
-else:
-    cache = FileSystemCache(config.CACHE_SERV)
+cache   = _fypress_.cache
 
 def clean_html(buf):
     if isinstance(buf, tuple):

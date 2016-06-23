@@ -1,0 +1,46 @@
+{% extends "admin/_base.html" %}
+{% block content %}
+    {% from 'macros/form.html' import render_form %}
+    <div class="col-lg-12">
+        <h1 class="page-header">{{ _('Themes') }}</h1>
+        <div class="panel panel-default">
+            <div class="panel-body">
+               {% for theme in themes %}
+                    <div class="col-md-3" style="height: 190px; {% if options.theme == theme.name %}background: #d8f9ce{% endif %}">
+                        <h3>{{theme.name}} {{_('version')}} {{theme.version}}</h3>
+                        <p>
+                            {% for tag in theme.tags %}
+                                <span class="label label-default">{{tag}}</span>
+                            {% endfor %}
+                        </p>
+                        <ul>
+                            <li>{{_('By')}} {{theme.author}} (<a href="{{theme.author_url}}" targer="_blank">{{theme.author_url}}</a>)</li>
+                            <li>{{theme.license}}</li>
+                        </ul>
+                        <br />
+                        {% if options.theme != theme.name %}
+                            <a href="{{url_for('admin.theme_active')}}?theme={{theme.name}}" class="btn btn-warning">{{_('Active')}}</a>
+                            <a href="#" data-name="{{theme.name}}" class="preview_btn btn btn-default">{{_('Preview')}}</a>
+                        {% endif %}
+                    </div>
+               {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-12">
+        <h1 class="page-header">{{ _('Preview') }} (<span id="preview_name">{{options.theme}}</span>)</h1>
+        <div class="panel panel-default">
+            <div class="panel-body">
+               <iframe id="preview_iframe" src="/_preview/?theme={{options.theme}}" style="width: 100%; height: 500px;" frameborder="0"></iframe>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function() {
+            $('.preview_btn').click(function() {
+                $('#preview_name').text($(this).data('name'));
+                $('#preview_iframe').attr('src', '{{options.url}}'+'_preview/?theme='+$(this).data('name'))
+            });
+        });
+    </script>
+{% endblock %}

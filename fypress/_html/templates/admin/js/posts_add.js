@@ -25,9 +25,6 @@ $('#fp_media_frame').on('load', function(){
     $iframe.find('.nav a').click(function() {
         $iframe.find('.medias-box').html('<div style="text-align: center"><i class="fa fa-spinner spin-it fat-icon"></i></div>');
     });
-    $iframe.find('nav a').click(function() {
-        $iframe.find('.medias-box').html('<div style="text-align: center"><i class="fa fa-spinner spin-it fat-icon"></i></div>');
-    });
     
     $iframe.find('.fp_media').click(function() {
         $('#fp_media_selected').empty();
@@ -59,7 +56,6 @@ $('#fp_media_frame').on('load', function(){
                 selected = '<img class="img-thumbnail" src="{{flask_config['UPLOAD_DIRECTORY_URL']}}'+$('#fp_media_format').val()+'" alt="'+data.data.name+'" />'
             });
         });
-        console.log($(this).data('type'))
         if ( $(this).data('type') == 'image') {
             $('#fp_insert_btn').html('<a  href="javascript:insert_featured()" class="btn btn-success">{{_('Post Featured')}}</a> <a  href="javascript:insert_content()" class="btn btn-primary pull-right ">{{_('Insert')}}</a>');
         } else {
@@ -84,6 +80,5 @@ $('#fp_medias_modal').on('shown.bs.modal', function (e) {
     if ($('#fp_media_frame').attr('src') == '') {
         $('#fp_media_loader').append('<i class="fa fa-spinner spin-it "></i>')
         $('#fp_media_frame').attr('src', '{{ url_for('admin.medias', parent=1)}}');    
-        console.log('test');
     }
 });
