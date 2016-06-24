@@ -18,7 +18,7 @@
     <h3>Post comment</h3>
     {% from theme('macros/form.html') import render_form %}
     <div>
-        {{render_form(comment_form, action_url={{options.url}}{{this.guid}}, btn_class="btn btn-success", action_text='Comment')}}
+        {{render_form(comment_form, action_url=options.url~this.guid, btn_class="btn btn-success", action_text='Comment')}}
     </div>
     <hr />
     <h2 id="comments">{{this.comment_count}} comment{% if this.comment_count > 1 %}s{% endif %}</h2>
