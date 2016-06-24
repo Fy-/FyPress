@@ -6,19 +6,17 @@ from flask_babel import lazy_gettext as gettext
 from fypress.user import level_required, login_required, User, UserEditForm, UserAddForm, UserEditFormAdmin, UserLoginForm
 from fypress.folder import FolderForm, Folder
 from fypress.media import Media
-from fypress.post import Post
+from fypress.post import Post, SimpleComment, AkismetForm
 from fypress.admin.static import messages
 from fypress.admin.forms import GeneralSettingsForm, SocialSettingsForm
 from fypress.admin.models import Option, Theme
 from fypress.utils import get_redirect_target, Paginator
-from fypress.local import _fypress_
-from fypress import __version__, __file__ as __fypress_file__
+from fypress import __version__, __file__ as __fypress_file__, FyPress
 
 import json, datetime
 
 admin  = Blueprint('admin', __name__,  url_prefix='/admin')
-config = _fypress_.config
-cache  = _fypress_.cache
+fypress = FyPress()
 
 env    = Environment(loader=PackageLoader('fypress', '_html/templates/'),  extensions=['jinja2.ext.autoescape', 'jinja2.ext.with_'], autoescape=True)
 
@@ -29,7 +27,7 @@ def render_template(template, **kwargs):
         'get_flashed_messages': get_flashed_messages,
         '_': gettext
     })
-    kwargs.update(dict(options=g.options, version=__version__, debug=config.DEBUG, flask_config=config))
+    kwargs.update(dict(options=g.options, version=__version__, debug=fypress.config.DEBUG, flask_config=fypress.config))
 
     template = env.get_template(template)
     return template.render(**kwargs)
@@ -45,8 +43,8 @@ def before_request():
 @admin.after_request
 def clear_cache(response):
     # todo, button clear cache
-    if cache:
-        cache.clear()
+    if fypress.cache:
+        fypress.cache.clear()
     return response
 
 @admin.route('/')
@@ -112,6 +110,7 @@ def themes():
 @admin.route('/themes/active')
 def theme_active():
     Option.update('theme', request.args.get('theme'))
+    fypress.options = Option.auto_load()
     return redirect(url_for('admin.themes'))
 
 """
@@ -125,6 +124,8 @@ def settings_general():
     if form.validate_on_submit():
         for data in form.data:
             Option.update(data, form.data[data])
+
+        fypress.options = Option.auto_load()
         return redirect(url_for('admin.settings_general'))
         
     return render_template('admin/settings_general.html', form=form, title=gettext('General - Settings'))
@@ -138,6 +139,7 @@ def settings_social():
         for data in form.data:
             Option.update(data, form.data[data])
 
+        fypress.options = Option.auto_load()
         return redirect(url_for('admin.settings_social'))
 
     return render_template('admin/settings_social.html', form=form, title=gettext('Social - Settings'))
@@ -151,22 +153,68 @@ def settings_design():
         for data in request.form:
             Option.update(data, request.form[data])
 
+        fypress.options = Option.auto_load()
         return redirect(url_for('admin.settings_design'))
 
     return render_template('admin/settings_design.html', design=options, title=gettext('Design - Settings'))
 
 @admin.route('/settings/reading')
 def settings_reading():
-    return render_template('admin/blank.html')
+    return render_template('admin/blank.html',  title=gettext('Design - Settings'))
 
 '''
     Comments
 '''
-@admin.route('/comments')
-@admin.route('/comments/all')
+@admin.route('/comments', methods=['POST', 'GET'])
+@admin.route('/comments/all', methods=['POST', 'GET'])
 @level_required(4)
 def comments():
-    return render_template('admin/blank.html')
+    count_published = SimpleComment.count_filter(SimpleComment.status=='valid')
+    count_spam      = SimpleComment.count_filter(SimpleComment.status=='spam')
+    paginator = Paginator(
+        query    = SimpleComment.filter(SimpleComment.status==(request.args.get('filter') or 'valid')).order_by(SimpleComment.created),
+        page     = request.args.get('page')
+    )
+    akismet      = Option.get(Option.name=='akismet')
+
+    if akismet:
+        form = AkismetForm(api_key=akismet.value)
+    else:
+        form = AkismetForm()
+
+    if form.validate_on_submit():
+        Option.update('akismet', request.form['api_key'])
+        fypress.options = Option.auto_load()
+        return redirect(url_for('admin.comments'))
+
+    return render_template('admin/comments.html', 
+        count_published=count_published, 
+        filter=request.args.get('filter'), 
+        count_spam=count_spam, 
+        pages=paginator.links,
+        akismet=akismet,
+        form=form,
+        comments=paginator.items,
+        title=gettext('Comments')
+    )
+
+@admin.route('/comments/delete')
+def comments_delete():
+    comment = SimpleComment.get(SimpleComment.id==request.args.get('id'))
+    id_post = comment.id_post
+    comment.remove()
+    SimpleComment.count_comments(id_post)
+
+    return redirect(url_for('admin.comments'))
+
+@admin.route('/comments/unspam')
+def comments_unspam():
+    comment = SimpleComment.get(SimpleComment.id==request.args.get('id'))
+    comment.status = 'valid'
+    comment.save()
+    SimpleComment.count_comments(comment.id_post)
+
+    return redirect(url_for('admin.comments'))
 
 """
     Posts & Pages

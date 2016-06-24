@@ -1,13 +1,12 @@
 # -*- coding: UTF-8 -*-
 from fypress.utils import slugify, url_unique, TreeHTML
-from fypress.local import _fypress_
 from fypress.models import FyPressTables
 from fysql import CharColumn, DateTimeColumn, IntegerColumn, TextColumn
+from fypress import FyPress
 
 import datetime
 
-config      = _fypress_.config
-database    = _fypress_.database.db 
+fypress = FyPress()
 
 def slug_setter(value):
     return slugify(value)
@@ -40,7 +39,7 @@ class Folder(FyPressTables):
                     post.parent = 0 AND post.id = folder.id
             )
         """
-        database.raw(query)
+        fypress.database.db.raw(query)
 
 
     @staticmethod
@@ -95,7 +94,7 @@ class Folder(FyPressTables):
           ORDER BY
             parent.`left`""".format(folder.id)
 
-        folder.guid = url_unique(database.raw(query).fetchone()[0], Folder, folder.id)
+        folder.guid = url_unique(fypress.database.db.raw(query).fetchone()[0], Folder, folder.id)
         folder.save()
 
     @staticmethod
@@ -108,7 +107,7 @@ class Folder(FyPressTables):
     @staticmethod
     def add(form):
         query = """SELECT MAX(`left`) as l, MAX(`right`) as r FROM folder"""
-        rv = database.raw(query).fetchall()[0]
+        rv = fypress.database.db.raw(query).fetchall()[0]
 
         if rv[0] == 0 and rv[1] == 0:
             r  = 1

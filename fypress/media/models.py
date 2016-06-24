@@ -4,13 +4,13 @@ from flask import flash, jsonify
 import datetime, magic, os, hashlib, json
 from fypress.utils import FyImage, FyOembed, slugify, url_unique
 from fypress.admin.static import messages
-from fypress.local import _fypress_
 from fypress.models import FyPressTables
+from fypress import FyPress
 from fysql import CharColumn, DateTimeColumn, IntegerColumn, TextColumn, DictColumn
 
 import urllib2, shutil
 
-config  = _fypress_.config
+fypress = FyPress()
 
 class Media(FyPressTables):
     # todo allowed {type, icon, }
@@ -32,11 +32,11 @@ class Media(FyPressTables):
     def urlify(self, image=False):
         if image:
             try:
-                return config.UPLOAD_DIRECTORY_URL + self.data['var'][image]['guid']
+                return fypress.config.UPLOAD_DIRECTORY_URL + self.data['var'][image]['guid']
             except:
                 return ''
         else:
-            return config.UPLOAD_DIRECTORY_URL + self.guid
+            return fypress.config.UPLOAD_DIRECTORY_URL + self.guid
 
     @staticmethod
     def add_from_web(url):
@@ -80,23 +80,23 @@ class Media(FyPressTables):
 
         if data['oembed'].has_key('thumbnail_url'):
             response = urllib2.urlopen(data['oembed']['thumbnail_url'])
-            Media.upload_save(response, os.path.join(Media.upload_path(config.CHUNKS_DIRECTORY), media_hash))
+            Media.upload_save(response, os.path.join(Media.upload_path(fypress.config.CHUNKS_DIRECTORY), media_hash))
 
             mime = magic.Magic(mime=True)
-            mime_file = mime.from_file(os.path.join(Media.upload_path(config.CHUNKS_DIRECTORY), media_hash))
+            mime_file = mime.from_file(os.path.join(Media.upload_path(fypress.config.CHUNKS_DIRECTORY), media_hash))
             mimes = {'image/jpeg': 'jpg', 'image/jpg': 'jpg', 'image/png':'png'}
 
             ext         = '.'+mimes[mime_file]
             filename    = 'oembed-'+media_hash+ext
-            fdir        = Media.upload_path(config.UPLOAD_DIRECTORY)
+            fdir        = Media.upload_path(fypress.config.UPLOAD_DIRECTORY)
             fpath       = os.path.join(fdir, filename)
 
-            shutil.move(os.path.join(Media.upload_path(config.CHUNKS_DIRECTORY), media_hash), fpath)
+            shutil.move(os.path.join(Media.upload_path(fypress.config.CHUNKS_DIRECTORY), media_hash), fpath)
 
             images      = FyImage(fpath).generate()
             sizes = {}
             for image in images:
-                sizes[image[3]] = {'name': image[1], 'source': os.path.join(Media.upload_path(config.UPLOAD_DIRECTORY), image[0]), 'guid': "{}/{}/".format(now.year, now.month)+image[2]}
+                sizes[image[3]] = {'name': image[1], 'source': os.path.join(Media.upload_path(fypress.config.UPLOAD_DIRECTORY), image[0]), 'guid': "{}/{}/".format(now.year, now.month)+image[2]}
 
             media.data['var'] = sizes
             media.save()
@@ -156,26 +156,26 @@ class Media(FyPressTables):
 
         filename = is_unique(filename)
         chunked = False
-        fdir    = Media.upload_path(config.UPLOAD_DIRECTORY)
+        fdir    = Media.upload_path(fypress.config.UPLOAD_DIRECTORY)
         fpath   = os.path.join(fdir, filename)
         
 
         if attrs.has_key('qqtotalparts') and int(attrs['qqtotalparts']) > 1:
             chunked = True
-            fdir    = Media.upload_path(config.CHUNKS_DIRECTORY)
+            fdir    = Media.upload_path(fypress.config.CHUNKS_DIRECTORY)
             fpath   = os.path.join(fdir, filename, str(attrs['qqpartindex']))
 
         Media.upload_save(file, fpath)
 
         if chunked and (int(attrs['qqtotalparts']) - 1 == int(attrs['qqpartindex'])):
-            Media.upload_combine_chunks(attrs['qqtotalparts'], attrs['qqtotalfilesize'], os.path.dirname(fpath), os.path.join(Media.upload_path(config.UPLOAD_DIRECTORY), filename))
+            Media.upload_combine_chunks(attrs['qqtotalparts'], attrs['qqtotalfilesize'], os.path.dirname(fpath), os.path.join(Media.upload_path(fypress.config.UPLOAD_DIRECTORY), filename))
             shutil.rmtree(os.path.dirname(os.path.dirname(fpath)))
 
         mime = magic.Magic(mime=True)
-        mime_file = mime.from_file(os.path.join(Media.upload_path(config.UPLOAD_DIRECTORY), filename))
+        mime_file = mime.from_file(os.path.join(Media.upload_path(fypress.config.UPLOAD_DIRECTORY), filename))
 
         if mime_file not in Media.allowed_upload_types:
-            os.remove(os.path.join(Media.upload_path(config.UPLOAD_DIRECTORY), filename))
+            os.remove(os.path.join(Media.upload_path(fypress.config.UPLOAD_DIRECTORY), filename))
             return jsonify(success=False, error='File type not allowed.'), 400
 
         if mime_file in Media.upload_types_images:
@@ -206,7 +206,7 @@ class Media(FyPressTables):
             sizes = {}
 
             for image in images:
-                sizes[image[3]] = {'name': image[1], 'source': os.path.join(Media.upload_path(config.UPLOAD_DIRECTORY), image[0]), 'guid': "{}/{}/".format(now.year, now.month)+image[2]}
+                sizes[image[3]] = {'name': image[1], 'source': os.path.join(Media.upload_path(fypress.config.UPLOAD_DIRECTORY), image[0]), 'guid': "{}/{}/".format(now.year, now.month)+image[2]}
 
             media.data = {'var':sizes}
             media.save()

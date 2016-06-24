@@ -14,6 +14,27 @@
         {% endwith %}    
         {{this.content|safe}}
     </article>
+    <hr />
+    <h3>Post comment</h3>
+    {% from theme('macros/form.html') import render_form %}
+    <div>
+        {{render_form(comment_form, action_url='', btn_class="btn btn-success", action_text='Comment')}}
+    </div>
+    <hr />
+    <h2 id="comments">{{this.comment_count}} comment{% if this.comment_count > 1 %}s{% endif %}</h2>
+    {% for comment in this.comments %}
+        <div class="blog-comment" id="comment_{{comment.id}}">
+            <div class="col-md-2">
+                <img src="{{comment.gravatar()}}" alt="{{comment.author}}" />
+            </div>
+            <div class="col-md-10">
+                <h4><a href="{{comment.author_uri}}" target="_blank" rel="nofollow">{{comment.author}} </a> <small><em><time class="timeago" datetime="{{comment.created.isoformat()}}">{{comment.created.isoformat()}}</time></em></small></h4>
+
+                <p>{{comment.content}}</p>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    {% endfor %}
 {% endblock %}
 
 {% block scripts %}

@@ -3,19 +3,19 @@ from flask import g, request
 from werkzeug.utils import secure_filename
 from fysql import CharColumn, TextColumn, BooleanColumn, DictColumn
 from fypress.models import FyPressTables
-from fypress.local import _fypress_
 from fypress.folder import Folder
 from fypress.post import Post
+from fypress import FyPress
 
 import os, imp
 
-config      = _fypress_.config
+fypress = FyPress()
 
 class Theme(object):
     @staticmethod
     def get_template(key):
         key  = os.path.normpath(key)
-        path = os.path.join(g.options['theme'], key)
+        path = os.path.join(fypress.options['theme'], key)
         return path
 
     @staticmethod
@@ -36,21 +36,21 @@ class Theme(object):
             title       = Theme._ctx_title,
             description = Theme._ctx_description,
             image       = Theme._ctx_image,
-            options     = g.options,
-            user        = g.user
+            options     = fypress.options
         )
 
     @staticmethod
     def load_themes():
         themes = []
 
-        for fn in os.listdir(config.THEME_FOLDER):
-            file  = os.path.join(config.THEME_FOLDER, fn, 'theme.py')
+        for fn in os.listdir(fypress.config.THEME_FOLDER):
+            file  = os.path.join(fypress.config.THEME_FOLDER, fn, 'theme.py')
             theme = imp.load_source(fn, file)
 
             themes.append(theme)
             
         return themes
+
     @staticmethod
     def _ctx_nav():
         nav = Folder.get_as_tree('nav', request.path)
@@ -60,14 +60,14 @@ class Theme(object):
     def _ctx_is_home():
         is_home = False
 
-        if request.url == g.options['url']:
+        if request.url == fypress.options['url']:
             is_home = True
 
         return is_home     
 
     @staticmethod
     def _ctx_theme(v):
-        return g.options['theme'] + '/' + v
+        return fypress.options['theme'] + '/' + v
 
     @staticmethod
     def _ctx_get_posts(order='post.created DESC', limit=5, type='post', folder=False):
@@ -93,14 +93,14 @@ class Theme(object):
     @staticmethod
     def _ctx_title(item=False):
         if request.path == '/articles/':
-            return 'Articles • '+g.options['name']
+            return 'Articles • '+fypress.options['name']
         elif isinstance(item, Folder):
-            return item.name+' • '+g.options['name']
+            return item.name+' • '+fypress.options['name']
         elif isinstance(item, Post):
             if item.id_folder == 1:
-                return item.title+' • '+g.options['name']
-            return item.title+' • '+item.folder.name+' • '+g.options['name']
-        return g.options['name']
+                return item.title+' • '+fypress.options['name']
+            return item.title+' • '+item.folder.name+' • '+fypress.options['name']
+        return fypress.options['name']
 
     @staticmethod
     def _ctx_description(item=False):
@@ -114,7 +114,7 @@ class Theme(object):
         elif isinstance(item, Post):
             return item.get_excerpt(155)
         else:
-            return g.options['slogan']
+            return fypress.options['slogan']
 
     @staticmethod
     def _ctx_image(item=False):

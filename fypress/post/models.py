@@ -1,22 +1,21 @@
 # -*- coding: UTF-8 -*-
-from flask import g, request
+from flask import g, request, session
 from flask_babel import lazy_gettext as gettext
 from BeautifulSoup import *
-
 from fypress.utils import slugify, url_unique
 from fypress.folder import Folder
 from fypress.user import User
 from fypress.media import Media
-from fypress.local import _fypress_
 from fypress.models import FyPressTables
+
+from fypress import FyPress
 from fysql import CharColumn, DateTimeColumn, IntegerColumn, DictColumn, FKeyColumn, TextColumn
 
 from akismet import Akismet
 
-import datetime
+import datetime, hashlib, urllib
 
-config      = _fypress_.config
-database    = _fypress_.database.db 
+fypress = FyPress()
 
 def slug_setter(value):
     return slugify(value)
@@ -60,7 +59,7 @@ class Post(FyPressTables):
             (SELECT COUNT(*) FROM post WHERE status = 'draft' {0}) AS draft,
             (SELECT COUNT(*) FROM post WHERE status = 'trash' {0}) AS trash
         """.format(add)
-        return database.raw(query).fetchone()
+        return fypress.database.db.raw(query).fetchone()
 
     @staticmethod
     def update(form, post):
@@ -203,10 +202,9 @@ class Post(FyPressTables):
             post.guid = post.guid_generate()
             post.save()
 
-class Comment(FyPressTables):
-    id_user          = FKeyColumn(table=User, reference='user')
+class SimpleComment(FyPressTables):
+    id_user          = FKeyColumn(table=User, reference='user', required=False)
     id_post          = FKeyColumn(table=Post, reference='post')
-    parent           = IntegerColumn(index=True)
     created          = DateTimeColumn(default=datetime.datetime.now)
     content          = TextColumn()
     status           = CharColumn(max_length=20, index=True)
@@ -216,44 +214,77 @@ class Comment(FyPressTables):
     user_ip          = CharColumn(max_length=30)
 
     @property
-    def uri(self):
-        if self.user_id != 0:
+    def author_uri(self):
+        if self.id_user != 0:
             return self.user.url
         else:
             return self.user_uri
 
     @property
     def author(self):
-        if self.user_id != 0:
+        if self.id_user != 0:
             return self.user.nicename
         else:
             return self.user_name
 
     @property
-    def email(self):
-        if self.user_id != 0:
+    def author_email(self):
+        if self.id_user != 0:
             return self.user.email
         else:
             return self.user_email
 
     def gravatar(self, size=50):
         default = "identicon"
-        gravatar_url = "http://www.gravatar.com/avatar/" + hashlib.md5(self.email.lower()).hexdigest() + "?"
+        gravatar_url = "http://www.gravatar.com/avatar/" + hashlib.md5(self.author_email.lower()).hexdigest() + "?"
         gravatar_url += urllib.urlencode({'d':default, 's':str(size)})
         return gravatar_url
 
     @staticmethod
+    def add(form, id_post):
+        comment = SimpleComment()
+        comment.user_ip    = request.remote_addr
+        comment.content    = form['content']
+        comment.id_post    = id_post
+
+        if not session.get('user_id'):
+            comment.user_name  = form['user_name']
+            comment.user_email = form['user_email']
+            comment.user_uri   = form['user_uri']
+            comment.id_user    = 0
+
+            comment = SimpleComment.check(comment)
+        else:
+            comment.id_user = session.get('user_id')
+            comment.status  = 'valid'
+            comment = comment.insert()
+
+        SimpleComment.count_comments(id_post)
+        return comment
+
+    @staticmethod
+    def count_comments(id_post):
+        post = Post.get(Post.id==id_post)
+        post.comment_count = SimpleComment.count_filter(SimpleComment.id_post==id_post,SimpleComment.status=='valid')
+        post.save()
+
+    @staticmethod
     def check(comment):
-        from fypress.admin import Option
-        if False: #check akismetapikey, ip= request.remote_addr
-            akismet = Akismet('1ba29d6f120c', blog=Options.get('url'), user_agent=request.headers.get('User-Agent'))
+        akismet_key = fypress.options.get('akismet')
+
+        if akismet_key:
+            akismet = Akismet(akismet_key, blog=fypress.options.get('url'))
             rv = akismet.check(
-                comment.ip, 
+                comment.user_ip, 
                 request.headers.get('User-Agent'), 
                 comment_author=comment.author,
-                comment_author_email=comment.email, 
-                comment_author_url=comment.uri,
+                comment_author_email=comment.author_email, 
+                comment_author_url=comment.author_uri,
                 comment_content=comment.content
             )
+            status = {True:'spam', False: 'valid'}
+            comment.status = status[rv]
+        else:
+            comment.status = 'valid'
 
-            print rv
+        return comment.insert()

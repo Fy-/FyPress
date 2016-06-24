@@ -2,7 +2,15 @@ from flask import g
 from unidecode import unidecode
 import string, random, re, os
 
-
+def singleton(cls):
+  cls._state = {}
+  orig_init = cls.__init__
+  def new_init(self, *args, **kwargs):
+    self.__dict__ = cls._state
+    orig_init(self, *args, **kwargs)
+  cls.__init__ = new_init
+  return cls
+    
 def slugify(text, delim=u'-'):
   _punct_re = re.compile(r'[\t !"#$%&\'()*\-/<=>?@\[\\\]^_`{|},.]+')
 

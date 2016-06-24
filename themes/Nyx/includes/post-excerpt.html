@@ -2,7 +2,7 @@
     <h2 class="blog-post-title"><a title="{{item.title}}" href="/{{item.guid}}.html">{{item.title}}</a></h2>
     <aside class="blog-post-meta">
         <time class="timeago" datetime="{{item.created.isoformat()}}">{{item.created.isoformat()}}</time> - By <a href="">{{item.user.nicename}}</a> in <a href="/{{item.folder.guid}}/">{{item.folder.guid}}</a>
-        <span class="pull-xs-right"><i class="fa fa-comments"></i> {{item.comment_count}} comment </span>
+        <span class="pull-xs-right"><i class="fa fa-comments"></i> <a href="/{{item.guid}}.html#comments">{{item.comment_count}} comment{% if item.comment_count > 1 %}s{% endif %}</a></span>
     </aside>
     {% if item.image.id %}
         <a title="{{item.title}}" href="/{{item.guid}}.html">

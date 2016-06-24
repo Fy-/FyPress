@@ -1,18 +1,18 @@
 {% macro render_field(field, label_visible=true) -%}
-    <div class="form-group {% if field.errors %}has-error{% endif %} {{ kwargs.pop('class_', '') }}">
-        {% if (field.type != 'HiddenField' and field.type !='CSRFTokenField') and label_visible %}
-            <label for="fp_{{ field.id }}" class="control-label">{{ field.label }}</label>
+    <fieldset class="form-group {% if field.errors %}has-danger{% endif %} {{ kwargs.pop('class_', '') }}">
+        {% if label_visible %}
+            <label for="fp_{{ field.id }}">{{ field.label }}</label>
         {% endif %}
         {{ field(class_='form-control', id='fp_'~field.id, **kwargs) }}
         {% if field.description and not field.errors %}
-            <p class="help-block">{{ field.description|safe }}</p>
+            <small class="text-muted">{{ field.description|safe }}</small>
         {% endif %}
         {% if field.errors %}
             {% for e in field.errors %}
-                <p class="error help-block">{{ e }}  {% if field.description %}<small>({{ field.description|safe }})</small>{% endif %}</p>
+                <small class="text-danger">{{ e }}  {% if field.description %}<small>({{ field.description|safe }})</small>{% endif %}</small>
             {% endfor %}
         {% endif %}
-    </div>
+    </fieldset>
 {%- endmacro %}
 
 {% macro render_checkbox_field(field) -%}
@@ -35,7 +35,7 @@
 
 {% macro render_form(form, action_url='', action_text='Submit', class_='', btn_class='btn btn-success') -%}
 
-    <form method="POST" action="{{ action_url }}" role="form" class="{{ class_ }}">
+    <form method="POST" action="{{ action_url }}#the_form" id="the_form" role="form" class="{{ class_ }}">
         {{ form.hidden_tag() if form.hidden_tag }}
         {% if caller %}
             {{ caller() }}
@@ -45,7 +45,7 @@
                     {{ render_checkbox_field(f) }}
                 {% elif f.type == 'RadioField' %}
                     {{ render_radio_field(f) }}
-                {% else %}
+                {% elif f.type != 'HiddenField' and f.type != 'CSRFTokenField' %}
                     {{ render_field(f) }}
                 {% endif %}
             {% endfor %}

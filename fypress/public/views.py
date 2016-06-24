@@ -1,35 +1,31 @@
 # -*- coding: UTF-8 -*-
 from flask import Blueprint, url_for, render_template, request, make_response, g, send_from_directory, redirect, session
 from werkzeug.contrib.atom import AtomFeed
-from fypress.local import _fypress_
 from fypress.folder import Folder
-from fypress.post import Post
+from fypress.post import Post, GuestCommentForm, LoggedCommentForm, SimpleComment
 from fypress.admin import Option, Theme
 from fypress.utils import Paginator
 from fypress.folder import Folder
 from fypress.user import User
 from fypress.admin.views import handle_404 as is_admin_404
-from fypress import __version__
-
+from fypress import __version__, FyPress
 from .decorators import cached
 
 public  = Blueprint('public', __name__)
-config  = _fypress_.config
+fypress = FyPress()
 
 def is_404():
     return render_template(Theme.get_template('404.html')), 404
 
-@public.before_request
-def before_request():
-    g.user = None
-    if 'user_id' in session:
-        g.user = User.get(User.id==session['user_id'])
-
-    g.options = Option.auto_load()
-
 @public.context_processor
 def template():
     return Theme.context()
+
+@public.before_request
+def before_request():
+    fypress = FyPress()
+    if not fypress.options:
+        fypress.options = Option.auto_load()
 
 @public.route('/')
 @cached(pretty=True)
@@ -39,8 +35,11 @@ def root():
 
 @public.route('/_preview/')
 def preview():
-    g.options['theme'] = request.args.get('theme')
-    return root()
+    fypress.options['theme'] = request.args.get('theme')
+    render = root()
+    fypress.options = Option.auto_load()
+    return render
+
 
 @public.route('/articles/')
 @cached(pretty=True)
@@ -57,7 +56,7 @@ def posts():
     )
     return render_template(Theme.get_template('articles.html'), this=folder)
 
-@public.route('/<path:slug>.html')
+@public.route('/<path:slug>.html', methods=['GET', 'POST'])
 @cached(pretty=True)
 def is_post(slug):
     post = Post.get(Post.guid==slug)
@@ -70,7 +69,21 @@ def is_post(slug):
         
         if post.type == 'post':
             post.is_post = True
-            return render_template(Theme.get_template('post.html'), this=post, show_sidebar=False)
+            post.comments = SimpleComment.filter(SimpleComment.id_post==post.id, SimpleComment.status=='valid').order_by(SimpleComment.created, 'asc').all()
+
+            if session.get('user_id'):
+                form = LoggedCommentForm()
+            else:
+                form = GuestCommentForm()
+
+            if form.validate_on_submit():
+                comment = SimpleComment.add(request.form, post.id)
+                if fypress.cache:
+                    fypress.cache.clear()
+                    
+                return redirect(request.url+'#comment_%s' % comment.id)
+
+            return render_template(Theme.get_template('post.html'), this=post, show_sidebar=False, comment_form=form)
         else:
             post.is_page = True
             post.pages = Post.filter(Post.id_folder==post.id_folder, Post.status=='published', Post.type=='page').order_by(Post.created).all()
@@ -102,7 +115,7 @@ def is_folder(slug):
 
 @public.route('/public/<path:folder>/<file>')
 def static(folder, file):
-    folder, file = Theme.get_template_static(folder, file, config)
+    folder, file = Theme.get_template_static(folder, file, fypress.config)
     return send_from_directory(folder, file)
 
 @public.route('/feed/<path:folder>/')

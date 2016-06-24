@@ -1,5 +1,7 @@
 from fysql import Table
-from fypress.local import _fypress_
+from fypress import FyPress
+
+fypress = FyPress()
 
 class FyPressTables(Table):
-    db = _fypress_.database.db
+    db = fypress.database.db
