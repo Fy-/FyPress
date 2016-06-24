@@ -9,7 +9,7 @@ def cached(timeout=5*60, key='public-%s', pretty=False):
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
-            if fypress.config.CACHE == False:
+            if fypress.config.CACHE == False or request.method == 'POST':
                 if pretty == True:
                     return f(*args, **kwargs)
                 return f(*args, **kwargs)
