@@ -12,35 +12,36 @@ import time, os
 root   = os.path.dirname(__file__)
 
 @singleton
-class FyPress(object):   
+class FyPress(object):
     def __init__(self, config=False, manager=False):
         if config:
+            self.cache    = False
+            self.prepared = False
+            self.options  = False
+
+            self.config = config
             self.app = Flask(
                 __name__,
                 static_folder=os.path.join(root, '_html', 'static'),
                 template_folder=config.THEME_FOLDER
             )
-            self.config = config
             self.app.config.from_object(config)
             self.app.wsgi_app = ProxyFix(self.app.wsgi_app)
-            self.app.prepared = False
 
-            self.app.babel = Babel(self.app)
-            self.database  = FySQL(self.app)
+            self.babel    = Babel(self.app)
+            self.database = FySQL(self.app)
 
             if not manager:
                 self.prepare()
 
     def run(self, host='0.0.0.0', port=5000):
-        if self.app.prepared == False:
+        if self.prepared == False:
             self.prepare()
 
         self.app.run(host=host, port=port, debug=self.config.DEBUG)
 
     def prepare(self):
-        self.app.prepared = True
-        self.options  = False
-        self.cache    = False
+        self.prepared = True
 
         # Cache
         if self.config.CACHE_TYPE == 'redis':
@@ -78,25 +79,3 @@ class FyPress(object):
     @staticmethod
     def uploaded_file(filename):
         return send_from_directory(self.app.config['UPLOAD_DIRECTORY'], filename)
-
-    @property
-    def options(self):
-        return self.app.options
-
-    @options.setter
-    def options(self, value):
-        self.app.options = value
-    
-    @property
-    def cache(self):
-        return self.app.cache
-    @cache.setter
-    def cache(self, value):
-        self.app.cache = value
-
-    @property
-    def config(self):
-        return self.app.fypress_config
-    @config.setter
-    def config(self, value):
-        self.app.fypress_config = value
