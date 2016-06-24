@@ -15,10 +15,14 @@ from fypress import __version__, __file__ as __fypress_file__, FyPress
 
 import json, datetime
 
-admin  = Blueprint('admin', __name__,  url_prefix='/admin')
+admin   = Blueprint('admin', __name__,  url_prefix='/admin')
 fypress = FyPress()
 
-env    = Environment(loader=PackageLoader('fypress', '_html/templates/'),  extensions=['jinja2.ext.autoescape', 'jinja2.ext.with_'], autoescape=True)
+admin_jinja = Environment(
+    loader=PackageLoader('fypress', '_html/templates/'),  
+    extensions=['jinja2.ext.autoescape', 'jinja2.ext.with_'], 
+    autoescape=True
+)
 
 def render_template(template, **kwargs):
     kwargs.update(_default_template_ctx_processor())
@@ -27,9 +31,9 @@ def render_template(template, **kwargs):
         'get_flashed_messages': get_flashed_messages,
         '_': gettext
     })
-    kwargs.update(dict(options=g.options, version=__version__, debug=fypress.config.DEBUG, flask_config=fypress.config))
+    kwargs.update(dict(options=fypress.options, version=__version__, debug=fypress.config.DEBUG, flask_config=fypress.config))
 
-    template = env.get_template(template)
+    template = admin_jinja.get_template(template)
     return template.render(**kwargs)
 
 @admin.before_request
@@ -38,11 +42,10 @@ def before_request():
     if 'user_id' in session:
         g.user = User.get(User.id==session['user_id'])
 
-    g.options = Option.auto_load()
+    fypress.options = Option.auto_load()
 
 @admin.after_request
 def clear_cache(response):
-    # todo, button clear cache
     if fypress.cache:
         fypress.cache.clear()
     return response
@@ -51,6 +54,16 @@ def clear_cache(response):
 @login_required
 def root():
     return render_template('admin/index.html', title='Admin')
+
+"""
+    Force Clear Cache
+"""
+@admin.route('/cache/')
+@level_required(4)
+def clear_cache_force():
+    if fypress.cache:
+        fypress.cache.clear()
+    return redirect(request.args.get('ref'))
 
 """
     Login & Logout

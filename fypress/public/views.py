@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-from flask import Blueprint, url_for, render_template, request, make_response, g, send_from_directory, redirect, session
+from flask import Blueprint, url_for, render_template as flask_render_template, request, make_response, g, send_from_directory, redirect, session
 from werkzeug.contrib.atom import AtomFeed
 from fypress.folder import Folder
 from fypress.post import Post, GuestCommentForm, LoggedCommentForm, SimpleComment
@@ -7,12 +7,25 @@ from fypress.admin import Option, Theme
 from fypress.utils import Paginator
 from fypress.folder import Folder
 from fypress.user import User
-from fypress.admin.views import handle_404 as is_admin_404
+from fypress.admin.views import handle_404 as is_admin_404, render_template as admin_render_template
 from fypress import __version__, FyPress
-from .decorators import cached
+from .cache import cached, get_cache_key
 
 public  = Blueprint('public', __name__)
 fypress = FyPress()
+
+def render_template(template, **kwargs):
+    g.user = None
+    if session.get('user_id'):
+        g.user = User.get(User.id==session['user_id'])
+
+    render = flask_render_template(template, **kwargs)
+    if session.get('user_id') and g.user.status >= 4:
+        render = render.replace('</html>', '')
+        render += admin_render_template('admin/bar.html')
+        render += '</html>'
+
+    return render
 
 def is_404():
     return render_template(Theme.get_template('404.html')), 404
@@ -23,7 +36,6 @@ def template():
 
 @public.before_request
 def before_request():
-    fypress = FyPress()
     if not fypress.options:
         fypress.options = Option.auto_load()
 
@@ -40,7 +52,6 @@ def preview():
     fypress.options = Option.auto_load()
     return render
 
-
 @public.route('/articles/')
 @cached(pretty=True)
 def posts():
@@ -52,7 +63,7 @@ def posts():
             query    = Post.filter(Post.status=='published', Post.type=='post').order_by(Post.created, 'DESC'),
             page     = request.args.get('page'),
             theme    = 'bootstrap',
-            per_page = 6
+            per_page = 5
     )
     return render_template(Theme.get_template('articles.html'), this=folder)
 
@@ -79,8 +90,8 @@ def is_post(slug):
             if form.validate_on_submit():
                 comment = SimpleComment.add(request.form, post.id)
                 if fypress.cache:
-                    fypress.cache.clear()
-                    
+                    fypress.cache.delete(get_cache_key())
+
                 return redirect(request.url+'#comment_%s' % comment.id)
 
             return render_template(Theme.get_template('post.html'), this=post, show_sidebar=False, comment_form=form)
@@ -104,7 +115,7 @@ def is_folder(slug):
                 query    = Post.filter(Post.id_folder==folder.id, Post.status=='published', Post.type=='post').order_by(Post.created),
                 page     = request.args.get('page'),
                 theme    = 'bootstrap',
-                per_page = 5
+                per_page = 4
             )
 
             return render_template(Theme.get_template('folder.html'), this=folder)
