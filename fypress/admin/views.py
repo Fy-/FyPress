@@ -201,10 +201,9 @@ def comments():
 @admin.route('/comments/delete')
 def comments_delete():
     comment = SimpleComment.get(SimpleComment.id==request.args.get('id'))
-    id_post = comment.id_post
+    SimpleComment.count_comments(comment.id_post, True)
     comment.remove()
-    SimpleComment.count_comments(id_post)
-
+    
     return redirect(url_for('admin.comments'))
 
 @admin.route('/comments/unspam')
