@@ -1,5 +1,5 @@
 from functools import wraps
-from flask import request, g
+from flask import request, g, session
 from fypress import FyPress
 import time
 
@@ -10,11 +10,9 @@ def cached(timeout=5*60, key='public-%s', pretty=False):
         @wraps(f)
         def decorated_function(*args, **kwargs):
             if fypress.config.CACHE == False or request.method == 'POST':
-                if pretty == True:
-                    return f(*args, **kwargs)
                 return f(*args, **kwargs)
 
-            cache_key = key % request.url
+            cache_key = key % request.url + str(session.get('user_id')) 
             rv = fypress.cache.get(cache_key)
             
             if rv is not None:
@@ -23,10 +21,7 @@ def cached(timeout=5*60, key='public-%s', pretty=False):
                 except:
                     return rv
 
-            if pretty == True:
-                rv = f(*args, **kwargs)
-            else:
-                rv = f(*args, **kwargs)
+            rv = f(*args, **kwargs)
             fypress.cache.set(cache_key, rv, timeout=timeout)
             return rv
         return decorated_function
