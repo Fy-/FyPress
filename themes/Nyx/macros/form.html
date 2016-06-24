@@ -34,7 +34,6 @@
 {%- endmacro %}
 
 {% macro render_form(form, action_url='', action_text='Submit', class_='', btn_class='btn btn-success') -%}
-
     <form method="POST" action="{{ action_url }}#the_form" id="the_form" role="form" class="{{ class_ }}">
         {{ form.hidden_tag() if form.hidden_tag }}
         {% if caller %}
