@@ -49,7 +49,8 @@ class Media(FyPressTables):
         data['oembed'] =  json.loads(data['oembed'])
         
         now = datetime.datetime.now()
-        media_hash          = Media.hash_string(data['url'])
+        media_hash = Media.hash_string(data['url'])
+        print media_hash
 
         if Media.get(Media.uid==media_hash):
             media = Media.get(Media.uid==media_hash)
@@ -57,11 +58,9 @@ class Media(FyPressTables):
             media.save()
             return jsonify(success=True), 200
         
-        media = Media.create()
-        media.uid           = media_hash
+        media = Media.create(uid=media_hash, guid="{}/{}/".format(now.year, now.month)+media_hash)
         media.type          = 'oembed'
         media.name          = data['title']
-        media.guid          = "{}/{}/".format(now.year, now.month)+media_hash
         media.source        = data['url']
         media.icon          = data['fa']
         media.html          = data['html']
