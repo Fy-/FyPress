@@ -5,7 +5,6 @@ from wtforms import validators, TextField, TextAreaField, HiddenField
 from wtforms.widgets import TextArea
 
 class CommentForm(Form):
-    id_post     = HiddenField()
     content     = TextAreaField(gettext(u'Content'), widget=TextArea(), validators=[validators.required()])
 
 class GuestCommentForm(CommentForm):
@@ -14,8 +13,8 @@ class GuestCommentForm(CommentForm):
     user_uri     = TextField(gettext(u'Website (URL)'), validators=[validators.required()])
 
 class LoggedCommentForm(CommentForm):
-    id_user      = HiddenField()
-
+    pass
+    
 class AkismetForm(Form):
     api_key      = TextField(gettext(u'Akismet API Key'), description=gettext('If you want to prevent spam in your comments you need to configure your Akismet API key.'),  validators=[validators.required()])
 
