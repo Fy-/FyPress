@@ -1,0 +1,57 @@
+<div id="fypress_bar">
+    <div id="fypress_bar_content">
+        <div id="fypress_left">
+            <a href="/admin/">
+                <img src="/static/admin/images/fypress_40.png" style="height: 20px; margin-top: -2px" alt="FyPress" />
+            </a>
+            <a href="/admin/">✅ Dashboard</a>
+            <a href="/admin/posts/new">✒ New Post</a>
+            <a href="/admin/pages/new">✒ New Page</a>
+            <a href="/admin/comments/all">✉ Comments</a>
+            <a href="/admin/cache?ref={{request.url}}">✖ Clear Cache</a>
+        </div>
+    
+        <div id="fypress_right">
+            Welcome <strong>{{g.user.nicename}}</strong> - <a href="{{url_for('admin.logout')}}">❎ {{ _('Logout') }}</a>
+        </div>
+    </div>
+</div>
+<style>
+    #fypress_bar_content {
+        padding-left: 20px;
+        padding-right: 20px;
+        color: #303030;
+    }
+    #fypress_bar_content a {
+        color: #337ab7;
+    }
+
+    #fypress_left a {
+        display: block;
+        padding-left: 10px;
+        padding-right: 10px;
+        float: left;
+    }
+    #fypress_left a:hover {
+        background: #e5e5e5;
+    }
+    #fypress_right {
+        float: right;
+    }
+    #fypress_bar {
+        background: #f9f9f9;
+        color: #ccc;
+        font: 400 13px/32px "Open Sans",sans-serif;
+        height: 32px;
+        left: 0;
+        min-width: 600px;
+        position: fixed;
+        top: 0;
+        width: 100%;
+        z-index: 99999;
+        border-bottom: 2px solid #d5d5d5;
+    }
+    body {
+        padding-top: 32px;
+    }
+</style>
