@@ -1,5 +1,5 @@
 from functools import wraps
-from flask import request
+from flask import request, g
 from fypress import FyPress
 import time
 
