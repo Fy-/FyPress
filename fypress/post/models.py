@@ -265,12 +265,12 @@ class SimpleComment(FyPressTables):
     @staticmethod
     def count_comments(id_post, rm=False):
         post = Post.get(Post.id==id_post)
-        post.comment_count = SimpleComment.count_filter(SimpleComment.id_post==id_post,SimpleComment.status=='valid')
-        post.save()
-
         if rm:
-            post.comment_count = post.comment_count-1
-            post.save()
+            post.comment_count = post.SimpleComment.count_filter(SimpleComment.id_post==id_post,SimpleComment.status=='valid')-1
+        else:
+            post.comment_count = SimpleComment.count_filter(SimpleComment.id_post==id_post,SimpleComment.status=='valid')
+            
+        post.save()
 
     @staticmethod
     def check(comment):
