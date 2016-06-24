@@ -236,7 +236,7 @@ class SimpleComment(FyPressTables):
 
     def gravatar(self, size=50):
         default = "identicon"
-        gravatar_url = "http://www.gravatar.com/avatar/" + hashlib.md5(self.author_email.lower()).hexdigest() + "?"
+        gravatar_url = "https://www.gravatar.com/avatar/" + hashlib.md5(self.author_email.lower()).hexdigest() + "?"
         gravatar_url += urllib.urlencode({'d':default, 's':str(size)})
         return gravatar_url
 
