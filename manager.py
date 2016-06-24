@@ -3,7 +3,7 @@ from fypress import FyPress
 from config import Config
 import re
 
-fypress = FyPress(Config, False)
+fypress = FyPress(Config, True)
 
 from flask_script import Manager
 from fypress.user import User
@@ -26,7 +26,7 @@ logo = """
 
 @manager.command
 def init_db():
-    _fypress_.database.db.create_all()
+    fypress.database.db.create_all()
 
     print '*** FyPress Database initialized.'
     return True

@@ -34,6 +34,8 @@ class FyPress(object):
             if not manager:
                 self.prepare()
 
+            self.blueprint()
+
     def run(self, host='0.0.0.0', port=5000):
         if self.prepared == False:
             self.prepare()
@@ -62,10 +64,7 @@ class FyPress(object):
 
         # Medias
         self.app.add_url_rule(self.app.config['UPLOAD_DIRECTORY_URL']+'<filename>', 'FyPress.uploaded_file', build_only=True)
-        self.app.wsgi_app = SharedDataMiddleware(self.app.wsgi_app, {self.app.config['UPLOAD_DIRECTORY_URL']: self.app.config['UPLOAD_DIRECTORY']})
-
-        # Blueprints
-        self.blueprint()
+        self.app.wsgi_app = SharedDataMiddleware(self.app.wsgi_app, {self.app.config['UPLOAD_DIRECTORY_URL']: self.app.config['UPLOAD_DIRECTORY']})        
 
     def blueprint(self):
         ### Blueprints ###
