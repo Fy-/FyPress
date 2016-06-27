@@ -12,7 +12,7 @@ from fypress.post import Post
 from fypress.admin import Option
 
 app = fypress.app
-db  = fypress.database
+db = fypress.database
 
 manager = Manager(app)
 
@@ -31,6 +31,7 @@ def init_db():
     print '*** FyPress Database initialized.'
     return True
 
+
 @manager.command
 def init_fypress(login='', email='', passwd=''):
     if not passwd or not email or not login:
@@ -39,22 +40,22 @@ def init_fypress(login='', email='', passwd=''):
 
     user = User.add(login, email, passwd)
     if user:
-        user.status   = 4
+        user.status = 4
         user.nicename = user.login
         user.save()
-        print '*** Added user: '+str(user)
+        print '*** Added user: ' + str(user)
     else:
         print '*** /!\ Invalid user (Duplicate entry)'
 
-    exist = Folder.get(Folder.id==1)
+    exist = Folder.get(Folder.id == 1)
     if not exist:
         folder = Folder()
-        folder.name     = 'Uncategorized'
-        folder.id       = 1
-        folder.guid     = ''
-        
-        folder.insert()       
-        print '*** Added Folder: '+str(folder)
+        folder.name = 'Uncategorized'
+        folder.id = 1
+        folder.guid = ''
+
+        folder.insert()
+        print '*** Added Folder: ' + str(folder)
 
     options = [
         ['name', 'FyPress Site'],
@@ -64,7 +65,7 @@ def init_fypress(login='', email='', passwd=''):
     ]
     for option in options:
         opt = Option.update(option[0], option[1])
-        print '*** Added Option: '+str(opt)
+        print '*** Added Option: ' + str(opt)
 
 if __name__ == '__main__':
     print logo

@@ -1,10 +1,12 @@
 # -*- coding: UTF-8 -*-
 from __future__ import unicode_literals
-import re, requests
+import re
+import requests
+
 
 class Sites(object):
     _instance = None
-    first     = False
+    first = False
 
     sources = {}
 
@@ -26,6 +28,7 @@ class Sites(object):
                 return self.sources[key]
         return False
 
+
 class FyOembed(object):
     sites = None
 
@@ -42,13 +45,11 @@ class FyOembed(object):
             if result.has_key('error'):
                 return False
 
-
-
             result['fa'] = oembed_url[1]
             result['service'] = oembed_url[2]
-               
-            return  result
-        else: 
+
+            return result
+        else:
             return False
 
     def __init__(self):
@@ -65,7 +66,7 @@ class FyOembed(object):
                 self.sites.add(r, 'https://www.dailymotion.com/services/oembed', 'fa-video-camera', 'Dailymotion')
 
             # Youtube
-            regex = (         
+            regex = (
                 'https?://youtu\\.be/.*',
                 'https?://www\\.youtube\\.com/embed/.*',
                 'https?://youtube\\.fr/.*',

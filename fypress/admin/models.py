@@ -7,20 +7,23 @@ from fypress.folder import Folder
 from fypress.post import Post
 from fypress import FyPress
 
-import os, imp
+import os
+import imp
 
 fypress = FyPress()
 
+
 class Theme(object):
+
     @staticmethod
     def get_template(key):
-        key  = os.path.normpath(key)
+        key = os.path.normpath(key)
         path = os.path.join(fypress.options['theme'], key)
         return path
 
     @staticmethod
     def get_template_static(key, file, config):
-        key  = os.path.normpath(key)
+        key = os.path.normpath(key)
         file = secure_filename(file)
         path = os.path.join(config.THEME_FOLDER, Theme.get_template(os.path.join('public', key)))
         return [path, file]
@@ -28,15 +31,15 @@ class Theme(object):
     @staticmethod
     def context():
         return dict(
-            nav         = Theme._ctx_nav(), 
-            theme       = Theme._ctx_theme,
-            get_posts   = Theme._ctx_get_posts, 
-            breadcrumb  = Theme._ctx_breadcrumb,
-            is_home     = Theme._ctx_is_home(),
-            title       = Theme._ctx_title,
-            description = Theme._ctx_description,
-            image       = Theme._ctx_image,
-            options     = fypress.options
+            nav=Theme._ctx_nav(),
+            theme=Theme._ctx_theme,
+            get_posts=Theme._ctx_get_posts,
+            breadcrumb=Theme._ctx_breadcrumb,
+            is_home=Theme._ctx_is_home(),
+            title=Theme._ctx_title,
+            description=Theme._ctx_description,
+            image=Theme._ctx_image,
+            options=fypress.options
         )
 
     @staticmethod
@@ -44,11 +47,11 @@ class Theme(object):
         themes = []
 
         for fn in os.listdir(fypress.config.THEME_FOLDER):
-            file  = os.path.join(fypress.config.THEME_FOLDER, fn, 'theme.py')
+            file = os.path.join(fypress.config.THEME_FOLDER, fn, 'theme.py')
             theme = imp.load_source(fn, file)
 
             themes.append(theme)
-            
+
         return themes
 
     @staticmethod
@@ -63,7 +66,7 @@ class Theme(object):
         if request.url == fypress.options['url']:
             is_home = True
 
-        return is_home     
+        return is_home
 
     @staticmethod
     def _ctx_theme(v):
@@ -72,9 +75,9 @@ class Theme(object):
     @staticmethod
     def _ctx_get_posts(order='post.created DESC', limit=5, type='post', folder=False):
         if not folder:
-            return Post.filter(Post.status=='published', Post.type==type).order_by(order).limit(limit, 0)
+            return Post.filter(Post.status == 'published', Post.type == type).order_by(order).limit(limit, 0)
         else:
-            return Post.filter(Post.status=='published', Post.type==type, Post.id_folder==folder).order_by(order).limit(limit, 0)
+            return Post.filter(Post.status == 'published', Post.type == type, Post.id_folder == folder).order_by(order).limit(limit, 0)
 
     @staticmethod
     def _ctx_breadcrumb(item=False):
@@ -93,13 +96,13 @@ class Theme(object):
     @staticmethod
     def _ctx_title(item=False):
         if request.path == '/articles/':
-            return 'Articles • '+fypress.options['name']
+            return 'Articles • ' + fypress.options['name']
         elif isinstance(item, Folder):
-            return item.name+' • '+fypress.options['name']
+            return item.name + ' • ' + fypress.options['name']
         elif isinstance(item, Post):
             if item.id_folder == 1:
-                return item.title+' • '+fypress.options['name']
-            return item.title+' • '+item.folder.name+' • '+fypress.options['name']
+                return item.title + ' • ' + fypress.options['name']
+            return item.title + ' • ' + item.folder.name + ' • ' + fypress.options['name']
         return fypress.options['name']
 
     @staticmethod
@@ -107,7 +110,7 @@ class Theme(object):
         if request.path == '/articles/':
             return False
         elif isinstance(item, Folder):
-            index = Post.filter(Post.id_folder==item.id, Post.slug=='index', Post.status=='published', Post.type=='page').one()
+            index = Post.filter(Post.id_folder == item.id, Post.slug == 'index', Post.status == 'published', Post.type == 'page').one()
             if index:
                 return index.get_excerpt(155)
             return item.seo_content
@@ -121,7 +124,7 @@ class Theme(object):
         if request.path == '/articles/':
             return False
         elif isinstance(item, Folder):
-            index = Post.filter(Post.id_folder==item.id, Post.slug=='index', Post.status=='published', Post.type=='page').one()
+            index = Post.filter(Post.id_folder == item.id, Post.slug == 'index', Post.status == 'published', Post.type == 'page').one()
             if index and index.id_image != 0:
                 return index.image
             return False
@@ -129,28 +132,30 @@ class Theme(object):
             if item.id_image != 0:
                 return item.image
 
-            index = Post.filter(Post.id_folder==item.id_folder, Post.slug=='index', Post.status=='published', Post.type=='page').one()
+            index = Post.filter(Post.id_folder == item.id_folder, Post.slug == 'index', Post.status == 'published', Post.type == 'page').one()
             if index and index.id_image != 0:
                 return index.image
-        
-        return False    
+
+        return False
+
+
 class Option(FyPressTables):
-    name  = CharColumn(pkey=True, unique=True, index=True, max_length=75)
+    name = CharColumn(pkey=True, unique=True, index=True, max_length=75)
     value = TextColumn()
-    load  = BooleanColumn(index=True)
+    load = BooleanColumn(index=True)
 
     @staticmethod
     def auto_load():
-        final   = {}
-        options = Option.filter(Option.load==1).all()
+        final = {}
+        options = Option.filter(Option.load == 1).all()
         for option in options:
-            final[option.name] = option.value 
+            final[option.name] = option.value
 
         return final
 
     @staticmethod
     def update(name, value, auto_load=1):
-        option = Option.get(Option.name==name)
+        option = Option.get(Option.name == name)
         if option:
             option.value = value
             option.save()
@@ -161,7 +166,7 @@ class Option(FyPressTables):
 
     @staticmethod
     def get_value(name):
-        option = Option.get(Option.name==name)
+        option = Option.get(Option.name == name)
         if option:
             return option.value
         return False
@@ -170,16 +175,17 @@ class Option(FyPressTables):
     def get_settings(option_type='general'):
         settings = {
             'general': ['name', 'url', 'slogan', 'footer'],
-            'social' : ['analytics', 'twitter', 'facebook', 'github'],
-            'design' : ['logo', 'ico', 'css']
+            'social': ['analytics', 'twitter', 'facebook', 'github'],
+            'design': ['logo', 'ico', 'css']
         }
 
         class Result(object):
             """ wtform """
+
             def set(self, name, value):
                 setattr(self, name, value)
 
-        result  = Result()
+        result = Result()
         options = Option.filter(Option.name << settings[option_type]).all()
         for option in options:
             result.set(option.name, option.value)

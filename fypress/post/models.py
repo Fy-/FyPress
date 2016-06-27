@@ -13,37 +13,41 @@ from fysql import CharColumn, DateTimeColumn, IntegerColumn, DictColumn, FKeyCol
 
 from akismet import Akismet
 
-import datetime, hashlib, urllib
+import datetime
+import hashlib
+import urllib
 
 fypress = FyPress()
+
 
 def slug_setter(value):
     return slugify(value)
 
-class Post(FyPressTables):
-    id_folder        = FKeyColumn(table=Folder, reference='folder')
-    id_image         = FKeyColumn(table=Media, reference='image', required=False)
-    id_user          = FKeyColumn(table=User, reference='user')
-    parent           = IntegerColumn(index=True)
-    guid             = CharColumn(index=True, max_length=255)
-    modified         = DateTimeColumn(default=datetime.datetime.now)
-    created          = DateTimeColumn(default=datetime.datetime.now)
-    content          = TextColumn()
-    title            = CharColumn(max_length=255)
-    excerpt          = CharColumn(max_length=255)
-    status           = CharColumn(max_length=20, index=True)
-    comment_status   = CharColumn(max_length=20, index=True)
-    comment_count    = IntegerColumn()
-    slug             = CharColumn(index=True, max_length=255, setter=slug_setter)
-    type             = CharColumn(index=True, max_length=50)
-    views            = IntegerColumn()
-    meta             = DictColumn()
 
-    txt_to_status         = {
-        'published' : gettext('Published'),
-        'draft'     : gettext('Draft'),
-        'trash'     : gettext('Deleted'),
-        'revision'  : gettext('Revision')
+class Post(FyPressTables):
+    id_folder = FKeyColumn(table=Folder, reference='folder')
+    id_image = FKeyColumn(table=Media, reference='image', required=False)
+    id_user = FKeyColumn(table=User, reference='user')
+    parent = IntegerColumn(index=True)
+    guid = CharColumn(index=True, max_length=255)
+    modified = DateTimeColumn(default=datetime.datetime.now)
+    created = DateTimeColumn(default=datetime.datetime.now)
+    content = TextColumn()
+    title = CharColumn(max_length=255)
+    excerpt = CharColumn(max_length=255)
+    status = CharColumn(max_length=20, index=True)
+    comment_status = CharColumn(max_length=20, index=True)
+    comment_count = IntegerColumn()
+    slug = CharColumn(index=True, max_length=255, setter=slug_setter)
+    type = CharColumn(index=True, max_length=50)
+    views = IntegerColumn()
+    meta = DictColumn()
+
+    txt_to_status = {
+        'published': gettext('Published'),
+        'draft': gettext('Draft'),
+        'trash': gettext('Deleted'),
+        'revision': gettext('Revision')
     }
 
     @staticmethod
@@ -76,21 +80,21 @@ class Post(FyPressTables):
         if form.has_key('slug'):
             slug = form['slug']
 
-        post.title          = form['title']
-        post.content        = form['content']
-        post.id_folder      = form['folder']
-        post.modified       = datetime.datetime.now()
-        post.status         = status
-        post.excerpt        = post.get_excerpt()
-        post.slug           = slug
-        post.guid           = post.guid_generate()
-        post.id_image       = form['image']
+        post.title = form['title']
+        post.content = form['content']
+        post.id_folder = form['folder']
+        post.modified = datetime.datetime.now()
+        post.status = status
+        post.excerpt = post.get_excerpt()
+        post.slug = slug
+        post.guid = post.guid_generate()
+        post.id_image = form['image']
         post.save()
 
-        post = Post.get(Post.id==post.id)
+        post = Post.get(Post.id == post.id)
         post_id = post.id
 
-        #if post.status == 'published':
+        # if post.status == 'published':
         #    post.create_revision()
 
         post.folder.count_posts()
@@ -109,26 +113,26 @@ class Post(FyPressTables):
             slug = form['slug']
 
         post = Post()
-        post.title          = form['title']
-        post.content        = form['content']
-        post.id_folder      = form['folder']
-        post.id_user        = g.user.id
-        post.parent         = 0
-        post.excerpt        = post.get_excerpt()
-        post.status         = status
+        post.title = form['title']
+        post.content = form['content']
+        post.id_folder = form['folder']
+        post.id_user = g.user.id
+        post.parent = 0
+        post.excerpt = post.get_excerpt()
+        post.status = status
         post.comment_status = 'open'
-        post.comment_count  = 0
-        post.slug           = slug
-        post.guid           = post.guid_generate()
-        post.id_image       = form['image']
-        post.type           = form['type']
+        post.comment_count = 0
+        post.slug = slug
+        post.guid = post.guid_generate()
+        post.id_image = form['image']
+        post.type = form['type']
 
         post = post.insert()
         post.folder.count_posts()
 
         post_id = post.id
-        
-        #if post.status == 'published':
+
+        # if post.status == 'published':
         #    post.create_revision()
 
         return post
@@ -148,38 +152,37 @@ class Post(FyPressTables):
     def guid_generate(self, rev=False):
         count = ''
         if rev:
-            count = Post.filter(Post.parent==rev).all()
-            count = '&rev='+str(len(count))
-            return '?post_id={}'.format(rev)+count
+            count = Post.filter(Post.parent == rev).all()
+            count = '&rev=' + str(len(count))
+            return '?post_id={}'.format(rev) + count
 
         path = Folder.get(Folder.id == self.id_folder)
         path = path.guid
 
         name = self.slug + count
-        
+
         if self.id:
-            guid = url_unique(path+'/'+name, Post, self.id)
+            guid = url_unique(path + '/' + name, Post, self.id)
         else:
-            guid = url_unique(path+'/'+name, Post)
+            guid = url_unique(path + '/' + name, Post)
 
         if guid[0] == '/':
             guid = guid[1:]
 
         return guid
 
-
     def get_excerpt(self, size=255):
         soup = Post.excerpt_utils_rm_headers(BeautifulSoup(self.content))
         text = ''.join(soup.findAll(text=True)).split('\n')
-        return ' '.join(text).strip()[0:size]   
-    
+        return ' '.join(text).strip()[0:size]
+
     @staticmethod
     def excerpt_utils_rm_headers(soup):
-        [[tree.extract() for tree in soup(elem)] for elem in ('h1','h2','h3','h4','h5','h6')]
+        [[tree.extract() for tree in soup(elem)] for elem in ('h1', 'h2', 'h3', 'h4', 'h5', 'h6')]
         return soup
 
     def count_revs(self):
-        return Post.count_filter(Post.parent==self.id)
+        return Post.count_filter(Post.parent == self.id)
 
     def move(self, status='draft'):
         self.status = status
@@ -189,7 +192,7 @@ class Post(FyPressTables):
 
     @staticmethod
     def delete(post):
-        childs = Post.filter(Post.parent==post.id).all()
+        childs = Post.filter(Post.parent == post.id).all()
         for post in childs:
             post.remove()
 
@@ -202,16 +205,17 @@ class Post(FyPressTables):
             post.guid = post.guid_generate()
             post.save()
 
+
 class SimpleComment(FyPressTables):
-    id_user          = FKeyColumn(table=User, reference='user', required=False)
-    id_post          = FKeyColumn(table=Post, reference='post')
-    created          = DateTimeColumn(default=datetime.datetime.now)
-    content          = TextColumn()
-    status           = CharColumn(max_length=20, index=True)
-    user_name        = CharColumn(max_length=75) 
-    user_uri         = CharColumn(max_length=150)
-    user_email       = CharColumn(max_length=150) 
-    user_ip          = CharColumn(max_length=30)
+    id_user = FKeyColumn(table=User, reference='user', required=False)
+    id_post = FKeyColumn(table=Post, reference='post')
+    created = DateTimeColumn(default=datetime.datetime.now)
+    content = TextColumn()
+    status = CharColumn(max_length=20, index=True)
+    user_name = CharColumn(max_length=75)
+    user_uri = CharColumn(max_length=150)
+    user_email = CharColumn(max_length=150)
+    user_ip = CharColumn(max_length=30)
 
     @property
     def author_uri(self):
@@ -237,26 +241,26 @@ class SimpleComment(FyPressTables):
     def gravatar(self, size=50):
         default = "identicon"
         gravatar_url = "https://www.gravatar.com/avatar/" + hashlib.md5(self.author_email.lower()).hexdigest() + "?"
-        gravatar_url += urllib.urlencode({'d':default, 's':str(size)})
+        gravatar_url += urllib.urlencode({'d': default, 's': str(size)})
         return gravatar_url
 
     @staticmethod
     def add(form, id_post):
         comment = SimpleComment()
-        comment.user_ip    = request.remote_addr
-        comment.content    = form['content']
-        comment.id_post    = id_post
+        comment.user_ip = request.remote_addr
+        comment.content = form['content']
+        comment.id_post = id_post
 
         if not session.get('user_id'):
-            comment.user_name  = form['user_name']
+            comment.user_name = form['user_name']
             comment.user_email = form['user_email']
-            comment.user_uri   = form['user_uri']
-            comment.id_user    = 0
+            comment.user_uri = form['user_uri']
+            comment.id_user = 0
 
             comment = SimpleComment.check(comment)
         else:
             comment.id_user = session.get('user_id')
-            comment.status  = 'valid'
+            comment.status = 'valid'
             comment = comment.insert()
 
         SimpleComment.count_comments(id_post)
@@ -264,12 +268,12 @@ class SimpleComment(FyPressTables):
 
     @staticmethod
     def count_comments(id_post, rm=False):
-        post = Post.get(Post.id==id_post)
+        post = Post.get(Post.id == id_post)
         if rm:
-            post.comment_count = SimpleComment.count_filter(SimpleComment.id_post==id_post,SimpleComment.status=='valid')-1
+            post.comment_count = SimpleComment.count_filter(SimpleComment.id_post == id_post, SimpleComment.status == 'valid') - 1
         else:
-            post.comment_count = SimpleComment.count_filter(SimpleComment.id_post==id_post,SimpleComment.status=='valid')
-            
+            post.comment_count = SimpleComment.count_filter(SimpleComment.id_post == id_post, SimpleComment.status == 'valid')
+
         post.save()
 
     @staticmethod
@@ -279,14 +283,14 @@ class SimpleComment(FyPressTables):
         if akismet_key:
             akismet = Akismet(akismet_key, blog=fypress.options.get('url'))
             rv = akismet.check(
-                comment.user_ip, 
-                request.headers.get('User-Agent'), 
+                comment.user_ip,
+                request.headers.get('User-Agent'),
                 comment_author=comment.author,
-                comment_author_email=comment.author_email, 
+                comment_author_email=comment.author_email,
                 comment_author_url=comment.author_uri,
                 comment_content=comment.content
             )
-            status = {True:'spam', False: 'valid'}
+            status = {True: 'spam', False: 'valid'}
             comment.status = status[rv]
         else:
             comment.status = 'valid'

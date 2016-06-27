@@ -2,6 +2,7 @@
 from functools import wraps, update_wrapper
 from flask import g, session, redirect, url_for, request
 
+
 def login_required(f):
     @wraps(f)
     def decorator(*args, **kwargs):
@@ -9,6 +10,7 @@ def login_required(f):
             return redirect(url_for('admin.login', next=request.url))
         return f(*args, **kwargs)
     return decorator
+
 
 def level_required(level):
     def decorator(f):

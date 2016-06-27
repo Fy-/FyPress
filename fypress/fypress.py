@@ -7,17 +7,20 @@ from flask_babel import Babel
 from flask_fysql import FySQL
 from .utils import singleton
 
-import time, os
+import time
+import os
 
-root   = os.path.dirname(__file__)
+root = os.path.dirname(__file__)
+
 
 @singleton
 class FyPress(object):
+
     def __init__(self, config=False, manager=False):
         if config:
-            self.cache    = False
+            self.cache = False
             self.prepared = False
-            self.options  = False
+            self.options = False
 
             self.config = config
             self.app = Flask(
@@ -28,7 +31,7 @@ class FyPress(object):
             self.app.config.from_object(config)
             self.app.wsgi_app = ProxyFix(self.app.wsgi_app)
 
-            self.babel    = Babel(self.app)
+            self.babel = Babel(self.app)
             self.database = FySQL(self.app)
 
             if not manager:
@@ -56,15 +59,15 @@ class FyPress(object):
         # Options
         from .admin import Option
         self.options = Option.auto_load()
-        
+
         # Timer
         @self.app.before_request
         def before_request():
             g.start = time.time()
 
         # Medias
-        self.app.add_url_rule(self.app.config['UPLOAD_DIRECTORY_URL']+'<filename>', 'FyPress.uploaded_file', build_only=True)
-        self.app.wsgi_app = SharedDataMiddleware(self.app.wsgi_app, {self.app.config['UPLOAD_DIRECTORY_URL']: self.app.config['UPLOAD_DIRECTORY']})        
+        self.app.add_url_rule(self.app.config['UPLOAD_DIRECTORY_URL'] + '<filename>', 'FyPress.uploaded_file', build_only=True)
+        self.app.wsgi_app = SharedDataMiddleware(self.app.wsgi_app, {self.app.config['UPLOAD_DIRECTORY_URL']: self.app.config['UPLOAD_DIRECTORY']})
 
     def blueprint(self):
         ### Blueprints ###

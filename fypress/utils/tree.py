@@ -1,20 +1,21 @@
 # -*- coding: UTF-8 -*-
 from flask import url_for
 
+
 class TreeHTML(object):
+
     def __init__(self, items):
-        self.html       = ''
-        self.items      = items
-        self.tritems    = []
+        self.html = ''
+        self.items = items
+        self.tritems = []
 
         self.convert()
 
-        self.json_rdy   = self.convert_to_json(self.tritems)
+        self.json_rdy = self.convert_to_json(self.tritems)
 
     def convert(self):
         for item in self.items:
             self.tritems.append((item.id, item, item.left, item.right, item.parent))
-
 
     def generate_folders_nav(self, items=False, cls='nav', current=''):
         if items == False:
@@ -22,11 +23,11 @@ class TreeHTML(object):
                 items = self.json_rdy[0]['children']
             except:
                 return ''
-                
+
         for item in items:
-            if '/'+item['data'].guid+'/' in current:
-                active = ' active'                
-            else: 
+            if '/' + item['data'].guid + '/' in current:
+                active = ' active'
+            else:
                 active = ''
 
             if item.has_key('children'):
@@ -51,11 +52,8 @@ class TreeHTML(object):
                         <a class="nav-link" href="/{2}/">{1}</a>
                     </li>
                 """).format(cls, item['data'].name, item['data'].guid, active)
-    
 
-        return self.html 
-
- 
+        return self.html
 
     def generate_folders_admin(self, items=False, cls=''):
         if items == False:
@@ -97,11 +95,11 @@ class TreeHTML(object):
                         </div>
                     </div>
                 """).format(
-                    item['data'].name, 
-                    item['data'].id, 
-                    item['data'].content, 
-                    item['data'].posts, 
-                    item['data'].slug, 
+                    item['data'].name,
+                    item['data'].id,
+                    item['data'].content,
+                    item['data'].posts,
+                    item['data'].slug,
                     url_for('admin.folders', edit=item['data'].id)
                 )
 
@@ -111,7 +109,7 @@ class TreeHTML(object):
             self.html += '</li>'
         self.html += '</ol>'
 
-        return self.html 
+        return self.html
 
     @staticmethod
     def convert_to_json(data):
@@ -119,12 +117,12 @@ class TreeHTML(object):
         parent_index = dict()
         for node in data:
             node_index[node[0]] = node
-            parent_index.setdefault(node[4],[]).append(node)
+            parent_index.setdefault(node[4], []).append(node)
 
         def process_node(index):
-            result = { 'data' : node_index[index][1] }
-            for node in parent_index.get(index,[]):
-                result.setdefault('children',[]).append(process_node(node[0]))
+            result = {'data': node_index[index][1]}
+            for node in parent_index.get(index, []):
+                result.setdefault('children', []).append(process_node(node[0]))
             return result
 
         node = process_node(1)

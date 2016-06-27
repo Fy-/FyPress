@@ -5,10 +5,12 @@ import time
 
 fypress = FyPress()
 
+
 def get_cache_key():
     return 'public-%s-%s' % (request.url, str(session.get('user_id')))
 
-def cached(timeout=5*60, key='public-%s', pretty=False):
+
+def cached(timeout=5 * 60, key='public-%s', pretty=False):
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
@@ -17,10 +19,10 @@ def cached(timeout=5*60, key='public-%s', pretty=False):
 
             cache_key = get_cache_key()
             rv = fypress.cache.get(get_cache_key())
-            
+
             if rv is not None:
                 try:
-                    return rv+'\n\n<!-- FyPress Cache, served in {}s -->'.format(time.time() - g.start)
+                    return rv + '\n\n<!-- FyPress Cache, served in {}s -->'.format(time.time() - g.start)
                 except:
                     return rv
 

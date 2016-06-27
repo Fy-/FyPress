@@ -20,15 +20,15 @@ class FySQL(object):
             self.init_app(app)
 
     def init_app(self, app):
-        engine   = self.app.config['DATABASE']['engine']
-        self.db_name  = self.app.config['DATABASE']['db']
+        engine = self.app.config['DATABASE']['engine']
+        self.db_name = self.app.config['DATABASE']['db']
 
         self.conn_kwargs = {}
         for key, attr in self.app.config['DATABASE'].items():
             if key not in ['engine', 'db']:
                 self.conn_kwargs[key] = attr
 
-        self.engine      = self.engines[engine]
+        self.engine = self.engines[engine]
 
         if hasattr(app, 'teardown_appcontext'):
             app.teardown_appcontext(self.teardown)

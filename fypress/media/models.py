@@ -1,30 +1,36 @@
 # -*- coding: UTF-8 -*-
 from werkzeug import secure_filename
 from flask import flash, jsonify
-import datetime, magic, os, hashlib, json
+import datetime
+import magic
+import os
+import hashlib
+import json
 from fypress.utils import FyImage, FyOembed, slugify, url_unique
 from fypress.admin.static import messages
 from fypress.models import FyPressTables
 from fypress import FyPress
 from fysql import CharColumn, DateTimeColumn, IntegerColumn, TextColumn, DictColumn
 
-import urllib2, shutil
+import urllib2
+import shutil
 
 fypress = FyPress()
 
+
 class Media(FyPressTables):
     # todo allowed {type, icon, }
-    allowed_upload_types  = ('image/jpeg', 'image/png', 'image/gif')
-    upload_types_images   = ('image/jpeg', 'image/png')
+    allowed_upload_types = ('image/jpeg', 'image/png', 'image/gif')
+    upload_types_images = ('image/jpeg', 'image/png')
 
-    uid             = CharColumn(unique=True, index=True, max_length=150)
-    modified        = DateTimeColumn(default=datetime.datetime.now)
-    type            = CharColumn(index=True, max_length=150)
-    guid            = CharColumn(unique=True, index=True, max_length=255)
-    name            = CharColumn(max_length=150)
-    data            = DictColumn()
-    icon            = CharColumn(max_length=75)
-    html            = TextColumn()
+    uid = CharColumn(unique=True, index=True, max_length=150)
+    modified = DateTimeColumn(default=datetime.datetime.now)
+    type = CharColumn(index=True, max_length=150)
+    guid = CharColumn(unique=True, index=True, max_length=255)
+    name = CharColumn(max_length=150)
+    data = DictColumn()
+    icon = CharColumn(max_length=75)
+    html = TextColumn()
 
     def generate_html(self):
         pass
@@ -40,40 +46,40 @@ class Media(FyPressTables):
 
     @staticmethod
     def add_from_web(url):
-        oembed_ = FyOembed().get(url) 
+        oembed_ = FyOembed().get(url)
         return jsonify(result=oembed_)
 
     @staticmethod
     def add_oembed(attrs):
         data = json.loads(attrs['data'])
-        data['oembed'] =  json.loads(data['oembed'])
-        
+        data['oembed'] = json.loads(data['oembed'])
+
         now = datetime.datetime.now()
         media_hash = Media.hash_string(data['url'])
         print media_hash
 
-        if Media.get(Media.uid==media_hash):
-            media = Media.get(Media.uid==media_hash)
+        if Media.get(Media.uid == media_hash):
+            media = Media.get(Media.uid == media_hash)
             media.modified = datetime.datetime.now()
             media.save()
             return jsonify(success=True), 200
-        
-        media = Media.create(uid=media_hash, guid="{}/{}/".format(now.year, now.month)+media_hash)
-        media.type          = 'oembed'
-        media.name          = data['title']
-        media.source        = data['url']
-        media.icon          = data['fa']
-        media.html          = data['html']
-        media.data          = {}
+
+        media = Media.create(uid=media_hash, guid="{}/{}/".format(now.year, now.month) + media_hash)
+        media.type = 'oembed'
+        media.name = data['title']
+        media.source = data['url']
+        media.icon = data['fa']
+        media.html = data['html']
+        media.data = {}
 
         media.data['provider_url'] = data['oembed']['provider_url'].encode('utf8')
-        media.data['provider']     = data['oembed']['service']
+        media.data['provider'] = data['oembed']['service']
         if data['oembed'].has_key('author_name'):
-            media.data['author_name']  = data['oembed']['author_name']
-            media.data['author_url']   = data['oembed']['author_url']
+            media.data['author_name'] = data['oembed']['author_name']
+            media.data['author_url'] = data['oembed']['author_url']
         else:
-            media.data['author_name']  = ''
-            media.data['author_url']   = ''
+            media.data['author_name'] = ''
+            media.data['author_url'] = ''
 
         media.save()
 
@@ -83,24 +89,24 @@ class Media(FyPressTables):
 
             mime = magic.Magic(mime=True)
             mime_file = mime.from_file(os.path.join(Media.upload_path(fypress.config.CHUNKS_DIRECTORY), media_hash))
-            mimes = {'image/jpeg': 'jpg', 'image/jpg': 'jpg', 'image/png':'png'}
+            mimes = {'image/jpeg': 'jpg', 'image/jpg': 'jpg', 'image/png': 'png'}
 
-            ext         = '.'+mimes[mime_file]
-            filename    = 'oembed-'+media_hash+ext
-            fdir        = Media.upload_path(fypress.config.UPLOAD_DIRECTORY)
-            fpath       = os.path.join(fdir, filename)
+            ext = '.' + mimes[mime_file]
+            filename = 'oembed-' + media_hash + ext
+            fdir = Media.upload_path(fypress.config.UPLOAD_DIRECTORY)
+            fpath = os.path.join(fdir, filename)
 
             shutil.move(os.path.join(Media.upload_path(fypress.config.CHUNKS_DIRECTORY), media_hash), fpath)
 
-            images      = FyImage(fpath).generate()
+            images = FyImage(fpath).generate()
             sizes = {}
             for image in images:
-                sizes[image[3]] = {'name': image[1], 'source': os.path.join(Media.upload_path(fypress.config.UPLOAD_DIRECTORY), image[0]), 'guid': "{}/{}/".format(now.year, now.month)+image[2]}
+                sizes[image[3]] = {'name': image[1], 'source': os.path.join(Media.upload_path(fypress.config.UPLOAD_DIRECTORY), image[0]), 'guid': "{}/{}/".format(now.year, now.month) + image[2]}
 
             media.data['var'] = sizes
             media.save()
 
-        flash(messages['added']+' ('+str(media)+')')
+        flash(messages['added'] + ' (' + str(media) + ')')
 
         return jsonify(success=True), 200
 
@@ -132,37 +138,36 @@ class Media(FyPressTables):
                     destination.write(source.read())
 
     @staticmethod
-    def upload(file, attrs):        
-        fhash   = attrs['qquuid']
+    def upload(file, attrs):
+        fhash = attrs['qquuid']
         upload_type = 'file'
         upload_icon = 'fa-file-o'
         filename = secure_filename(attrs['qqfilename'])
 
         def is_unique(url):
             now = datetime.datetime.now()
-            exist = Media.get(Media.guid == "{}/{}/".format(now.year, now.month)+url)
+            exist = Media.get(Media.guid == "{}/{}/".format(now.year, now.month) + url)
             if not exist:
                 return url
 
             i = 1
             ext = url.split('.')
-            while Media.get(Media.guid == "{}/{}/".format(now.year, now.month)+url):
-                add  = '{}{}'.format('-', i)
-                url = ext[0]+add+'.'+ext[1]
-                i += 1 
+            while Media.get(Media.guid == "{}/{}/".format(now.year, now.month) + url):
+                add = '{}{}'.format('-', i)
+                url = ext[0] + add + '.' + ext[1]
+                i += 1
 
             return url
 
         filename = is_unique(filename)
         chunked = False
-        fdir    = Media.upload_path(fypress.config.UPLOAD_DIRECTORY)
-        fpath   = os.path.join(fdir, filename)
-        
+        fdir = Media.upload_path(fypress.config.UPLOAD_DIRECTORY)
+        fpath = os.path.join(fdir, filename)
 
         if attrs.has_key('qqtotalparts') and int(attrs['qqtotalparts']) > 1:
             chunked = True
-            fdir    = Media.upload_path(fypress.config.CHUNKS_DIRECTORY)
-            fpath   = os.path.join(fdir, filename, str(attrs['qqpartindex']))
+            fdir = Media.upload_path(fypress.config.CHUNKS_DIRECTORY)
+            fpath = os.path.join(fdir, filename, str(attrs['qqpartindex']))
 
         Media.upload_save(file, fpath)
 
@@ -178,8 +183,8 @@ class Media(FyPressTables):
             return jsonify(success=False, error='File type not allowed.'), 400
 
         if mime_file in Media.upload_types_images:
-             upload_type = 'image'
-             upload_icon = ' fa-file-image-o'
+            upload_type = 'image'
+            upload_icon = ' fa-file-image-o'
 
         media_hash = Media.hash_file(fpath)
         if Media.get(Media.uid == media_hash):
@@ -191,12 +196,12 @@ class Media(FyPressTables):
 
         now = datetime.datetime.now()
         media = Media.create()
-        media.uid           = media_hash
-        media.type          = upload_type
-        media.name          = filename
-        media.guid          = "{}/{}/".format(now.year, now.month)+filename
-        media.source        = fpath
-        media.icon          = upload_icon
+        media.uid = media_hash
+        media.type = upload_type
+        media.name = filename
+        media.guid = "{}/{}/".format(now.year, now.month) + filename
+        media.source = fpath
+        media.icon = upload_icon
 
         media.save()
 
@@ -205,12 +210,12 @@ class Media(FyPressTables):
             sizes = {}
 
             for image in images:
-                sizes[image[3]] = {'name': image[1], 'source': os.path.join(Media.upload_path(fypress.config.UPLOAD_DIRECTORY), image[0]), 'guid': "{}/{}/".format(now.year, now.month)+image[2]}
+                sizes[image[3]] = {'name': image[1], 'source': os.path.join(Media.upload_path(fypress.config.UPLOAD_DIRECTORY), image[0]), 'guid': "{}/{}/".format(now.year, now.month) + image[2]}
 
-            media.data = {'var':sizes}
+            media.data = {'var': sizes}
             media.save()
-            
-        flash(messages['added']+' ('+str(media)+')')
+
+        flash(messages['added'] + ' (' + str(media) + ')')
 
         return jsonify(success=True), 200
 
@@ -218,7 +223,7 @@ class Media(FyPressTables):
     def hash_string(txt):
         hasher = hashlib.sha1()
         hasher.update(txt)
-        return hasher.hexdigest() 
+        return hasher.hexdigest()
 
     @staticmethod
     def hash_file(file):

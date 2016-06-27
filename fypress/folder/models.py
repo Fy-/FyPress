@@ -8,22 +8,24 @@ import datetime
 
 fypress = FyPress()
 
+
 def slug_setter(value):
     return slugify(value)
 
+
 class Folder(FyPressTables):
-    parent           = IntegerColumn(index=True)
-    left             = IntegerColumn(index=True)
-    right            = IntegerColumn(index=True)
-    depth            = IntegerColumn(index=True)
-    guid             = CharColumn(index=True, max_length=255)
-    slug             = CharColumn(index=True, max_length=255, setter=slug_setter)
-    posts            = IntegerColumn()
-    name             = CharColumn(index=True, max_length=150)
-    modified         = DateTimeColumn(default=datetime.datetime.now)
-    created          = DateTimeColumn(default=datetime.datetime.now)
-    content          = TextColumn()
-    seo_content      = TextColumn()
+    parent = IntegerColumn(index=True)
+    left = IntegerColumn(index=True)
+    right = IntegerColumn(index=True)
+    depth = IntegerColumn(index=True)
+    guid = CharColumn(index=True, max_length=255)
+    slug = CharColumn(index=True, max_length=255, setter=slug_setter)
+    posts = IntegerColumn()
+    name = CharColumn(index=True, max_length=150)
+    modified = DateTimeColumn(default=datetime.datetime.now)
+    created = DateTimeColumn(default=datetime.datetime.now)
+    content = TextColumn()
+    seo_content = TextColumn()
 
     def count_posts(self):
         query = """
@@ -41,7 +43,6 @@ class Folder(FyPressTables):
         """
         fypress.database.db.raw(query)
 
-
     @staticmethod
     def update_all(data):
         if data:
@@ -49,11 +50,11 @@ class Folder(FyPressTables):
             for item in data:
                 if item.has_key('id') and item['id'] != '1':
                     exist.append(int(item['id']))
-                    folder = Folder.get(Folder.id==item['id'])
-                    folder.depth    = item['depth']
-                    folder.left     = item['left']
-                    folder.right    = item['right']
-                    folder.parent   = item['parent_id']
+                    folder = Folder.get(Folder.id == item['id'])
+                    folder.depth = item['depth']
+                    folder.left = item['left']
+                    folder.right = item['right']
+                    folder.parent = item['parent_id']
 
                     folder.modified = datetime.datetime.now()
                     folder.save()
@@ -66,20 +67,20 @@ class Folder(FyPressTables):
             diff = [item for item in all_folders if item not in exist]
             for item in diff:
                 if item != 1:
-                    from fypress.post import Post 
-                    posts = Post.filter(Post.id_folder==item).all()
+                    from fypress.post import Post
+                    posts = Post.filter(Post.id_folder == item).all()
                     for post in posts:
                         post.id_folder = 1
                         post.save()
-                    Folder.get(Folder.id==item).remove()
+                    Folder.get(Folder.id == item).remove()
 
             for folder in folders:
                 folder.count_posts()
 
             Folder.build_guid()
             from fypress.post import Post
-            
-            Post.link_posts()        
+
+            Post.link_posts()
 
     @staticmethod
     def update_guid(folder):
@@ -110,17 +111,17 @@ class Folder(FyPressTables):
         rv = fypress.database.db.raw(query).fetchall()[0]
 
         if rv[0] == 0 and rv[1] == 0:
-            r  = 1
-            l  = 2
-        else: 
+            r = 1
+            l = 2
+        else:
             r = rv[0]
             l = rv[1]
 
         folder = Folder.create()
         form.populate_obj(folder)
-        folder.parent  = 1
-        folder.left    = r+1
-        folder.right   = l+1
+        folder.parent = 1
+        folder.left = r + 1
+        folder.right = l + 1
         folder.save()
 
         Folder.build_guid()
@@ -153,7 +154,7 @@ class Folder(FyPressTables):
             return tree.generate_folders_nav(current=current)
 
     @staticmethod
-    def get_all(html = False):
+    def get_all(html=False):
         folders = Folder.select(
             add_from='folder AS parent'
         ).where(
@@ -163,13 +164,12 @@ class Folder(FyPressTables):
         ).order_by(
             'folder.left, folder.id'
         ).all()
-        
+
         if not html:
             return folders
-        
+
         if not folders:
             return ''
 
         tree = TreeHTML(folders)
         return tree.generate_folders_admin(False, 'sortable')
-
