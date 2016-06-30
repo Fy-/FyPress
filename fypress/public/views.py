@@ -149,7 +149,7 @@ def feed_folder(folder):
             posts = Post.filter(Post.id_folder == folder.id, Post.status == 'published', Post.type == 'post').order_by(Post.created).limit(20)
 
             feed = AtomFeed(
-                g.options['name'] + ' • ' + folder.name,
+                fypress.options['name'] + ' • ' + folder.name,
                 subtitle=folder.seo_content,
                 feed_url=request.url_root + 'feed/',
                 url=request.url_root,
