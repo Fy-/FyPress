@@ -3,6 +3,7 @@ BeautifulSoup==3.2.1
 click==6.6
 Flask==0.11.1
 Flask-Babel==0.11.1
+Flask-Script==2.0.5
 Flask-WTF==0.12
 -e git+https://github.com/Fy-/fysql@fc076d47712bdf8d0a30d672305685846ba3533d#egg=fysql
 itsdangerous==0.24
