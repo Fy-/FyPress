@@ -59,7 +59,8 @@
         {% if this and this.is_folder %}
             <link rel="alternate" type="application/rss+xml" title="{{options.name}} • {{this.name}}" href="/feed/{{this.guid}}/"/>
         {% endif %}
-        {% block microdata %}{% include theme('jsonld/breadcrumb.html') %}{% endblock %}
+        {% include theme('jsonld/breadcrumb.html') %}
+        {% block microdata %}{% endblock %}
     </head>
 
     <body>
