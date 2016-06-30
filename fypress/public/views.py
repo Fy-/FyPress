@@ -182,8 +182,8 @@ def feed_folder(folder):
 def feed():
 
     feed = AtomFeed(
-        g.options['name'],
-        subtitle=g.options['slogan'],
+        fypress.options['name'],
+        subtitle=fypress.options['slogan'],
         feed_url=request.url_root + 'feed/',
         url=request.url_root,
         generator=None
