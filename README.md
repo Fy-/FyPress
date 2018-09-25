@@ -1,3 +1,6 @@
+THIS PROJECT IS DEAD FYBB WILL BE PUBLISHED SOON(ISH)
+--------
+
 FyPress (Still in development)
 --------
 [![irc #fy](https://img.shields.io/badge/IRC-fy-green.svg)](http://webchat.freenode.net/?channels=%23fy)
