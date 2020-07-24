@@ -1,4 +1,4 @@
-THIS PROJECT IS DEAD FYBB WILL BE PUBLISHED SOON(ISH) (December 2018)
+THIS PROJECT IS DEAD: Working on a new version: [Naginie](https://github.com/Fy-/Naginie)
 --------
 
 FyPress (Still in development)
